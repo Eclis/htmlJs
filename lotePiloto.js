@@ -4,9 +4,9 @@ function InserirAgendamentoRascunho() {
     $('#main [name]').each(function () {
         var $this = $(this);
 
-        if($this.is('[type=checkbox]') && $this.val() != undefined) {
+        if ($this.is('[type=checkbox]') && $this.val() != undefined) {
             campos.push([this.name, $this.is('[type=checkbox]').attr('checked')]);
-        } else if($this.val() != undefined) {
+        } else if ($this.val() != undefined) {
             campos.push([this.name, $this.val()]);
         }
     });
@@ -68,10 +68,10 @@ function CarregarAgendamento(id) {
 
             var atributos = $(Data.responseText).find('z\\:row:first').get(0).attributes;
 
-            $.each(atributos, function() {
+            $.each(atributos, function () {
                 var $elemento = $('#main [name=' + this.name.substr(4) + ' i]');
 
-                if($elemento.is('[type=checkbox]')) {
+                if ($elemento.is('[type=checkbox]')) {
                     $elemento.attr('checked', this.value == "1");
                     $elemento.change();
                 } else {
@@ -90,13 +90,51 @@ function ResetarAgendamento() {
     $('#main [name]').each(function () {
         var $this = $(this);
 
-        if($this.is('[type=checkbox]')) {
+        if ($this.is('[type=checkbox]')) {
             $this.attr('checked', false);
             $this.change();
         } else {
             $this.val('');
         }
     });
+}
+
+function CarregarFabricas() {
+    var $promise = $.Deferred();
+    $().SPServices({
+        operation: 'GetListItems',
+        listName: 'Fabricas',
+        CAMLQuery: '<Query><OrderBy><FieldRef Name="ID" /></OrderBy></Query>',
+        CAMLViewFields: '<ViewFields><FieldRef Name="ID" /><FieldRef Name="Title" /></ViewFields>',
+        completefunc: function (Data, Status) {
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
+                });
+
+                return;
+            }
+
+            // var atributos = $(Data.responseText).find('z\\:row:first').get(0).attributes;
+
+            // $.each(atributos, function () {
+            //     var $elemento = $('#main [name=' + this.name.substr(4) + ' i]');
+
+            //     if ($elemento.is('[type=checkbox]')) {
+            //         $elemento.attr('checked', this.value == "1");
+            //         $elemento.change();
+            //     } else {
+            //         $elemento.val(this.value);
+            //     }
+            // });
+
+            $promise.resolve();
+        }
+    });
+
+    return $promise;
+
 }
 
 function CarregarListaStatus() {
@@ -107,6 +145,34 @@ function CarregarListaStatus() {
             if (Status == 'success') {
                 $(Data.responseXML).find('Field[DisplayName="Status"] CHOICE').each(function () {
                     $('select#status').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+                });
+            }
+        }
+    });
+};
+
+function CarregarListaMotivos() {
+    $().SPServices({
+        operation: 'GetList',
+        listName: 'Agendamentos',
+        completefunc: function (Data, Status) {
+            if (Status == 'success') {
+                $(Data.responseXML).find('Field[DisplayName="Motivo "] CHOICE').each(function () {
+                    $('select#motivo').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+                });
+            }
+        }
+    });
+};
+
+function CarregarListaTiposLotes() {
+    $().SPServices({
+        operation: 'GetList',
+        listName: 'Agendamentos',
+        completefunc: function (Data, Status) {
+            if (Status == 'success') {
+                $(Data.responseXML).find('Field[DisplayName="Tipo de Lote "] CHOICE').each(function () {
+                    $('select#tipoDeLote').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
                 });
             }
         }
@@ -139,12 +205,26 @@ function CarregarLinhasDoProduto() {
             }
         }
     });
+    $().SPServices({
+        operation: "GetList",
+        listName: "Agendamentos",
+        completefunc: function (Data, Status) {
+            if (Status == 'success') {
+                $(Data.responseXML).find('Field[DisplayName="Linha do produto"] CHOICE').each(function () {
+                    $('select#linhaDoProduto').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+                });
+            }
+        }
+    });
 };
 
 $(document).ready(function () {
     CarregarLinhasDoProduto();
     CarregarCategoriaProjeto();
     CarregarListaStatus();
+    CarregarListaTiposLotes();
+    CarregarListaMotivos();
+    
 
     $("#tabs").tabs();
     $("#agendamentoDataInicioProgramado").datepicker();
