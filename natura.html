@@ -1,0 +1,435 @@
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script type="text/javascript" src="/_layouts/15/MicrosoftAjax.js"></script>
+<script type="text/javascript" src="/_layouts/15/sp.runtime.js"></script>
+<script type="text/javascript" src="/_layouts/15/sp.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.SPServices/2014.02/jquery.SPServices.js"></script>
+<script src="https://naturabr.sharepoint.com/sites/DEV_LotePiloto/_layouts/15/download.aspx?SourceUrl=%2Fsites%2FDEV%5FLotePiloto%2FSiteAssets%2FJS%2FlotePiloto%2Ejs"></script>
+<style>
+    .grid {
+        margin: 20px 8px 8px 20px !important;
+        overflow: auto !important;
+    }
+
+    .cabecalho {
+        margin-bottom: 20px;
+    }
+
+    .cabecalho > div {
+        display: inline-block;
+    }
+
+    .title {
+        font-weight: bold;
+    }
+
+    .ui-widget-header {
+        border: 0;
+        background: #FFFFFF;
+    }
+
+    .ui-corner-all, .ui-corner-top, .ui-corner-right, .ui-corner-tr {
+        border-top-right-radius: 0px;
+    }
+
+    .ui-corner-all, .ui-corner-top, .ui-corner-left, .ui-corner-tl {
+        border-top-left-radius: 0px;
+    }
+
+    .ui-tabs .ui-tabs-nav {
+        text-align: center;
+    }
+
+    .ui-tabs .ui-tabs-nav li {
+        border-bottom-width: 1px;
+        float: none !important;
+        display: inline-block;
+    }
+
+    .ui-widget.ui-widget-content {
+        border: 0px;
+    }
+
+    .ui-state-default a, .ui-state-default a:link, .ui-state-default a:visited, a.ui-button, a:link.ui-button, a:visited.ui-button, .ui-button {
+        color: #FFFFFF;
+    }
+
+    #tabs li {
+        background: #CACACA;
+        border-color: #000000;
+    }
+
+    #tabs li.ui-state-active {
+        background: #AC3E0B;
+        border-color: #000000;
+    }
+
+    #tabs li:hover {
+        background: #DD4F0E;
+        border-color: #DD4F0E;
+    }
+
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 34px;
+    }
+
+    /* Hide default HTML checkbox */
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    /* The slider */
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        -webkit-transition: .4s;
+        transition: .4s;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        -webkit-transition: .4s;
+        transition: .4s;
+    }
+
+    input:checked + .slider {
+        background-color: #2196F3;
+    }
+
+    input:focus + .slider {
+        box-shadow: 0 0 1px #2196F3;
+    }
+
+    input:checked + .slider:before {
+        -webkit-transform: translateX(26px);
+        -ms-transform: translateX(26px);
+        transform: translateX(26px);
+    }
+
+    /* Rounded sliders */
+    .slider.round {
+        border-radius: 34px;
+    }
+
+    .slider.round:before {
+        border-radius: 50%;
+    }
+
+    .classTabs {
+        width: 100%;
+    }
+</style>
+<div id="main">
+    <table>
+        <tbody>
+            <tr>
+                <td>
+                    <div id="lblLabelId">ID</div>
+                </td>
+                <td>
+                    <div id="lblLabelTitle">* Título</div>
+                </td>
+                <td>
+                    <div id="lblLabelStatus">Status</div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div id="txtValueId">123</div>
+                    <div id="lblMsgId"></div>
+                </td>
+                <td>
+                    <div id="txtValueTitle">
+                        <input id="agTitle" type="text" name="Title" />
+                    </div>
+                    <div id="lblMsgTitle"></div>
+                </td>
+                <td>
+                    <div id="lblValueStatus">
+                        <input id="agStatus" type="text" name="Status" />
+                    </div>
+                    <div id="lblMsgTitle"></div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div id="tabs" class="${ styles.classTabs}">
+        <ul>
+            <li>
+                <a href="#tab-Produto">Produto</a>
+            </li>
+            <li>
+                <a href="#tab-Agendamento">Agendamento</a>
+            </li>
+            <li>
+                <a href="#tab-Responsaveis">Responsáveis</a>
+            </li>
+            <li>
+                <a href="#tab-Acompanhamento">Acompanhamento</a>
+            </li>
+            <li>
+                <a href="#tab-Historico">Histórico</a>
+            </li>
+        </ul>
+        <div id="tab-Produto">
+            <h1>Produto</h1>
+            <div>
+                <div class="title">Linha do produto</div>
+                <div>
+                    <select id="linhaDoProduto" name="LinhaProduto"></select>
+                </div>
+            </div>
+            <div id="produtoControlDescricao">
+                <div id="produtoDescricaoLabel" class="title">Descrição do produto</div>
+                <div id="produtoDescricaoField">
+                    <input id="produtoDescricao" runat="server" name="DescricaoProduto"/>
+                </div>
+            </div>
+            <div id="produtoControlProjeto">
+                <div id="produtoProjetoLabel" class="title">Projeto</div>
+                <div id="produtoProjetoField">
+                    <input id="produtoProjeto" runat="server" name="Projeto"/>
+                </div>
+            </div>
+            <div>
+                <div class="title">Categoria do projeto</div>
+                <div>
+                    <select id="categoriaDoProjeto" name="CategoriaProjeto"></select>
+                </div>
+            </div>
+            <div id="produtoControlTipoLote">
+                <div id="produtoTipoLoteLabel" class="title">Tipo de Lote</div>
+                <div id="produtoTipoLoteField">
+                    <select id="tipoDeLote" name="TipoLote"></select>
+                </div>
+            </div>
+            <div id="produtoControlFormula">
+                <div id="produtoFormulaLabel" class="title">Fórmula</div>
+                <div id="produtoFormulaField">
+                    <input id="produtoFormula" runat="server" name="Formula"/>
+                </div>
+            </div>
+            <div id="produtoControlQuantidade">
+                <div id="produtoQuantidadeLabel" class="title">Quantidade (peças)</div>
+                <div id="produtoQuantidadeField">
+                    <input id="produtoQuantidade" runat="server" name="QuantidadePecas"/>
+                </div>
+            </div>
+            <div id="produtoControlMotivo">
+                <div id="produtoMotivoLabel" class="title">Motivo</div>
+                <div id="produtoMotivoField">
+                    <select id="motivo" name="Motivo"></select>
+                </div>
+            </div>
+            <div id="produtoControlEnvioAmostras">
+                <div id="produtoEnvioAmostrasLabel" class="title">Solicitação de envio de amostras</div>
+                <label class="${ styles.switch}">
+                    <input id="produtoEnvioAmostras" type="checkbox" name="EnvioAmostras">
+                    <span class="${ styles.slider} ${ styles.round}"></span>
+                </label>
+            </div>
+            <div id="produtoControlResponsavelAmostra">
+                <div id="produtoResponsavelAmostraLabel" class="title">Responsável pela amostra</div>
+                <div id="produtoResponsavelAmostraField">
+                    <input id="produtoResponsavelAmostra" runat="server" name="ResponsavelAmostra"/>
+                </div>
+            </div>
+            <div id="produtoControlQuantidadeAmostra">
+                <div id="produtoQuantidadeAmostraLabel" class="title">Quantidade de amostras</div>
+                <div id="produtoQuantidadeAmostraField">
+                    <input id="produtoQuantidadeAmostra" runat="server" name="QuantidadeAmostra"/>
+                </div>
+            </div>
+        </div>
+        <div id="tab-Agendamento">
+            <h1>Agendamento</h1>
+            <div id="agendamentoControlFabrica">
+                <div id="agendamentoFabricaLabel" class="title">Fábrica</div>
+                <div id="agendamentoFabricaField">
+                    <select id="fabrica" name="Fabrica"></select>
+                </div>
+            </div>
+            <div id="agendamentoControlLinhaEquipamento">
+                <div id="agendamentoLinhaEquipamentoLabel" class="title">Linha ou Equipamento</div>
+                <div id="agendamentoLinhaEquipamentoField">
+                    <select id="linhaEquipamento" name="LinhaEquipamento"></select>
+                </div>
+            </div>
+            <div id="agendamentoControlCentroCusto">
+                <div id="agendamentoCentroCustoLabel" class="title">Centro de custo – PEP – NT</div>
+                <div id="agendamentoCentroCustoField">
+                    <input id="agendamentoCentroCusto" runat="server" name="CentroCusto"/>
+                </div>
+            </div>
+            <div id="agendamentoControlGrauComplexidade">
+                <div id="agendamentoGrauComplexidadeLabel" class="title">Grau de complexidade</div>
+                <div id="agendamentoGrauComplexidadeField">
+                    <select id="grauComplexidade" name="GrauComplexidade"></select>
+                </div>
+            </div>
+            <div id="agendamentoControlDataInicioProgramado">
+                <div id="agendamentoDataInicioProgramadoLabel" class="title">Início programado</div>
+                <div id="agendamentoDataInicioProgramadoField">
+                    <input id="agendamentoDataInicioProgramado" name="InicioProgramado" runat="server" />
+                </div>
+                <div id="agendamentoDataInicioProgramadoHora">
+                    <select id="inicioProgramadoHoras" name="InicioProgramadoHoras"></select>
+                </div>
+                <div id="agendamentoDataInicioProgramadoMinuto">
+                    <select id="inicioProgramadoMinutos" name="InicioProgramadoMinutos"></select>
+                </div>
+            </div>
+            <div id="agendamentoControlDuracaoHora">
+                <div id="agendamentoDuracaoHoraLabel" class="title">Duração (hh)</div>
+                <div id="agendamentoDuracaoHoraField">
+                    <input id="agendamentoDuracaoHora" runat="server" name="DuracaoEstimadaHoras"/>
+                </div>
+            </div>
+            <div id="agendamentoControlDuracaoMinuto">
+                <div id="agendamentoDuracaoMinutoLabel" class="title">Duração (mm)</div>
+                <div id="agendamentoDuracaoMinutoField">
+                    <input id="agendamentoDuracaoMinuto" runat="server" name="DuracaoEstimadaMinutos"/>
+                </div>
+            </div>
+            <div id="agendamentoControlFim">
+                <div id="agendamentoFimLabel" class="title">Fim programado (calculado)</div>
+                <div id="agendamentoFimField">
+                    <div id="agendamentoFim"></div>
+                </div>
+            </div>
+            <div id="agendamentoControlObservacoes">
+                <div id="agendamentoObservacoesLabel" class="title">Observações</div>
+                <div id="agendamentoObservacoesField">
+                    <input id="agendamentoObservacoes" runat="server" name="Observacoes" />
+                </div>
+            </div>
+        </div>
+        <div id="tab-Responsaveis">
+            <div>
+                <div class="title">Tipo de Lote</div>
+                <div>
+                    <select id="tipoDeLote">
+                        <option value="Brinde">Brinde</option>
+                        <option value="Envase">Envase</option>
+                        <option value="Fabricação">Fabricação</option>
+                        <option value="Picking">Picking</option>
+                    </select>
+                </div>
+            </div>
+            <div id="tabsResponsaveis" class="${ styles.classTabs}">
+                <ul>
+                    <li>
+                        <a href="#tab-RespDLPCL">DL/PCL</a>
+                    </li>
+                    <li>
+                        <a href="#tab-RespEngEnv">Eng. Envase</a>
+                    </li>
+                    <li>
+                        <a href="#tab-RespEngFab">Eng. Fabricação</a>
+                    </li>
+                    <li>
+                        <a href="#tab-RespInvDF">Inov. DF</a>
+                    </li>
+                    <li>
+                        <a href="#tab-RespQual">Qualidade</a>
+                    </li>
+                    <li>
+                        <a href="#tab-RespFab">Fábrica</a>
+                    </li>
+                </ul>
+                <div id="tab-RespDLPCL">
+                    <h1>DL/PCL</h1>
+                </div>
+                <div id="tab-RespEngEnv">
+                    <h1>Eng. Envase</h1>
+                </div>
+                <div id="tab-RespEngFab">
+                    <h1>Eng. Fabricação</h1>
+                </div>
+                <div id="tab-RespInvDF">
+                    <h1>Inov. DF</h1>
+                </div>
+                <div id="tab-RespQual">
+                    <h1>Qualidade</h1>
+                </div>
+                <div id="tab-RespFab">
+                    <h1>Fábrica</h1>
+                </div>
+            </div>
+        </div>
+        <div id="tab-Acompanhamento">
+            <div id="tabsAcompanhamento" class="${ styles.classTabs}">
+                <ul>
+                    <li>
+                        <a href="#tab-AcompDLPCL">DL/PCL</a>
+                    </li>
+                    <li>
+                        <a href="#tab-AcompEngEnv">Eng. Envase</a>
+                    </li>
+                    <li>
+                        <a href="#tab-AcompEngFab">Eng. Fabricação</a>
+                    </li>
+                    <li>
+                        <a href="#tab-AcompInvDE">Inov. DE</a>
+                    </li>
+                    <li>
+                        <a href="#tab-AcompInvDF">Inov. DF</a>
+                    </li>
+                    <li>
+                        <a href="#tab-AcompQual">Qualidade</a>
+                    </li>
+                    <li>
+                        <a href="#tab-AcompFab">Fábrica</a>
+                    </li>
+                    <li>
+                        <a href="#tab-AcompMeioAmb">Meio Ambiente</a>
+                    </li>
+                </ul>
+                <div id="tab-AcompDLPCL">
+                    <h1>DL/PCL</h1>
+                </div>
+                <div id="tab-AcompEngEnv">
+                    <h1>Eng. Envase</h1>
+                </div>
+                <div id="tab-AcompEngFab">
+                    <h1>Eng. Fabricação</h1>
+                </div>
+                <div id="tab-AcompInvDE">
+                    <h1>Inov. DE</h1>
+                </div>
+                <div id="tab-AcompInvDF">
+                    <h1>Inov. DF</h1>
+                </div>
+                <div id="tab-AcompQual">
+                    <h1>Qualidade</h1>
+                </div>
+                <div id="tab-AcompFab">
+                    <h1>Fábrica</h1>
+                </div>
+                <div id="tab-AcompMeioAmb">
+                    <h1>Meio Ambiente</h1>
+                </div>
+            </div>
+        </div>
+        <div id="tab-Historico">
+            <h1>Histórico</h1>
+        </div>
+    </div>
+</div>
