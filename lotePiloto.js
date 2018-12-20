@@ -4,9 +4,9 @@ function InserirAgendamento() {
     $('#main [name]').each(function () {
         var $this = $(this);
 
-        if ($this.is('[type=checkbox]') && $this.val() != undefined) {
-            campos.push([this.name, $this.is('[type=checkbox]').attr('checked')]);
-        } else if ($this.val() != undefined) {
+        if($this.is('[type=checkbox]') && $this.val() != undefined) {
+            campos.push([this.name, $this.attr('checked')]);
+        } else if($this.val() != undefined) {
             campos.push([this.name, $this.val()]);
         }
     });
@@ -79,10 +79,10 @@ function CarregarAgendamento(id) {
 
             var atributos = $registro.get(0).attributes;
 
-            $.each(atributos, function () {
+            $.each(atributos, function() {
                 var $elemento = $('#main [name=' + this.name.substr(4) + ' i]');
 
-                if ($elemento.is('[type=checkbox]')) {
+                if($elemento.is('[type=checkbox]')) {
                     $elemento.attr('checked', this.value == "1");
                     $elemento.change();
                 } else {
@@ -101,7 +101,7 @@ function ResetarAgendamento() {
     $('#main [name]').each(function () {
         var $this = $(this);
 
-        if ($this.is('[type=checkbox]')) {
+        if($this.is('[type=checkbox]')) {
             $this.attr('checked', false);
             $this.change();
         } else {
@@ -216,17 +216,6 @@ function CarregarLinhasDoProduto() {
             }
         }
     });
-    $().SPServices({
-        operation: "GetList",
-        listName: "Agendamentos",
-        completefunc: function (Data, Status) {
-            if (Status == 'success') {
-                $(Data.responseXML).find('Field[DisplayName="Linha do produto"] CHOICE').each(function () {
-                    $('select#linhaDoProduto').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
-                });
-            }
-        }
-    });
 };
 
 function EscolherAgendamento() {
@@ -247,7 +236,7 @@ $(document).ready(function () {
     CarregarListaStatus();
     CarregarListaTiposLotes();
     CarregarListaMotivos();
-    
+
 
     $("#tabs").tabs();
     $("#agendamentoDataInicioProgramado").datepicker();
