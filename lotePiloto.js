@@ -1,4 +1,4 @@
-function InserirAgendamentoRascunho() {
+function InserirAgendamento() {
     var campos = [];
 
     $('#main [name]').each(function () {
@@ -66,7 +66,18 @@ function CarregarAgendamento(id) {
                 return;
             }
 
-            var atributos = $(Data.responseText).find('z\\:row:first').get(0).attributes;
+            var $registro = $(Data.responseText).find('z\\:row:first');
+
+            if (!$registro.size()) {
+                $promise.reject({
+                    errorCode: '0x99999998',
+                    errorText: 'Registro não encontrado'
+                });
+
+                return;
+            }
+
+            var atributos = $registro.get(0).attributes;
 
             $.each(atributos, function () {
                 var $elemento = $('#main [name=' + this.name.substr(4) + ' i]');
@@ -218,6 +229,18 @@ function CarregarLinhasDoProduto() {
     });
 };
 
+function EscolherAgendamento() {
+    var agendamentoId = prompt('Digite o ID do agendamento');
+
+    if(agendamentoId) {
+        ResetarAgendamento();
+
+        CarregarAgendamento(agendamentoId).fail(function (response) {
+            alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
+        });
+    }
+};
+
 $(document).ready(function () {
     CarregarLinhasDoProduto();
     CarregarCategoriaProjeto();
@@ -298,7 +321,7 @@ $(document).ready(function () {
     $('#tipoDeLote').change();
 
     $('#btnSalvar').click(function () {
-        InserirAgendamentoRascunho().then(function (response) {
+        InserirAgendamento().then(function (response) {
             CarregarAgendamento(response.record.attr('ows_ID')).then(function () {
                 alert("Agendamento Salvo como rascunho");
             });
@@ -310,8 +333,10 @@ $(document).ready(function () {
     });
 
     $('#btnCarregar').click(function () {
-        CarregarAgendamento(prompt('Digite o ID do agendamento')).fail(function () {
-            alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
-        });
+        EscolherAgendamento();
     });
+
+    if(!$('[type="text"][name="ID"]').val()) {
+        EscolherAgendamento();
+    }
 });
