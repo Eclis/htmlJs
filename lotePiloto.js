@@ -1,17 +1,17 @@
-function InserirAgendamentoRascunho()
-{
+function InserirAgendamentoRascunho() {
     var campos = [];
 
     $('#main [name]').each(function () {
         var $this = $(this);
-        if($this.is('select') && $this.find(':checked').val() != undefined) {
-            campos.push([this.name, $this.find(':checked').val()]);
-        } else if($this.is('[type=checkbox]') && $this.val() != undefined) {
-            campos.push([this.name, ($this.is('[type=checkbox]') == 'on')? 1 : 0]);
+
+        if($this.is('[type=checkbox]') && $this.val() != undefined) {
+            campos.push([this.name, $this.is('[type=checkbox]').attr('checked')]);
         } else if($this.val() != undefined) {
             campos.push([this.name, $this.val()]);
         }
     });
+
+    var $promise = $.Deferred();
 
     $().SPServices({
         operation: "UpdateListItems",
@@ -20,12 +20,97 @@ function InserirAgendamentoRascunho()
         listName: "Agendamentos",
         valuepairs: campos,
         completefunc: function (xData, Status) {
-            alert("Agendamento Salvo como rascunho");
-            window.fuck = xData;
-            window.fuck2 = Status;
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
+                });
+
+                return;
+            }
+
+            var $response = $(xData.responseText);
+            var errorCode = $response.find('ErrorCode').text();
+
+            if (errorCode == '0x00000000') {
+                $promise.resolve({
+                    record: $response.find('z\\:row:first')
+                });
+            } else {
+                $promise.reject({
+                    errorCode: errorCode,
+                    errorText: $response.find('ErrorText').text()
+                });
+            }
         }
     });
 
+    return $promise;
+};
+
+function CarregarAgendamento(id) {
+    var $promise = $.Deferred();
+
+    $().SPServices({
+        operation: 'GetListItems',
+        listName: 'Agendamentos',
+        CAMLQuery: '<Query><Where><Eq><FieldRef Name="ID" /><Value Type="Number">' + id + '</Value></Eq></Where></Query>',
+        CAMLViewFields: '<ViewFields><FieldRef Name="Title" /><FieldRef Name="CodigoProduto" /><FieldRef Name="LinhaProduto" /><FieldRef Name="DescricaoProduto" /><FieldRef Name="Projeto" /><FieldRef Name="CategoriaProjeto" /><FieldRef Name="Motivo" /><FieldRef Name="TipoLote" /><FieldRef Name="QuantidadePecas" /><FieldRef Name="Formula" /><FieldRef Name="EnvioAmostras" /><FieldRef Name="ResponsavelAmostra" /><FieldRef Name="QuantidadeAmostra" /><FieldRef Name="InicioProgramado" /><FieldRef Name="DuracaoEstimadaHoras" /><FieldRef Name="DuracaoEstimadaMinutos" /><FieldRef Name="FimProgramado" /><FieldRef Name="Fabrica" /><FieldRef Name="LinhaEquipamento" /><FieldRef Name="CentroCusto" /><FieldRef Name="GrauComplexidade" /><FieldRef Name="MaoObra" /><FieldRef Name="Observacoes" /><FieldRef Name="Status" /><FieldRef Name="EngenhariaFabricacaoAcompanhamen" /><FieldRef Name="EngenhariaEnvaseAcompanhamento" /><FieldRef Name="InovacaoDfAcompanhamento" /><FieldRef Name="InovacaoDeAcompanhamento" /><FieldRef Name="QualidadeAcompanhamento" /><FieldRef Name="FabricaAcompanhamento" /><FieldRef Name="CodigoAgendamento" /><FieldRef Name="NaoExecutadoMotivo" /><FieldRef Name="NaoExecutadoComentarios" /><FieldRef Name="CanceladoMotivo" /><FieldRef Name="CanceladoComentarios" /><FieldRef Name="ReagendamentoContador" /><FieldRef Name="CalendarioTitulo" /><FieldRef Name="CalendarioSubtitulo" /><FieldRef Name="Executado" /><FieldRef Name="MeioAmbienteAcompanhamento" /><FieldRef Name="RegistroAnalisesInicio" /><FieldRef Name="Modified" /><FieldRef Name="Created" /><FieldRef Name="Author" /><FieldRef Name="Editor" /></ViewFields>',
+        completefunc: function (Data, Status) {
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
+                });
+
+                return;
+            }
+
+            var atributos = $(Data.responseText).find('z\\:row:first').get(0).attributes;
+
+            $.each(atributos, function() {
+                var $elemento = $('#main [name=' + this.name.substr(4) + ' i]');
+
+                if($elemento.is('[type=checkbox]')) {
+                    $elemento.attr('checked', this.value == "1");
+                    $elemento.change();
+                } else {
+                    $elemento.val(this.value);
+                }
+            });
+
+            $promise.resolve();
+        }
+    });
+
+    return $promise;
+};
+
+function ResetarAgendamento() {
+    $('#main [name]').each(function () {
+        var $this = $(this);
+
+        if($this.is('[type=checkbox]')) {
+            $this.attr('checked', false);
+            $this.change();
+        } else {
+            $this.val('');
+        }
+    });
+}
+
+function CarregarListaStatus() {
+    $().SPServices({
+        operation: 'GetList',
+        listName: 'Agendamentos',
+        completefunc: function (Data, Status) {
+            if (Status == 'success') {
+                $(Data.responseXML).find('Field[DisplayName="Status"] CHOICE').each(function () {
+                    $('select#status').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+                });
+            }
+        }
+    });
 };
 
 function CarregarCategoriaProjeto() {
@@ -59,6 +144,7 @@ function CarregarLinhasDoProduto() {
 $(document).ready(function () {
     CarregarLinhasDoProduto();
     CarregarCategoriaProjeto();
+    CarregarListaStatus();
 
     $("#tabs").tabs();
     $("#agendamentoDataInicioProgramado").datepicker();
@@ -130,4 +216,16 @@ $(document).ready(function () {
     });
 
     $('#tipoDeLote').change();
+
+    $('#btnSalvar').click(function () {
+        InserirAgendamentoRascunho().then(function (response) {
+            CarregarAgendamento(response.record.attr('ows_ID')).then(function () {
+                alert("Agendamento Salvo como rascunho");
+            });
+        }).fail(function (response) {
+            alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
+        });
+
+        return false;
+    });
 });

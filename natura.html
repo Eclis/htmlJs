@@ -153,7 +153,9 @@
             </tr>
             <tr>
                 <td>
-                    <div id="txtValueId">123</div>
+                    <div id="txtValueId">
+                        <input type="text" name="ID" readonly />
+                    </div>
                     <div id="lblMsgId"></div>
                 </td>
                 <td>
@@ -164,14 +166,16 @@
                 </td>
                 <td>
                     <div id="lblValueStatus">
-                        <input id="agStatus" type="text" name="Status" />
+                        <select id="status" name="Status">
+                            <option disabled selected>Selecione uma opção</option>
+                        </select>
                     </div>
                     <div id="lblMsgTitle"></div>
                 </td>
             </tr>
         </tbody>
     </table>
-    <div id="tabs" class="${ styles.classTabs}">
+    <div id="tabs">
         <ul>
             <li>
                 <a href="#tab-Produto">Produto</a>
@@ -194,7 +198,9 @@
             <div>
                 <div class="title">Linha do produto</div>
                 <div>
-                    <select id="linhaDoProduto" name="LinhaProduto"></select>
+                    <select id="linhaDoProduto" name="LinhaProduto">
+                        <option disabled selected>Selecione uma opção</option>
+                    </select>
                 </div>
             </div>
             <div id="produtoControlDescricao">
@@ -212,13 +218,17 @@
             <div>
                 <div class="title">Categoria do projeto</div>
                 <div>
-                    <select id="categoriaDoProjeto" name="CategoriaProjeto"></select>
+                    <select id="categoriaDoProjeto" name="CategoriaProjeto">
+                        <option disabled selected>Selecione uma opção</option>
+                    </select>
                 </div>
             </div>
             <div id="produtoControlTipoLote">
                 <div id="produtoTipoLoteLabel" class="title">Tipo de Lote</div>
                 <div id="produtoTipoLoteField">
-                    <select id="tipoDeLote" name="TipoLote"></select>
+                    <select id="tipoDeLote" name="TipoLote">
+                        <option disabled selected>Selecione uma opção</option>
+                    </select>
                 </div>
             </div>
             <div id="produtoControlFormula">
@@ -236,7 +246,9 @@
             <div id="produtoControlMotivo">
                 <div id="produtoMotivoLabel" class="title">Motivo</div>
                 <div id="produtoMotivoField">
-                    <select id="motivo" name="Motivo"></select>
+                    <select id="motivo" name="Motivo">
+                        <option disabled selected>Selecione uma opção</option>
+                    </select>
                 </div>
             </div>
             <div id="produtoControlEnvioAmostras">
@@ -433,4 +445,5 @@
             <h1>Histórico</h1>
         </div>
     </div>
+    <a id="btnSalvar" href="#" class="btn btn-primary" role="button">Salvar</a>
 </div>
