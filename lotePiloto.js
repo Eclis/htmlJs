@@ -5,7 +5,7 @@ function InserirAgendamento() {
         var $this = $(this);
 
         if($this.is('[type=checkbox]') && $this.val() != undefined) {
-            campos.push([this.name, $this.attr('checked')]);
+            campos.push([this.name, $this.val() == 'on']);
         } else if($this.val() != undefined) {
             campos.push([this.name, $this.val()]);
         }
