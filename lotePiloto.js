@@ -182,7 +182,7 @@ function CarregarListaTiposLotes() {
         listName: 'Agendamentos',
         completefunc: function (Data, Status) {
             if (Status == 'success') {
-                $(Data.responseXML).find('Field[DisplayName="Tipo de Lote "] CHOICE').each(function () {
+                $(Data.responseXML).find('Field[DisplayName="Tipo de Lote"] CHOICE').each(function () {
                     $('select#tipoDeLote').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
                 });
             }

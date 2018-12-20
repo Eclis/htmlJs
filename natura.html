@@ -150,6 +150,9 @@
                 <td>
                     <div id="lblLabelStatus">Status</div>
                 </td>
+                <td>
+                    <div>Tipo de Lote</div>
+                </td>
             </tr>
             <tr>
                 <td>
@@ -171,6 +174,13 @@
                         </select>
                     </div>
                     <div id="lblMsgTitle"></div>
+                </td>
+                <td>
+                    <div>
+                        <select id="tipoDeLote" name="TipoLote">
+                            <option disabled selected>Selecione uma opção</option>
+                        </select>
+                    </div>
                 </td>
             </tr>
         </tbody>
@@ -219,14 +229,6 @@
                 <div class="title">Categoria do projeto</div>
                 <div>
                     <select id="categoriaDoProjeto" name="CategoriaProjeto">
-                        <option disabled selected>Selecione uma opção</option>
-                    </select>
-                </div>
-            </div>
-            <div id="produtoControlTipoLote">
-                <div id="produtoTipoLoteLabel" class="title">Tipo de Lote</div>
-                <div id="produtoTipoLoteField">
-                    <select id="tipoDeLote" name="TipoLote">
                         <option disabled selected>Selecione uma opção</option>
                     </select>
                 </div>
@@ -335,18 +337,7 @@
             </div>
         </div>
         <div id="tab-Responsaveis">
-            <div>
-                <div class="title">Tipo de Lote</div>
-                <div>
-                    <select id="tipoDeLote">
-                        <option value="Brinde">Brinde</option>
-                        <option value="Envase">Envase</option>
-                        <option value="Fabricação">Fabricação</option>
-                        <option value="Picking">Picking</option>
-                    </select>
-                </div>
-            </div>
-            <div id="tabsResponsaveis" class="${ styles.classTabs}">
+            <div id="tabsResponsaveis">
                 <ul>
                     <li>
                         <a href="#tab-RespDLPCL">DL/PCL</a>
@@ -388,7 +379,7 @@
             </div>
         </div>
         <div id="tab-Acompanhamento">
-            <div id="tabsAcompanhamento" class="${ styles.classTabs}">
+            <div id="tabsAcompanhamento">
                 <ul>
                     <li>
                         <a href="#tab-AcompDLPCL">DL/PCL</a>
