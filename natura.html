@@ -20,7 +20,7 @@
         margin-bottom: 20px;
     }
 
-    .cabecalho > div {
+    .cabecalho>div {
         display: inline-block;
     }
 
@@ -33,11 +33,17 @@
         background: #FFFFFF;
     }
 
-    .ui-corner-all, .ui-corner-top, .ui-corner-right, .ui-corner-tr {
+    .ui-corner-all,
+    .ui-corner-top,
+    .ui-corner-right,
+    .ui-corner-tr {
         border-top-right-radius: 0px;
     }
 
-    .ui-corner-all, .ui-corner-top, .ui-corner-left, .ui-corner-tl {
+    .ui-corner-all,
+    .ui-corner-top,
+    .ui-corner-left,
+    .ui-corner-tl {
         border-top-left-radius: 0px;
     }
 
@@ -55,7 +61,13 @@
         border: 0px;
     }
 
-    .ui-state-default a, .ui-state-default a:link, .ui-state-default a:visited, a.ui-button, a:link.ui-button, a:visited.ui-button, .ui-button {
+    .ui-state-default a,
+    .ui-state-default a:link,
+    .ui-state-default a:visited,
+    a.ui-button,
+    a:link.ui-button,
+    a:visited.ui-button,
+    .ui-button {
         color: #FFFFFF;
     }
 
@@ -82,6 +94,7 @@
     }
 
     /* Hide default HTML checkbox */
+
     .switch input {
         opacity: 0;
         width: 0;
@@ -89,6 +102,7 @@
     }
 
     /* The slider */
+
     .slider {
         position: absolute;
         cursor: pointer;
@@ -113,21 +127,22 @@
         transition: .4s;
     }
 
-    input:checked + .slider {
+    input:checked+.slider {
         background-color: #2196F3;
     }
 
-    input:focus + .slider {
+    input:focus+.slider {
         box-shadow: 0 0 1px #2196F3;
     }
 
-    input:checked + .slider:before {
+    input:checked+.slider:before {
         -webkit-transform: translateX(26px);
         -ms-transform: translateX(26px);
         transform: translateX(26px);
     }
 
     /* Rounded sliders */
+
     .slider.round {
         border-radius: 34px;
     }
@@ -219,13 +234,13 @@
             <div id="produtoControlDescricao">
                 <div id="produtoDescricaoLabel" class="title">Descrição do produto</div>
                 <div id="produtoDescricaoField">
-                    <input id="produtoDescricao" runat="server" name="DescricaoProduto"/>
+                    <input id="produtoDescricao" runat="server" name="DescricaoProduto" />
                 </div>
             </div>
             <div id="produtoControlProjeto">
                 <div id="produtoProjetoLabel" class="title">Projeto</div>
                 <div id="produtoProjetoField">
-                    <input id="produtoProjeto" runat="server" name="Projeto"/>
+                    <input id="produtoProjeto" runat="server" name="Projeto" />
                 </div>
             </div>
             <div>
@@ -239,13 +254,13 @@
             <div id="produtoControlFormula">
                 <div id="produtoFormulaLabel" class="title">Fórmula</div>
                 <div id="produtoFormulaField">
-                    <input id="produtoFormula" runat="server" name="Formula"/>
+                    <input id="produtoFormula" runat="server" name="Formula" />
                 </div>
             </div>
             <div id="produtoControlQuantidade">
                 <div id="produtoQuantidadeLabel" class="title">Quantidade (peças)</div>
                 <div id="produtoQuantidadeField">
-                    <input id="produtoQuantidade" runat="server" name="QuantidadePecas"/>
+                    <input id="produtoQuantidade" runat="server" name="QuantidadePecas" />
                 </div>
             </div>
             <div id="produtoControlMotivo">
@@ -266,13 +281,13 @@
             <div id="produtoControlResponsavelAmostra">
                 <div id="produtoResponsavelAmostraLabel" class="title">Responsável pela amostra</div>
                 <div id="produtoResponsavelAmostraField">
-                    <input id="produtoResponsavelAmostra" runat="server" name="ResponsavelAmostra"/>
+                    <input id="produtoResponsavelAmostra" runat="server" name="ResponsavelAmostra" />
                 </div>
             </div>
             <div id="produtoControlQuantidadeAmostra">
                 <div id="produtoQuantidadeAmostraLabel" class="title">Quantidade de amostras</div>
                 <div id="produtoQuantidadeAmostraField">
-                    <input id="produtoQuantidadeAmostra" runat="server" name="QuantidadeAmostra"/>
+                    <input id="produtoQuantidadeAmostra" runat="server" name="QuantidadeAmostra" />
                 </div>
             </div>
         </div>
@@ -293,7 +308,7 @@
             <div id="agendamentoControlCentroCusto">
                 <div id="agendamentoCentroCustoLabel" class="title">Centro de custo – PEP – NT</div>
                 <div id="agendamentoCentroCustoField">
-                    <input id="agendamentoCentroCusto" runat="server" name="CentroCusto"/>
+                    <input id="agendamentoCentroCusto" runat="server" name="CentroCusto" />
                 </div>
             </div>
             <div id="agendamentoControlGrauComplexidade">
@@ -317,13 +332,13 @@
             <div id="agendamentoControlDuracaoHora">
                 <div id="agendamentoDuracaoHoraLabel" class="title">Duração (hh)</div>
                 <div id="agendamentoDuracaoHoraField">
-                    <input id="agendamentoDuracaoHora" runat="server" name="DuracaoEstimadaHoras"/>
+                    <input id="agendamentoDuracaoHora" runat="server" name="DuracaoEstimadaHoras" />
                 </div>
             </div>
             <div id="agendamentoControlDuracaoMinuto">
                 <div id="agendamentoDuracaoMinutoLabel" class="title">Duração (mm)</div>
                 <div id="agendamentoDuracaoMinutoField">
-                    <input id="agendamentoDuracaoMinuto" runat="server" name="DuracaoEstimadaMinutos"/>
+                    <input id="agendamentoDuracaoMinuto" runat="server" name="DuracaoEstimadaMinutos" />
                 </div>
             </div>
             <div id="agendamentoControlFim">
@@ -355,6 +370,9 @@
                         <a href="#tab-RespInvDF">Inov. DF</a>
                     </li>
                     <li>
+                        <a href="#tab-RespInvDE">Inov. DE</a>
+                    </li>
+                    <li>
                         <a href="#tab-RespQual">Qualidade</a>
                     </li>
                     <li>
@@ -362,22 +380,96 @@
                     </li>
                 </ul>
                 <div id="tab-RespDLPCL">
-                    <h1>DL/PCL</h1>
+                    <div>
+                        <h1>DL/PCL - Responsável</h1>
+                        <div>* Pessoa</div>
+                        <div id="peoplePickerRespDLPCL"></div>
+                        <button type="button" onclick="getInfo()">Buscar Usuário</button>
+                    </div>
                 </div>
                 <div id="tab-RespEngEnv">
-                    <h1>Eng. Envase</h1>
+                    <div>
+                        <h1>Engenharia Envase - Responsável</h1>
+                        <div>* Pessoa</div>
+                        <div id="peoplePickerRespEngEnvase"></div>
+                        <button type="button" onclick="getInfo()">Buscar Usuário</button>
+                    </div>
+                    <div>
+                        <h1>Engenharia Envase - Gerente</h1>
+                        <div>* Pessoa</div>
+                        <div id="peoplePickerGerenteEngEnvase"></div>
+                        <button type="button" onclick="getInfo()">Buscar Usuário</button>
+                    </div>
                 </div>
                 <div id="tab-RespEngFab">
-                    <h1>Eng. Fabricação</h1>
+                    <div>
+                        <h1>Eng. Fabricação - Responsável</h1>
+                        <div>* Pessoa</div>
+                        <div id="peoplePickerRespDLPCL"></div>
+                        <button type="button" onclick="getInfo()">Buscar Usuário</button>
+                    </div>
+                    <div>
+                        <h1>Eng. Fabricação - Gerente</h1>
+                        <div>* Pessoa</div>
+                        <div id="peoplePickerRespDLPCL"></div>
+                        <button type="button" onclick="getInfo()">Buscar Usuário</button>
+                    </div>
                 </div>
                 <div id="tab-RespInvDF">
-                    <h1>Inov. DF</h1>
+                    <div>
+                        <h1>Inovação DF - Responsável</h1>
+                        <div>* Pessoa</div>
+                        <div id="peoplePickerRespInDF"></div>
+                        <button type="button" onclick="getInfo()">Buscar Usuário</button>
+                    </div>
+                    <div>
+                        <h1>Inovação DF - Gerente</h1>
+                        <div>* Pessoa</div>
+                        <div id="peoplePickerGerenteInDF"></div>
+                        <button type="button" onclick="getInfo()">Buscar Usuário</button>
+                    </div>
                 </div>
+                <div id="tab-RespInvDE">
+                        <div>
+                            <h1>Inovação DE - Responsável</h1>
+                            <div>* Pessoa</div>
+                            <div id="peoplePickerRespInDE"></div>
+                            <button type="button" onclick="getInfo()">Buscar Usuário</button>
+                        </div>
+                        <div>
+                            <h1>Inovação DE - Gerente</h1>
+                            <div>* Pessoa</div>
+                            <div id="peoplePickerGerenteInDE"></div>
+                            <button type="button" onclick="getInfo()">Buscar Usuário</button>
+                        </div>
+                    </div>
                 <div id="tab-RespQual">
-                    <h1>Qualidade</h1>
+                    <div>
+                        <h1>Qualidade - Responsável</h1>
+                        <div>* Pessoa</div>
+                        <div id="peoplePickerRespQualidade"></div>
+                        <button type="button" onclick="getInfo()">Buscar Usuário</button>
+                    </div>
+                    <div>
+                        <h1>Qualidade - Gerente</h1>
+                        <div>* Pessoa</div>
+                        <div id="peoplePickerGerenteQualidade"></div>
+                        <button type="button" onclick="getInfo()">Buscar Usuário</button>
+                    </div>
                 </div>
                 <div id="tab-RespFab">
-                    <h1>Fábrica</h1>
+                    <div>
+                        <h1>Fábrica - Responsável</h1>
+                        <div>* Pessoa</div>
+                        <div id="peoplePickerRespFabrica"></div>
+                        <button type="button" onclick="getInfo()">Buscar Usuário</button>
+                    </div>
+                    <div>
+                        <h1>Fábrica - Gerente</h1>
+                        <div>* Pessoa</div>
+                        <div id="peoplePickerGerenteFabrica"></div>
+                        <button type="button" onclick="getInfo()">Buscar Usuário</button>
+                    </div>
                 </div>
             </div>
         </div>
