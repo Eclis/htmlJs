@@ -325,7 +325,7 @@ $(document).ready(function () {
         EscolherAgendamento();
     });
 
-    if(!$('[type="text"][name="ID"]').val()) {
-        EscolherAgendamento();
-    }
+    // if(!$('[type="text"][name="ID"]').val()) {
+    //     EscolherAgendamento();
+    // }
 });
