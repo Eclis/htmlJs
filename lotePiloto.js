@@ -228,4 +228,10 @@ $(document).ready(function () {
 
         return false;
     });
+
+    $('#btnCarregar').click(function () {
+        CarregarAgendamento(prompt('Digite o ID do agendamento')).fail(function () {
+            alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
+        });
+    });
 });
