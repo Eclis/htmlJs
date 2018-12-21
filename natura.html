@@ -39,19 +39,24 @@
     </div>
     <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
         <li class="nav-item">
-            <a class="nav-link active" id="pills-produto-tab" data-toggle="pill" href="#pills-produto" role="tab" aria-controls="pills-produto" aria-selected="true">Produto</a>
+            <a class="nav-link active" id="pills-produto-tab" data-toggle="pill" href="#pills-produto" role="tab" aria-controls="pills-produto"
+                aria-selected="true">Produto</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="pills-agendamento-tab" data-toggle="pill" href="#pills-agendamento" role="tab" aria-controls="pills-agendamento" aria-selected="false">Agendamento</a>
+            <a class="nav-link" id="pills-agendamento-tab" data-toggle="pill" href="#pills-agendamento" role="tab" aria-controls="pills-agendamento"
+                aria-selected="false">Agendamento</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="pills-responsaveis-tab" data-toggle="pill" href="#pills-responsaveis" role="tab" aria-controls="pills-responsaveis" aria-selected="false">Responsáveis</a>
+            <a class="nav-link" id="pills-responsaveis-tab" data-toggle="pill" href="#pills-responsaveis" role="tab" aria-controls="pills-responsaveis"
+                aria-selected="false">Responsáveis</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="pills-acompanhamento-tab" data-toggle="pill" href="#pills-acompanhamento" role="tab" aria-controls="pills-acompanhamento" aria-selected="false">Acompanhamento</a>
+            <a class="nav-link" id="pills-acompanhamento-tab" data-toggle="pill" href="#pills-acompanhamento" role="tab" aria-controls="pills-acompanhamento"
+                aria-selected="false">Acompanhamento</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="pills-historico-tab" data-toggle="pill" href="#pills-historico" role="tab" aria-controls="pills-historico" aria-selected="false">Histórico</a>
+            <a class="nav-link" id="pills-historico-tab" data-toggle="pill" href="#pills-historico" role="tab" aria-controls="pills-historico"
+                aria-selected="false">Histórico</a>
         </li>
     </ul>
     <div class="tab-content" id="pills-tabContent">
@@ -214,12 +219,30 @@
                     </li>
                 </ul>
                 <div id="tab-RespDLPCL">
-                    <div>
-                        <h1>DL/PCL - Responsável</h1>
-                        <div>* Pessoa</div>
-                        <div id="peoplePickerRespDLPCL"></div>
-                        <button type="button" onclick="getInfo()">Buscar Usuário</button>
+                    <div class="form-group">
+                        <label id="Name">
+                            Pessoa
+                            <span class="error-msg">*</span>
+                        </label>
+                        <div id="peoplePickerDiv"></div>
+                        <input type="hidden" id="siteOwenerId" value="" />
+                        <input type="hidden" id="siteOwenerEmail" value="" />
+                        <input type="hidden" id="siteOwenerClaim" value="" />
+                        <input type="hidden" id="siteOwenerName" value="" />
+                        <input type="hidden" id="siteOwenerLogin" value="" />
+                        <div>
+                            <br />
+                            <input type="button" value="Get User Info" onclick="getUserInfo()" />
+                            <br />
+                            <h1>User info:</h1>
+                            <p id="resolvedUsers"></p>
+                            <h1>User keys:</h1>
+                            <p id="userKeys"></p>
+                            <h1>User ID:</h1>
+                            <p id="userId"></p>
+                        </div>
                     </div>
+
                 </div>
                 <div id="tab-RespEngEnv">
                     <div>
