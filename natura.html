@@ -62,7 +62,8 @@
         </li>
     </ul>
     <div class="tab-content" id="pills-tabContent">
-        <div class="tab-pane fade show active" id="pills-produto" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel" aria-labelledby="pills-produto-tab">.
+        <div class="tab-pane fade show active" id="pills-produto" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel"
+            aria-labelledby="pills-produto-tab">.
             <div class="row">
                 <div class="col-md-6">
                     <label for="codigoProduto">Código do produto</label>
@@ -103,7 +104,7 @@
                     <input type="text" class="form-control" id="produtoQuantidade" name="QuantidadePecas">
                 </div>
             </div>
-             <div class="row" style="margin-top: 10px;">
+            <div class="row" style="margin-top: 10px;">
                 <div class="col-md-6">
                     <label for="categoriaDoProjeto">Motivo</label>
                     <select class="custom-select" id="motivo" name="Motivo">
@@ -219,30 +220,16 @@
                     </li>
                 </ul>
                 <div id="tab-RespDLPCL">
-                    <div class="form-group">
-                        <label id="Name">
-                            Pessoa
-                            <span class="error-msg">*</span>
-                        </label>
-                        <div id="peoplePickerDiv"></div>
-                        <input type="hidden" id="siteOwenerId" value="" />
-                        <input type="hidden" id="siteOwenerEmail" value="" />
-                        <input type="hidden" id="siteOwenerClaim" value="" />
-                        <input type="hidden" id="siteOwenerName" value="" />
-                        <input type="hidden" id="siteOwenerLogin" value="" />
-                        <div>
-                            <br />
-                            <input type="button" value="Get User Info" onclick="getUserInfo()" />
-                            <br />
-                            <h1>User info:</h1>
-                            <p id="resolvedUsers"></p>
-                            <h1>User keys:</h1>
-                            <p id="userKeys"></p>
-                            <h1>User ID:</h1>
-                            <p id="userId"></p>
-                        </div>
+                    <div>
+                        Haverá acompanhamento Eng. Envase durante a execução do lote?
+                        <input type="checkbox" checked data-toggle="tootle" id="acRespDLPCL" />
                     </div>
-
+                    <div>
+                        <h1>DL/PCL - Responsável</h1>
+                        <div>* Pessoa</div>
+                        <div id="peoplePickerRespDLPCL"></div>
+                        <input type="button" value="Get user Info" onclick="getUserInfo()"></input>
+                    </div>
                 </div>
                 <div id="tab-RespEngEnv">
                     <div>
@@ -253,59 +240,67 @@
                         <h1>Engenharia Envase - Responsável</h1>
                         <div>* Pessoa</div>
                         <div id="peoplePickerRespEngEnvase"></div>
-                        <button type="button" onclick="getInfo()">Buscar Usuário</button>
+                        <button type="button" onclick="getUserInfo()">Buscar Usuário</button>
                     </div>
                     <div>
                         <h1>Engenharia Envase - Gerente</h1>
                         <div>* Pessoa</div>
                         <div id="peoplePickerGerenteEngEnvase"></div>
-                        <button type="button" onclick="getInfo()">Buscar Usuário</button>
+                        <button type="button" onclick="getUserInfo()">Buscar Usuário</button>
                     </div>
                 </div>
                 <div id="tab-RespEngFab">
                     <div>
+                        Haverá acompanhamento Eng. Fabricação durante a execução do lote?
+                        <input type="checkbox" checked data-toggle="tootle" id="acRespEngFab" />
+                    </div>
+                    <div>
                         <h1>Eng. Fabricação - Responsável</h1>
                         <div>* Pessoa</div>
-                        <div id="peoplePickerRespDLPCL"></div>
-                        <button type="button" onclick="getInfo()">Buscar Usuário</button>
+                        <div id="peoplePickerRespEngFab"></div>
+                        <button type="button" onclick="getUserInfo()">Buscar Usuário</button>
                     </div>
                     <div>
                         <h1>Eng. Fabricação - Gerente</h1>
                         <div>* Pessoa</div>
-                        <div id="peoplePickerRespDLPCL"></div>
-                        <button type="button" onclick="getInfo()">Buscar Usuário</button>
+                        <div id="peoplePickerGerenteEngFab"></div>
+                        <button type="button" onclick="getUserInfo()">Buscar Usuário</button>
                     </div>
                 </div>
                 <div id="tab-RespInvDF">
                     <div>
+                        Haverá acompanhamento Inov. DF durante a execução do lote?
+                        <input type="checkbox" checked data-toggle="tootle" id="acRespInvDF" />
+                    </div>
+                    <div>
                         <h1>Inovação DF - Responsável</h1>
                         <div>* Pessoa</div>
                         <div id="peoplePickerRespInDF"></div>
-                        <button type="button" onclick="getInfo()">Buscar Usuário</button>
+                        <button type="button" onclick="getUserInfo()">Buscar Usuário</button>
                     </div>
                     <div>
                         <h1>Inovação DF - Gerente</h1>
                         <div>* Pessoa</div>
                         <div id="peoplePickerGerenteInDF"></div>
-                        <button type="button" onclick="getInfo()">Buscar Usuário</button>
+                        <button type="button" onclick="getUserInfo()">Buscar Usuário</button>
                     </div>
                 </div>
                 <div id="tab-RespInvDE">
                     <div>
                         Haverá acompanhamento Inov. DE durante a execução do lote?
-                        <input type="checkbox" checked data-toggle="tootle" id="acRespInovacaoDE" />
+                        <input type="checkbox" checked data-toggle="tootle" id="acRespInvDE" />
                     </div>
                     <div>
                         <h1>Inovação DE - Responsável</h1>
                         <div>* Pessoa</div>
-                        <div id="peoplePickerRespInDE"></div>
-                        <button type="button" onclick="getInfo()">Buscar Usuário</button>
+                        <div id="peoplePickerRespInvDE"></div>
+                        <button type="button" onclick="getUserInfo()">Buscar Usuário</button>
                     </div>
                     <div>
                         <h1>Inovação DE - Gerente</h1>
                         <div>* Pessoa</div>
-                        <div id="peoplePickerGerenteInDE"></div>
-                        <button type="button" onclick="getInfo()">Buscar Usuário</button>
+                        <div id="peoplePickerGerenteInvDE"></div>
+                        <button type="button" onclick="getUserInfo()">Buscar Usuário</button>
                     </div>
                 </div>
                 <div id="tab-RespQual">
@@ -317,13 +312,13 @@
                         <h1>Qualidade - Responsável</h1>
                         <div>* Pessoa</div>
                         <div id="peoplePickerRespQualidade"></div>
-                        <button type="button" onclick="getInfo()">Buscar Usuário</button>
+                        <button type="button" onclick="getUserInfo()">Buscar Usuário</button>
                     </div>
                     <div>
                         <h1>Qualidade - Gerente</h1>
                         <div>* Pessoa</div>
                         <div id="peoplePickerGerenteQualidade"></div>
-                        <button type="button" onclick="getInfo()">Buscar Usuário</button>
+                        <button type="button" onclick="getUserInfo()">Buscar Usuário</button>
                     </div>
                 </div>
                 <div id="tab-RespFab">
@@ -335,13 +330,13 @@
                         <h1>Fábrica - Responsável</h1>
                         <div>* Pessoa</div>
                         <div id="peoplePickerRespFabrica"></div>
-                        <button type="button" onclick="getInfo()">Buscar Usuário</button>
+                        <button type="button" onclick="getUserInfo()">Buscar Usuário</button>
                     </div>
                     <div>
                         <h1>Fábrica - Gerente</h1>
                         <div>* Pessoa</div>
                         <div id="peoplePickerGerenteFabrica"></div>
-                        <button type="button" onclick="getInfo()">Buscar Usuário</button>
+                        <button type="button" onclick="getUserInfo()">Buscar Usuário</button>
                     </div>
                 </div>
             </div>

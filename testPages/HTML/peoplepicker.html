@@ -3,33 +3,31 @@
     <title>
 
     </title>
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-    <script src="https://naturabr.sharepoint.com/sites/DEV_LotePiloto/SiteAssets/JS/peoplepicker.js"></script>
-
-    <script>
-    </script>
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <link rel="stylesheet" href="/sites/DEV_LotePiloto/SiteAssets/CSS/bootstrap-custom.css">
+    <link rel="stylesheet" href="/sites/DEV_LotePiloto/SiteAssets/CSS/bootstrap-custom-grid.css">
+    <link rel="stylesheet" href="/sites/DEV_LotePiloto/SiteAssets/CSS/bootstrap-custom-reboot.css">
+    <script type="text/javascript" src="/sites/DEV_LotePiloto/SiteAssets/bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/_layouts/15/MicrosoftAjax.js"></script>
+    <script type="text/javascript" src="/_layouts/15/sp.core.js"></script>
+    <script type="text/javascript" src="/_layouts/15/sp.runtime.js"></script>
+    <script type="text/javascript" src="/_layouts/15/sp.js"></script>
+    <script type="text/javascript" src="/_layouts/15/clienttemplates.js"></script>
+    <script type="text/javascript" src="/_layouts/15/clientforms.js"></script>
+    <script type="text/javascript" src="/_layouts/15/clientpeoplepicker.js"></script>
+    <script type="text/javascript" src="/_layouts/15/autofill.js"></script>
+    <script type="text/javascript" src="/_layouts/15/1033/sts_strings.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.SPServices/2014.02/jquery.SPServices.js"></script>
+    <script src="/sites/DEV_LotePiloto/SiteAssets/JS/peoplepicker.js"></script>
 </header>
 
 <body>
     <h1>Teste People Picker</h1>
     <br>
-    <div id="peoplePickerDiv">Selecione um usuário...</div>
-    <button type="button" onclick="getInfo()">Buscar Usuário</button>
-    <script> 
-        var mp = new MyPeoplePicker();
-        mp.init('peoplePickerDiv', { AllowMultipleValues: false });
-        $('#peoplePickerDiv').on('user:changed', function () {
-            var users = mp.getUsers().map(function (u) { return u.DisplayText });
-            alert("Names entered: " + users.join("; "));
-        })
-
-        function getInfo(){
-            console.log(mp.getUsers());
-            mp.getUsersID(function(){
-                console.log(arguments);
-            })
-        }
-    </script>
+    <div id="peoplePickerDiv"></div>
+    <div>
+        <button type="button" onclick="getUserInfo()" value="Get User Info"></button>
+    </div>
 </body>
 
 </html>
