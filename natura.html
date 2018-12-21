@@ -1,7 +1,11 @@
 <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-<link rel="stylesheet" href="/sites/DEV_LotePiloto/SiteAssets/bootstrap/css/bootstrap.min.css">
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<!-- <link rel="stylesheet" href="/sites/DEV_LotePiloto/SiteAssets/bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet" href="/sites/DEV_LotePiloto/SiteAssets/bootstrap/css/bootstrap-grid.min.css">
+<link rel="stylesheet" href="/sites/DEV_LotePiloto/SiteAssets/bootstrap/css/bootstrap-reboot.min.css"> -->
+<link rel="stylesheet" href="/sites/DEV_LotePiloto/SiteAssets/CSS/bootstrap-custom.css">
+<link rel="stylesheet" href="/sites/DEV_LotePiloto/SiteAssets/CSS/bootstrap-custom-grid.css">
+<link rel="stylesheet" href="/sites/DEV_LotePiloto/SiteAssets/CSS/bootstrap-custom-reboot.css">
+<script type="text/javascript" src="/sites/DEV_LotePiloto/SiteAssets/bootstrap/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="/_layouts/15/MicrosoftAjax.js"></script>
 <script type="text/javascript" src="/_layouts/15/sp.runtime.js"></script>
 <script type="text/javascript" src="/_layouts/15/sp.js"></script>
@@ -10,202 +14,56 @@
 <script type="text/javascript" src="/_layouts/15/autofill.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.SPServices/2014.02/jquery.SPServices.js"></script>
 <script src="/sites/DEV_LotePiloto/SiteAssets/JS/lotePiloto.js"></script>
-<style>
-    .grid {
-        margin: 20px 8px 8px 20px !important;
-        overflow: auto !important;
-    }
-
-    .cabecalho {
-        margin-bottom: 20px;
-    }
-
-    .cabecalho>div {
-        display: inline-block;
-    }
-
-    .title {
-        font-weight: bold;
-    }
-
-    .ui-widget-header {
-        border: 0;
-        background: #FFFFFF;
-    }
-
-    .ui-corner-all,
-    .ui-corner-top,
-    .ui-corner-right,
-    .ui-corner-tr {
-        border-top-right-radius: 0px;
-    }
-
-    .ui-corner-all,
-    .ui-corner-top,
-    .ui-corner-left,
-    .ui-corner-tl {
-        border-top-left-radius: 0px;
-    }
-
-    .ui-tabs .ui-tabs-nav {
-        text-align: center;
-    }
-
-    .ui-tabs .ui-tabs-nav li {
-        border-bottom-width: 1px;
-        float: none !important;
-        display: inline-block;
-    }
-
-    .ui-widget.ui-widget-content {
-        border: 0px;
-    }
-
-    .ui-state-default a,
-    .ui-state-default a:link,
-    .ui-state-default a:visited,
-    a.ui-button,
-    a:link.ui-button,
-    a:visited.ui-button,
-    .ui-button {
-        color: #FFFFFF;
-    }
-
-    #tabs li {
-        background: #CACACA;
-        border-color: #000000;
-    }
-
-    #tabs li.ui-state-active {
-        background: #AC3E0B;
-        border-color: #000000;
-    }
-
-    #tabs li:hover {
-        background: #DD4F0E;
-        border-color: #DD4F0E;
-    }
-
-    .switch {
-        position: relative;
-        display: inline-block;
-        width: 60px;
-        height: 34px;
-    }
-
-    /* Hide default HTML checkbox */
-
-    .switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-    }
-
-    /* The slider */
-
-    .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #ccc;
-        -webkit-transition: .4s;
-        transition: .4s;
-    }
-
-    .slider:before {
-        position: absolute;
-        content: "";
-        height: 26px;
-        width: 26px;
-        left: 4px;
-        bottom: 4px;
-        background-color: white;
-        -webkit-transition: .4s;
-        transition: .4s;
-    }
-
-    input:checked+.slider {
-        background-color: #2196F3;
-    }
-
-    input:focus+.slider {
-        box-shadow: 0 0 1px #2196F3;
-    }
-
-    input:checked+.slider:before {
-        -webkit-transform: translateX(26px);
-        -ms-transform: translateX(26px);
-        transform: translateX(26px);
-    }
-
-    /* Rounded sliders */
-
-    .slider.round {
-        border-radius: 34px;
-    }
-
-    .slider.round:before {
-        border-radius: 50%;
-    }
-
-    .classTabs {
-        width: 100%;
+<style type="text/css">
+    div#main .nav-tabs .nav-link.active,
+    div#main .nav-tabs .nav-item.show .nav-link {
+      color: #495057;
+      background-color: rgba(255, 165, 0, 0.545);
+      border-color: #dee2e6 #dee2e6 #fff;
     }
 </style>
 <div id="main">
-    <table>
-        <tbody>
-            <tr>
-                <td>
-                    <div id="lblLabelId">ID</div>
-                </td>
-                <td>
-                    <div id="lblLabelTitle">* Título</div>
-                </td>
-                <td>
-                    <div id="lblLabelStatus">Status</div>
-                </td>
-                <td>
-                    <div>Tipo de Lote</div>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <div id="txtValueId">
-                        <input type="text" name="ID" readonly />
-                    </div>
-                    <div id="lblMsgId"></div>
-                </td>
-                <td>
-                    <div id="txtValueTitle">
-                        <input id="agTitle" type="text" name="Title" />
-                    </div>
-                    <div id="lblMsgTitle"></div>
-                </td>
-                <td>
-                    <div id="lblValueStatus">
-                        <select id="status" name="Status">
-                            <option disabled selected>Selecione uma opção</option>
-                        </select>
-                    </div>
-                    <div id="lblMsgTitle"></div>
-                </td>
-                <td>
-                    <div>
-                        <select id="tipoDeLote" name="TipoLote">
-                            <option disabled selected>Selecione uma opção</option>
-                        </select>
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <div id="tabs">
-        <ul>
-            <li>
+    <div class="container" style="background-color: rgb(242, 164, 61); padding: 10px; margin-bottom: 10px">
+        <div class="row">
+            <div class="col-md-3">
+                <label for="inputId">ID</label>
+                <input type="text" readonly class="form-control" id="inputId" name="ID">
+            </div>
+            <div class="col-md-3">
+                <label for="inputTitulo">Titulo</label>
+                <input type="text" required="true" class="form-control" id="inputTitulo" name="Title">
+            </div>
+            <div class="col-md-3">
+                <label for="inputStatus">Status</label>
+                <select class="custom-select" id="inputStatus" name="Status">
+                    <option disabled selected>Selecione uma opção</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="inputTipoLote">Tipo de Lote</label>
+                <input type="text" class="form-control" id="inputTipoLote" name="TipoLote">
+            </div>
+        </div>
+    </div>
+    <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab" aria-controls="pills-home" aria-selected="true">Home</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-profile" aria-selected="false">Profile</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="pills-contact-tab" data-toggle="pill" href="#pills-contact" role="tab" aria-controls="pills-contact" aria-selected="false">Contact</a>
+        </li>
+    </ul>
+    <div class="tab-content" id="pills-tabContent">
+        <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">...</div>
+        <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">...</div>
+        <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">...</div>
+    </div>
+    <!-- <div id="tabs">
+        <ul class="nav nav-tabs">
+            <li class="active">
                 <a href="#tab-Produto">Produto</a>
             </li>
             <li>
@@ -552,7 +410,7 @@
         <div id="tab-Historico">
             <h1>Histórico</h1>
         </div>
-    </div>
+    </div> -->
     <a id="btnSalvar" href="#" class="btn btn-primary" role="button">Salvar</a>
     <a id="btnCarregar" href="#" class="btn btn-primary" role="button">Carregar</a>
 </div>
