@@ -1,0 +1,35 @@
+<html>
+<header>
+    <title>
+
+    </title>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://naturabr.sharepoint.com/sites/DEV_LotePiloto/SiteAssets/JS/peoplepicker.js"></script>
+
+    <script>
+    </script>
+</header>
+
+<body>
+    <h1>Teste People Picker</h1>
+    <br>
+    <div id="peoplePickerDiv">Selecione um usuário...</div>
+    <button type="button" onclick="getInfo()">Buscar Usuário</button>
+    <script> 
+        var mp = new MyPeoplePicker();
+        mp.init('peoplePickerDiv', { AllowMultipleValues: false });
+        $('#peoplePickerDiv').on('user:changed', function () {
+            var users = mp.getUsers().map(function (u) { return u.DisplayText });
+            alert("Names entered: " + users.join("; "));
+        })
+
+        function getInfo(){
+            console.log(mp.getUsers());
+            mp.getUsersID(function(){
+                console.log(arguments);
+            })
+        }
+    </script>
+</body>
+
+</html>
