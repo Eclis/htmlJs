@@ -15,7 +15,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.SPServices/2014.02/jquery.SPServices.js"></script>
 <script src="/sites/DEV_LotePiloto/SiteAssets/JS/lotePiloto.js"></script>
 <div id="main">
-    <div class="container" style="background-color: rgb(242, 164, 61); padding: 10px; margin-bottom: 10px">
+    <div class="container" style="background-color: rgb(255, 182, 86); padding: 10px; margin-bottom: 10px">
         <div class="row">
             <div class="col-md-3">
                 <label for="inputId">ID</label>
@@ -26,18 +26,20 @@
                 <input type="text" required="true" class="form-control" id="inputTitulo" name="Title">
             </div>
             <div class="col-md-3">
-                <label for="inputStatus">Status</label>
-                <select class="custom-select" id="inputStatus" name="Status">
+                <label for="status">Status</label>
+                <select class="custom-select" id="status" name="Status">
                     <option disabled selected>Selecione uma opção</option>
                 </select>
             </div>
             <div class="col-md-3">
-                <label for="inputTipoLote">Tipo de Lote</label>
-                <input type="text" class="form-control" id="inputTipoLote" name="TipoLote">
+                <label for="tipoDeLote">Tipo de Lote</label>
+                <select class="custom-select" id="tipoDeLote" name="TipoLote">
+                    <option disabled selected>Selecione uma opção</option>
+                </select>
             </div>
         </div>
     </div>
-    <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+    <ul class="nav nav-tabs" id="nav-tab" role="tablist">
         <li class="nav-item">
             <a class="nav-link active" id="pills-produto-tab" data-toggle="pill" href="#pills-produto" role="tab" aria-controls="pills-produto"
                 aria-selected="true">Produto</a>
@@ -60,77 +62,75 @@
         </li>
     </ul>
     <div class="tab-content" id="pills-tabContent">
-        <div class="tab-pane fade show active" id="pills-produto" style="background-color: rgb(242, 164, 61);" role="tabpanel" aria-labelledby="pills-produto-tab">.
-            <h1>Produto</h1>
-            <div>
-                <div class="title">Linha do produto</div>
-                <div>
-                    <select id="linhaDoProduto" name="LinhaProduto">
+        <div class="tab-pane fade show active" id="pills-produto" style="background-color: rgb(255, 182, 86); padding: 10px;" role="tabpanel" aria-labelledby="pills-produto-tab">.
+            <div class="row">
+                <div class="col-md-6">
+                    <label for="codigoProduto">Código do produto</label>
+                    <input type="text" class="form-control" id="codigoProduto" name="CodigoProduto">
+                </div>
+                <div class="col-md-6">
+                    <label for="linhaDoProduto">Linha do produto</label>
+                    <select class="custom-select" id="linhaDoProduto" name="LinhaProduto">
                         <option disabled selected>Selecione uma opção</option>
                     </select>
                 </div>
             </div>
-            <div id="produtoControlDescricao">
-                <div id="produtoDescricaoLabel" class="title">Descrição do produto</div>
-                <div id="produtoDescricaoField">
-                    <input id="produtoDescricao" runat="server" name="DescricaoProduto" />
+            <div class="row" style="margin-top: 10px;">
+                <div class="col-md-12">
+                    <label for="produtoDescricao">Descrição do produto</label>
+                    <textarea class="form-control" id="produtoDescricao" name="DescricaoProduto" rows="3"></textarea>
                 </div>
             </div>
-            <div id="produtoControlProjeto">
-                <div id="produtoProjetoLabel" class="title">Projeto</div>
-                <div id="produtoProjetoField">
-                    <input id="produtoProjeto" runat="server" name="Projeto" />
+            <div class="row" style="margin-top: 10px;">
+                <div class="col-md-6">
+                    <label for="produtoProjeto">Projeto</label>
+                    <input type="text" class="form-control" id="produtoProjeto" name="Projeto">
                 </div>
-            </div>
-            <div>
-                <div class="title">Categoria do projeto</div>
-                <div>
-                    <select id="categoriaDoProjeto" name="CategoriaProjeto">
+                <div class="col-md-6">
+                    <label for="categoriaDoProjeto">Categoria do projeto</label>
+                    <select class="custom-select" id="categoriaDoProjeto" name="CategoriaProjeto">
                         <option disabled selected>Selecione uma opção</option>
                     </select>
                 </div>
             </div>
-            <div id="produtoControlFormula">
-                <div id="produtoFormulaLabel" class="title">Fórmula</div>
-                <div id="produtoFormulaField">
-                    <input id="produtoFormula" runat="server" name="Formula" />
+            <div class="row" style="margin-top: 10px;">
+                <div class="col-md-6">
+                    <label for="produtoFormula">Fórmula</label>
+                    <input type="text" class="form-control" id="produtoFormula" name="Formula">
+                </div>
+                <div class="col-md-6">
+                    <label for="produtoQuantidade">Quantidade (peças)</label>
+                    <input type="text" class="form-control" id="produtoQuantidade" name="QuantidadePecas">
                 </div>
             </div>
-            <div id="produtoControlQuantidade">
-                <div id="produtoQuantidadeLabel" class="title">Quantidade (peças)</div>
-                <div id="produtoQuantidadeField">
-                    <input id="produtoQuantidade" runat="server" name="QuantidadePecas" />
-                </div>
-            </div>
-            <div id="produtoControlMotivo">
-                <div id="produtoMotivoLabel" class="title">Motivo</div>
-                <div id="produtoMotivoField">
-                    <select id="motivo" name="Motivo">
+             <div class="row" style="margin-top: 10px;">
+                <div class="col-md-6">
+                    <label for="categoriaDoProjeto">Motivo</label>
+                    <select class="custom-select" id="motivo" name="Motivo">
                         <option disabled selected>Selecione uma opção</option>
                     </select>
                 </div>
             </div>
-            <div id="produtoControlEnvioAmostras">
-                <div id="produtoEnvioAmostrasLabel" class="title">Solicitação de envio de amostras</div>
-                <label class="${ styles.switch}">
-                    <input id="produtoEnvioAmostras" type="checkbox" name="EnvioAmostras">
-                    <span class="${ styles.slider} ${ styles.round}"></span>
-                </label>
-            </div>
-            <div id="produtoControlResponsavelAmostra">
-                <div id="produtoResponsavelAmostraLabel" class="title">Responsável pela amostra</div>
-                <div id="produtoResponsavelAmostraField">
-                    <input id="produtoResponsavelAmostra" runat="server" name="ResponsavelAmostra" />
+            <div class="row" style="margin-top: 10px;">
+                <div class="col-md-auto">
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="produtoEnvioAmostras" name="EnvioAmostras">
+                        <label class="custom-control-label" for="produtoEnvioAmostras">Solicitação de envio de amostras</label>
+                    </div>
                 </div>
             </div>
-            <div id="produtoControlQuantidadeAmostra">
-                <div id="produtoQuantidadeAmostraLabel" class="title">Quantidade de amostras</div>
-                <div id="produtoQuantidadeAmostraField">
-                    <input id="produtoQuantidadeAmostra" runat="server" name="QuantidadeAmostra" />
+            <div class="row" style="margin-top: 10px;">
+                <div class="col-md-6">
+                    <label for="produtoResponsavelAmostra">Responsável pela amostra</label>
+                    <input type="text" class="form-control" id="produtoResponsavelAmostra" name="ResponsavelAmostra">
+                </div>
+                <div class="col-md-6">
+                    <label for="produtoQuantidadeAmostra">Quantidade de amostras</label>
+                    <input type="text" class="form-control" id="produtoQuantidadeAmostra" name="QuantidadeAmostra">
                 </div>
             </div>
         </div>
-        <div class="tab-pane fade" id="pills-agendamento" style="background-color: rgb(242, 164, 61);" role="tabpanel" aria-labelledby="pills-agendamento-tab">
+        <div class="tab-pane fade" id="pills-agendamento" style="background-color: rgb(255, 182, 86);" role="tabpanel" aria-labelledby="pills-agendamento-tab">
             <h1>Agendamento</h1>
             <div id="agendamentoControlFabrica">
                 <div id="agendamentoFabricaLabel" class="title">Fábrica</div>
@@ -145,7 +145,7 @@
                 </div>
             </div>
             <div id="agendamentoControlCentroCusto">
-                <div id="agendamentoCentroCustoLabel" class="title">Centro de custo â€“ PEP â€“ NT</div>
+                <div id="agendamentoCentroCustoLabel" class="title">Centro de custo - PEP - NT</div>
                 <div id="agendamentoCentroCustoField">
                     <input id="agendamentoCentroCusto" runat="server" name="CentroCusto" />
                 </div>
@@ -193,7 +193,7 @@
                 </div>
             </div>
         </div>
-        <div class="tab-pane fade" id="pills-responsaveis" style="background-color: rgb(242, 164, 61);" role="tabpanel" aria-labelledby="pills-responsaveis-tab">
+        <div class="tab-pane fade" id="pills-responsaveis" style="background-color: rgb(255, 182, 86);" role="tabpanel" aria-labelledby="pills-responsaveis-tab">
             <div id="tabsResponsaveis">
                 <ul>
                     <li>
@@ -346,7 +346,7 @@
                 </div>
             </div>
         </div>
-        <div class="tab-pane fade" id="pills-acompanhamento" style="background-color: rgb(242, 164, 61);" role="tabpanel" aria-labelledby="pills-acompanhamento-tab">
+        <div class="tab-pane fade" id="pills-acompanhamento" style="background-color: rgb(255, 182, 86);" role="tabpanel" aria-labelledby="pills-acompanhamento-tab">
             <div id="tabsAcompanhamento">
                 <ul>
                     <li>
@@ -406,7 +406,7 @@
                 </div>
             </div>
         </div>
-        <div class="tab-pane fade" id="pills-historico" style="background-color: rgb(242, 164, 61);" role="tabpanel" aria-labelledby="pills-historico-tab">
+        <div class="tab-pane fade" id="pills-historico" style="background-color: rgb(255, 182, 86);" role="tabpanel" aria-labelledby="pills-historico-tab">
             <h1>Histórico</h1>
         </div>
     </div>
