@@ -98,31 +98,30 @@
                     <input type="text" class="form-control" id="produtoQuantidade" name="QuantidadePecas">
                 </div>
             </div>
-            <div id="produtoControlMotivo">
-                <div id="produtoMotivoLabel" class="title">Motivo</div>
-                <div id="produtoMotivoField">
-                    <select id="motivo" name="Motivo">
+             <div class="row" style="margin-top: 10px;">
+                <div class="col-md-6">
+                    <label for="categoriaDoProjeto">Motivo</label>
+                    <select class="custom-select" id="motivo" name="Motivo">
                         <option disabled selected>Selecione uma opção</option>
                     </select>
                 </div>
             </div>
-            <div id="produtoControlEnvioAmostras">
-                <div id="produtoEnvioAmostrasLabel" class="title">Solicitação de envio de amostras</div>
-                <label class="${ styles.switch}">
-                    <input id="produtoEnvioAmostras" type="checkbox" name="EnvioAmostras">
-                    <span class="${ styles.slider} ${ styles.round}"></span>
-                </label>
-            </div>
-            <div id="produtoControlResponsavelAmostra">
-                <div id="produtoResponsavelAmostraLabel" class="title">Responsável pela amostra</div>
-                <div id="produtoResponsavelAmostraField">
-                    <input id="produtoResponsavelAmostra" runat="server" name="ResponsavelAmostra" />
+            <div class="row" style="margin-top: 10px;">
+                <div class="col-md-auto">
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="produtoEnvioAmostras" name="EnvioAmostras">
+                        <label class="custom-control-label" for="produtoEnvioAmostras">Solicitação de envio de amostras</label>
+                    </div>
                 </div>
             </div>
-            <div id="produtoControlQuantidadeAmostra">
-                <div id="produtoQuantidadeAmostraLabel" class="title">Quantidade de amostras</div>
-                <div id="produtoQuantidadeAmostraField">
-                    <input id="produtoQuantidadeAmostra" runat="server" name="QuantidadeAmostra" />
+            <div class="row" style="margin-top: 10px;">
+                <div class="col-md-6">
+                    <label for="produtoResponsavelAmostra">Responsável pela amostra</label>
+                    <input type="text" class="form-control" id="produtoResponsavelAmostra" name="ResponsavelAmostra">
+                </div>
+                <div class="col-md-6">
+                    <label for="produtoQuantidadeAmostra">Quantidade de amostras</label>
+                    <input type="text" class="form-control" id="produtoQuantidadeAmostra" name="QuantidadeAmostra">
                 </div>
             </div>
         </div>
@@ -141,7 +140,7 @@
                 </div>
             </div>
             <div id="agendamentoControlCentroCusto">
-                <div id="agendamentoCentroCustoLabel" class="title">Centro de custo â€“ PEP â€“ NT</div>
+                <div id="agendamentoCentroCustoLabel" class="title">Centro de custo - PEP - NT</div>
                 <div id="agendamentoCentroCustoField">
                     <input id="agendamentoCentroCusto" runat="server" name="CentroCusto" />
                 </div>
