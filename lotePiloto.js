@@ -48,6 +48,57 @@ function InserirAgendamento() {
     return $promise;
 };
 
+function AtualizarAgendamento(id) {
+    var campos = [];
+
+    $('#main [name]').each(function () {
+        var $this = $(this);
+
+        if($this.is('[type=checkbox]') && $this.val() != undefined) {
+            campos.push([this.name, $this.val() == 'on']);
+        } else if($this.val() != undefined) {
+            campos.push([this.name, $this.val()]);
+        }
+    });
+
+    var $promise = $.Deferred();
+
+    $().SPServices({
+        operation: "UpdateListItems",
+        async: false,
+        batchCmd: "Update",
+        listName: "Agendamentos",
+        ID: id,
+        valuepairs: campos,
+        completefunc: function (xData, Status) {
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
+                });
+
+                return;
+            }
+
+            var $response = $(xData.responseText);
+            var errorCode = $response.find('ErrorCode').text();
+
+            if (errorCode == '0x00000000') {
+                $promise.resolve({
+                    record: $response.find('z\\:row:first')
+                });
+            } else {
+                $promise.reject({
+                    errorCode: errorCode,
+                    errorText: $response.find('ErrorText').text()
+                });
+            }
+        }
+    });
+
+    return $promise;
+};
+
 function CarregarAgendamento(id) {
     var $promise = $.Deferred();
 
@@ -304,13 +355,25 @@ $(document).ready(function () {
     $('#tipoDeLote').change();
 
     $('#btnSalvar').click(function () {
-        InserirAgendamento().then(function (response) {
-            CarregarAgendamento(response.record.attr('ows_ID')).then(function () {
-                alert("Agendamento Salvo como rascunho");
+        var id = $('input[name="ID"]').val();
+
+        if (id) {
+            AtualizarAgendamento(id).then(function (response) {
+                CarregarAgendamento(response.record.attr('ows_ID')).then(function () {
+                    alert("Agendamento Salvo");
+                });
+            }).fail(function (response) {
+                alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
             });
-        }).fail(function (response) {
-            alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
-        });
+        } else {
+            InserirAgendamento().then(function (response) {
+                CarregarAgendamento(response.record.attr('ows_ID')).then(function () {
+                    alert("Agendamento Salvo");
+                });
+            }).fail(function (response) {
+                alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
+            });
+        }
 
         return false;
     });
