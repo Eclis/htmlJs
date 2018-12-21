@@ -168,7 +168,7 @@ function CarregarListaMotivos() {
         listName: 'Agendamentos',
         completefunc: function (Data, Status) {
             if (Status == 'success') {
-                $(Data.responseXML).find('Field[DisplayName="Motivo "] CHOICE').each(function () {
+                $(Data.responseXML).find('Field[DisplayName="Motivo"] CHOICE').each(function () {
                     $('select#motivo').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
                 });
             }
@@ -237,9 +237,6 @@ $(document).ready(function () {
     CarregarListaTiposLotes();
     CarregarListaMotivos();
 
-
-    $("#tabs").tabs();
-    $("#agendamentoDataInicioProgramado").datepicker();
     $("#produtoControlResponsavelAmostra").hide();
     $("#produtoControlQuantidadeAmostra").hide();
     $("#produtoResponsavelAmostra").text('');
@@ -256,9 +253,6 @@ $(document).ready(function () {
             $("#produtoControlQuantidadeAmostra").hide();
         }
     });
-
-    $('#tabsResponsaveis').tabs();
-    $('#tabsAcompanhamento').tabs();
 
     $('#tipoDeLote').change(function () {
         $('#tabsResponsaveis').show();
