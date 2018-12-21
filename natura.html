@@ -14,14 +14,6 @@
 <script type="text/javascript" src="/_layouts/15/autofill.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.SPServices/2014.02/jquery.SPServices.js"></script>
 <script src="/sites/DEV_LotePiloto/SiteAssets/JS/lotePiloto.js"></script>
-<style type="text/css">
-    div#main .nav-tabs .nav-link.active,
-    div#main .nav-tabs .nav-item.show .nav-link {
-      color: #495057;
-      background-color: rgba(255, 165, 0, 0.545);
-      border-color: #dee2e6 #dee2e6 #fff;
-    }
-</style>
 <div id="main">
     <div class="container" style="background-color: rgb(242, 164, 61); padding: 10px; margin-bottom: 10px">
         <div class="row">
@@ -47,39 +39,23 @@
     </div>
     <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
         <li class="nav-item">
-            <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab" aria-controls="pills-home" aria-selected="true">Home</a>
+            <a class="nav-link active" id="pills-produto-tab" data-toggle="pill" href="#pills-produto" role="tab" aria-controls="pills-produto" aria-selected="true">Produto</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-profile" aria-selected="false">Profile</a>
+            <a class="nav-link" id="pills-agendamento-tab" data-toggle="pill" href="#pills-agendamento" role="tab" aria-controls="pills-agendamento" aria-selected="false">Agendamento</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="pills-contact-tab" data-toggle="pill" href="#pills-contact" role="tab" aria-controls="pills-contact" aria-selected="false">Contact</a>
+            <a class="nav-link" id="pills-responsaveis-tab" data-toggle="pill" href="#pills-responsaveis" role="tab" aria-controls="pills-responsaveis" aria-selected="false">Responsáveis</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="pills-acompanhamento-tab" data-toggle="pill" href="#pills-acompanhamento" role="tab" aria-controls="pills-acompanhamento" aria-selected="false">Acompanhamento</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="pills-historico-tab" data-toggle="pill" href="#pills-historico" role="tab" aria-controls="pills-historico" aria-selected="false">Histórico</a>
         </li>
     </ul>
     <div class="tab-content" id="pills-tabContent">
-        <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">...</div>
-        <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">...</div>
-        <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">...</div>
-    </div>
-    <!-- <div id="tabs">
-        <ul class="nav nav-tabs">
-            <li class="active">
-                <a href="#tab-Produto">Produto</a>
-            </li>
-            <li>
-                <a href="#tab-Agendamento">Agendamento</a>
-            </li>
-            <li>
-                <a href="#tab-Responsaveis">Responsáveis</a>
-            </li>
-            <li>
-                <a href="#tab-Acompanhamento">Acompanhamento</a>
-            </li>
-            <li>
-                <a href="#tab-Historico">Histórico</a>
-            </li>
-        </ul>
-        <div id="tab-Produto">
+        <div class="tab-pane fade show active" id="pills-produto" style="background-color: rgb(242, 164, 61);" role="tabpanel" aria-labelledby="pills-produto-tab">.
             <h1>Produto</h1>
             <div>
                 <div class="title">Linha do produto</div>
@@ -149,7 +125,7 @@
                 </div>
             </div>
         </div>
-        <div id="tab-Agendamento">
+        <div class="tab-pane fade" id="pills-agendamento" style="background-color: rgb(242, 164, 61);" role="tabpanel" aria-labelledby="pills-agendamento-tab">
             <h1>Agendamento</h1>
             <div id="agendamentoControlFabrica">
                 <div id="agendamentoFabricaLabel" class="title">Fábrica</div>
@@ -212,7 +188,7 @@
                 </div>
             </div>
         </div>
-        <div id="tab-Responsaveis">
+        <div class="tab-pane fade" id="pills-responsaveis" style="background-color: rgb(242, 164, 61);" role="tabpanel" aria-labelledby="pills-responsaveis-tab">
             <div id="tabsResponsaveis">
                 <ul>
                     <li>
@@ -347,7 +323,7 @@
                 </div>
             </div>
         </div>
-        <div id="tab-Acompanhamento">
+        <div class="tab-pane fade" id="pills-acompanhamento" style="background-color: rgb(242, 164, 61);" role="tabpanel" aria-labelledby="pills-acompanhamento-tab">
             <div id="tabsAcompanhamento">
                 <ul>
                     <li>
@@ -407,10 +383,10 @@
                 </div>
             </div>
         </div>
-        <div id="tab-Historico">
+        <div class="tab-pane fade" id="pills-historico" style="background-color: rgb(242, 164, 61);" role="tabpanel" aria-labelledby="pills-historico-tab">
             <h1>Histórico</h1>
         </div>
-    </div> -->
+    </div>
     <a id="btnSalvar" href="#" class="btn btn-primary" role="button">Salvar</a>
     <a id="btnCarregar" href="#" class="btn btn-primary" role="button">Carregar</a>
 </div>
