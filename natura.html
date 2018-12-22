@@ -194,7 +194,7 @@
                         aria-selected="false">Eng. Fabricação</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="pills-inof-df-tab" data-toggle="pill" href="#pills-inof-df" role="tab" aria-controls="pills-inof-df"
+                    <a class="nav-link" id="pills-inov-df-tab" data-toggle="pill" href="#pills-inov-df" role="tab" aria-controls="pills-inov-df"
                         aria-selected="false">Inov. DF</a>
                 </li>
                 <li class="nav-item">
@@ -216,7 +216,7 @@
                         <div class="col-md-auto">
                             <div class="custom-control custom-checkbox">
                                 <input type="checkbox" class="custom-control-input" id="acRespDLPCL">
-                                <label class="custom-control-label" for="acRespDLPCL">Haverá acompanhamento Eng. Envase durante a execução do lote?</label>
+                                <label class="custom-control-label" for="acRespDLPCL">Haverá acompanhamento durante a execução do lote?</label>
                             </div>
                         </div>
                     </div>
@@ -230,12 +230,12 @@
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane fade show active" id="pills-eng-envase" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel" aria-labelledby="pills-eng-envase-tab">
+                <div class="tab-pane fade" id="pills-eng-envase" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel" aria-labelledby="pills-eng-envase-tab">
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-auto">
                             <div class="custom-control custom-checkbox">
                                 <input type="checkbox" class="custom-control-input" id="acRespEngEnvase">
-                                <label class="custom-control-label" for="acRespEngEnvase">Haverá acompanhamento Eng. envase durante a execução do lote?</label>
+                                <label class="custom-control-label" for="acRespEngEnvase">Haverá acompanhamento durante a execução do lote?</label>
                             </div>
                         </div>
                     </div>
@@ -256,12 +256,12 @@
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane fade show active" id="pills-eng-fabricacao" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel" aria-labelledby="pills-eng-fabricacao-tab">
+                <div class="tab-pane fade" id="pills-eng-fabricacao" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel" aria-labelledby="pills-eng-fabricacao-tab">
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-auto">
                             <div class="custom-control custom-checkbox">
                                 <input type="checkbox" class="custom-control-input" id="acRespEngfabricacao">
-                                <label class="custom-control-label" for="acRespEngfabricacao">Haverá acompanhamento Eng. fabricação durante a execução do lote?</label>
+                                <label class="custom-control-label" for="acRespEngfabricacao">Haverá acompanhamento durante a execução do lote?</label>
                             </div>
                         </div>
                     </div>
@@ -282,78 +282,134 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <div id="tabsResponsaveis">
-                <!-- <div id="tab-RespInvDF">
-                    <div>
-                        Haverá acompanhamento Inov. DF durante a execução do lote?
-                        <input type="checkbox" checked data-toggle="tootle" id="acRespInvDF" />
+                <div class="tab-pane fade" id="pills-inov-df" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel" aria-labelledby="pills-inov-df-tab">
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-auto">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="acRespInofDF">
+                                <label class="custom-control-label" for="acRespInofDF">Haverá acompanhamento durante a execução do lote?</label>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <h1>Inovação DF - Responsável</h1>
-                        <div>* Pessoa</div>
-                        <div id="peoplePickerRespInDF"></div>
-                        <input type="button" value="Get user Info" onclick="getUserInfo()"></input>
-                    </div>
-                    <div>
-                        <h1>Inovação DF - Gerente</h1>
-                        <div>* Pessoa</div>
-                        <div id="peoplePickerGerenteInDF"></div>
-                        <input type="button" value="Get user Info" onclick="getUserInfo()"></input>
-                    </div>
-                </div> -->
-                <div id="tab-RespInvDE">
-                    <div>
-                        Haverá acompanhamento Inov. DE durante a execução do lote?
-                        <input type="checkbox" checked data-toggle="tootle" id="acRespInvDE" />
-                    </div>
-                    <div>
-                        <h1>Inovação DE - Responsável</h1>
-                        <div>* Pessoa</div>
-                        <div id="peoplePickerRespInvDE"></div>
-                        <input type="button" value="Get user Info" onclick="getUserInfo()"></input>
-                    </div>
-                    <div>
-                        <h1>Inovação DE - Gerente</h1>
-                        <div>* Pessoa</div>
-                        <div id="peoplePickerGerenteInvDE"></div>
-                        <input type="button" value="Get user Info" onclick="getUserInfo()"></input>
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-3">
+                            <label for="peoplePickerRespInofDF">Responsável</label>
+                            <input type="text" class="form-control" id="peoplePickerRespInofDF"/>
+                        </div>
+                        <div class="col-md-3">
+                            <a id="btnGetUserInfoRespInofDF" href="#" class="btn btn-primary" role="button">Get user info</a>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="peoplePickerGerInofDF">Gerente</label>
+                            <input type="text" class="form-control" id="peoplePickerGerInofDF"/>
+                        </div>
+                        <div class="col-md-3">
+                            <a id="btnGetUserInfoGerInofDF" href="#" class="btn btn-primary" role="button">Get user info</a>
+                        </div>
                     </div>
                 </div>
-                <div id="tab-RespQual">
-                    <div>
-                        Haverá acompanhamento Qualidade durante a execução do lote?
-                        <input type="checkbox" checked data-toggle="tootle" id="acRespQualidade" />
+                <div class="tab-pane fade" id="pills-inov-de" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel" aria-labelledby="pills-inov-de-tab">
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-auto">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="acRespInofDE">
+                                <label class="custom-control-label" for="acRespInofDE">Haverá acompanhamento durante a execução do lote?</label>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <h1>Qualidade - Responsável</h1>
-                        <div>* Pessoa</div>
-                        <div id="peoplePickerRespQualidade"></div>
-                        <input type="button" value="Get user Info" onclick="getUserInfo()"></input>
-                    </div>
-                    <div>
-                        <h1>Qualidade - Gerente</h1>
-                        <div>* Pessoa</div>
-                        <div id="peoplePickerGerenteQualidade"></div>
-                        <input type="button" value="Get user Info" onclick="getUserInfo()"></input>
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-3">
+                            <label for="peoplePickerRespInofDE">Responsável</label>
+                            <input type="text" class="form-control" id="peoplePickerRespInofDE"/>
+                        </div>
+                        <div class="col-md-3">
+                            <a id="btnGetUserInfoRespInofDE" href="#" class="btn btn-primary" role="button">Get user info</a>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="peoplePickerGerInofDE">Gerente</label>
+                            <input type="text" class="form-control" id="peoplePickerGerInofDE"/>
+                        </div>
+                        <div class="col-md-3">
+                            <a id="btnGetUserInfoGerInofDE" href="#" class="btn btn-primary" role="button">Get user info</a>
+                        </div>
                     </div>
                 </div>
-                <div id="tab-RespFab">
-                    <div>
-                        Haverá acompanhamento Fábrica durante a execução do lote?
-                        <input type="checkbox" checked data-toggle="tootle" id="acRespInovacaoDE" />
+                <div class="tab-pane fade" id="pills-inov-de" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel" aria-labelledby="pills-inov-de-tab">
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-auto">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="acRespInofDE">
+                                <label class="custom-control-label" for="acRespInofDE">Haverá acompanhamento durante a execução do lote?</label>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <h1>Fábrica - Responsável</h1>
-                        <div>* Pessoa</div>
-                        <div id="peoplePickerRespFabrica"></div>
-                        <input type="button" value="Get user Info" onclick="getUserInfo()"></input>
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-3">
+                            <label for="peoplePickerRespInofDE">Responsável</label>
+                            <input type="text" class="form-control" id="peoplePickerRespInofDE"/>
+                        </div>
+                        <div class="col-md-3">
+                            <a id="btnGetUserInfoRespInofDE" href="#" class="btn btn-primary" role="button">Get user info</a>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="peoplePickerGerInofDE">Gerente</label>
+                            <input type="text" class="form-control" id="peoplePickerGerInofDE"/>
+                        </div>
+                        <div class="col-md-3">
+                            <a id="btnGetUserInfoGerInofDE" href="#" class="btn btn-primary" role="button">Get user info</a>
+                        </div>
                     </div>
-                    <div>
-                        <h1>Fábrica - Gerente</h1>
-                        <div>* Pessoa</div>
-                        <div id="peoplePickerGerenteFabrica"></div>
-                        <input type="button" value="Get user Info" onclick="getUserInfo()"></input>
+                </div>
+                <div class="tab-pane fade" id="pills-qualidade" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel" aria-labelledby="pills-qualidade-tab">
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-auto">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="acRespQualidade">
+                                <label class="custom-control-label" for="acRespQualidade">Haverá acompanhamento durante a execução do lote?</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-3">
+                            <label for="peoplePickerRespQualidade">Responsável</label>
+                            <input type="text" class="form-control" id="peoplePickerRespQualidade"/>
+                        </div>
+                        <div class="col-md-3">
+                            <a id="btnGetUserInfoRespQualidade" href="#" class="btn btn-primary" role="button">Get user info</a>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="peoplePickerGerQualidade">Gerente</label>
+                            <input type="text" class="form-control" id="peoplePickerGerQualidade"/>
+                        </div>
+                        <div class="col-md-3">
+                            <a id="btnGetUserInfoGerQualidade" href="#" class="btn btn-primary" role="button">Get user info</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="pills-fabrica" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel" aria-labelledby="pills-fabrica-tab">
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-auto">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="acRespFabrica">
+                                <label class="custom-control-label" for="acRespFabrica">Haverá acompanhamento durante a execução do lote?</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-3">
+                            <label for="peoplePickerRespFabrica">Responsável</label>
+                            <input type="text" class="form-control" id="peoplePickerRespFabrica"/>
+                        </div>
+                        <div class="col-md-3">
+                            <a id="btnGetUserInfoRespFabrica" href="#" class="btn btn-primary" role="button">Get user info</a>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="peoplePickerGerFabrica">Gerente</label>
+                            <input type="text" class="form-control" id="peoplePickerGerFabrica"/>
+                        </div>
+                        <div class="col-md-3">
+                            <a id="btnGetUserInfoGerFabrica" href="#" class="btn btn-primary" role="button">Get user info</a>
+                        </div>
                     </div>
                 </div>
             </div>
