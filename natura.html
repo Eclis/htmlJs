@@ -16,7 +16,7 @@
 <script src="/sites/DEV_LotePiloto/SiteAssets/JS/lotePiloto.js"></script>
 <div id="main">
     <input type="hidden" name="Title" required />
-    <div class="container" style="background-color: rgb(242, 242, 242); padding: 10px; margin-bottom: 10px">
+    <div class="container" style="background-color: rgb(242, 242, 242); padding: 10px; margin-bottom: 10px;">
         <div class="row">
             <div class="col-md-4">
                 <label for="inputId">ID</label>
@@ -59,9 +59,8 @@
         </li>
     </ul>
     <div class="tab-content" id="pills-tabContent">
-        <div class="tab-pane fade show active" id="pills-produto" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel"
-            aria-labelledby="pills-produto-tab">.
-            <div class="row">
+        <div class="tab-pane fade show active" id="pills-produto" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel" aria-labelledby="pills-produto-tab">
+            <div class="row" style="margin-top: 10px;">
                 <div class="col-md-6">
                     <label for="codigoProduto">Código do produto</label>
                     <input type="text" class="form-control" id="codigoProduto" name="CodigoProduto">
@@ -128,70 +127,59 @@
                 </div>
             </div>
         </div>
-        <div class="tab-pane fade" id="pills-agendamento" style="background-color: rgb(242, 242, 242);" role="tabpanel" aria-labelledby="pills-agendamento-tab">
-            <h1>Agendamento</h1>
-            <div id="agendamentoControlFabrica">
-                <div id="agendamentoFabricaLabel" class="title">Fábrica</div>
-                <div id="agendamentoFabricaField">
-                    <select id="fabrica" name="Fabrica"></select>
+        <div class="tab-pane fade" id="pills-agendamento" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel" aria-labelledby="pills-agendamento-tab">
+            <div class="row" style="margin-top: 10px;">
+                <div class="col-md-6">
+                    <label for="fabrica">Fábrica</label>
+                    <select class="custom-select" id="fabrica" name="Fabrica">
+                        <option disabled selected>Selecione uma opção</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="linhaEquipamento">Linha ou Equipamento</label>
+                    <input type="text" class="form-control" id="linhaEquipamento" name="LinhaEquipamento">
                 </div>
             </div>
-            <div id="agendamentoControlLinhaEquipamento">
-                <div id="agendamentoLinhaEquipamentoLabel" class="title">Linha ou Equipamento</div>
-                <div id="agendamentoLinhaEquipamentoField">
-                    <select id="linhaEquipamento" name="LinhaEquipamento"></select>
+            <div class="row" style="margin-top: 10px;">
+                <div class="col-md-6">
+                    <label for="agendamentoCentroCusto">Centro de custo - PEP - NT</label>
+                    <input type="text" class="form-control" id="agendamentoCentroCusto" name="CentroCusto">
                 </div>
             </div>
-            <div id="agendamentoControlCentroCusto">
-                <div id="agendamentoCentroCustoLabel" class="title">Centro de custo - PEP - NT</div>
-                <div id="agendamentoCentroCustoField">
-                    <input id="agendamentoCentroCusto" runat="server" name="CentroCusto" />
+            <div class="row" style="margin-top: 10px;">
+                <div class="col-md-6">
+                    <label for="grauComplexidade">Grau de complexidade</label>
+                    <select class="custom-select" id="grauComplexidade" name="GrauComplexidade">
+                        <option disabled selected>Selecione uma opção</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="agendamentoDataInicioProgramado">Início programado</label>
+                    <input type="text" class="form-control" id="agendamentoDataInicioProgramado" name="InicioProgramado"/>
                 </div>
             </div>
-            <div id="agendamentoControlGrauComplexidade">
-                <div id="agendamentoGrauComplexidadeLabel" class="title">Grau de complexidade</div>
-                <div id="agendamentoGrauComplexidadeField">
-                    <select id="grauComplexidade" name="GrauComplexidade"></select>
+            <div class="row" style="margin-top: 10px;">
+                <div class="col-md-3">
+                    <label for="agendamentoDuracaoHora">Duração (hh)</label>
+                    <input type="text" class="form-control" id="agendamentoDuracaoHora" name="DuracaoEstimadaHoras"/>
+                </div>
+                <div class="col-md-3">
+                    <label for="agendamentoDuracaoMinuto">Duração (mm)</label>
+                    <input type="text" class="form-control" id="agendamentoDuracaoMinuto" name="DuracaoEstimadaMinutos"/>
+                </div>
+                <div class="col-md-6">
+                    <label for="agendamentoFim">Fim programado (calculado)</label>
+                    <input type="text" class="form-control" id="agendamentoFim"/>
                 </div>
             </div>
-            <div id="agendamentoControlDataInicioProgramado">
-                <div id="agendamentoDataInicioProgramadoLabel" class="title">Início programado</div>
-                <div id="agendamentoDataInicioProgramadoField">
-                    <input id="agendamentoDataInicioProgramado" name="InicioProgramado" runat="server" />
-                </div>
-                <div id="agendamentoDataInicioProgramadoHora">
-                    <select id="inicioProgramadoHoras" name="InicioProgramadoHoras"></select>
-                </div>
-                <div id="agendamentoDataInicioProgramadoMinuto">
-                    <select id="inicioProgramadoMinutos" name="InicioProgramadoMinutos"></select>
-                </div>
-            </div>
-            <div id="agendamentoControlDuracaoHora">
-                <div id="agendamentoDuracaoHoraLabel" class="title">Duração (hh)</div>
-                <div id="agendamentoDuracaoHoraField">
-                    <input id="agendamentoDuracaoHora" runat="server" name="DuracaoEstimadaHoras" />
-                </div>
-            </div>
-            <div id="agendamentoControlDuracaoMinuto">
-                <div id="agendamentoDuracaoMinutoLabel" class="title">Duração (mm)</div>
-                <div id="agendamentoDuracaoMinutoField">
-                    <input id="agendamentoDuracaoMinuto" runat="server" name="DuracaoEstimadaMinutos" />
-                </div>
-            </div>
-            <div id="agendamentoControlFim">
-                <div id="agendamentoFimLabel" class="title">Fim programado (calculado)</div>
-                <div id="agendamentoFimField">
-                    <div id="agendamentoFim"></div>
-                </div>
-            </div>
-            <div id="agendamentoControlObservacoes">
-                <div id="agendamentoObservacoesLabel" class="title">Observações</div>
-                <div id="agendamentoObservacoesField">
-                    <input id="agendamentoObservacoes" runat="server" name="Observacoes" />
+            <div class="row" style="margin-top: 10px;">
+                <div class="col-md-12">
+                    <label for="agendamentoObservacoes">Observações</label>
+                    <textarea class="form-control" id="agendamentoObservacoes" name="Observacoes" rows="3"></textarea>
                 </div>
             </div>
         </div>
-        <div class="tab-pane fade" id="pills-responsaveis" style="background-color: rgb(242, 242, 242);" role="tabpanel" aria-labelledby="pills-responsaveis-tab">
+        <div class="tab-pane fade" id="pills-responsaveis" style="background-color: rgb(242, 242, 242); padding: 10px; margin-bottom: 10px;" role="tabpanel" aria-labelledby="pills-responsaveis-tab">
             <div id="tabsResponsaveis">
                 <ul>
                     <li>
@@ -338,7 +326,7 @@
                 </div>
             </div>
         </div>
-        <div class="tab-pane fade" id="pills-acompanhamento" style="background-color: rgb(242, 242, 242);" role="tabpanel" aria-labelledby="pills-acompanhamento-tab">
+        <div class="tab-pane fade" id="pills-acompanhamento" style="background-color: rgb(242, 242, 242); padding: 10px; margin-bottom: 10px;" role="tabpanel" aria-labelledby="pills-acompanhamento-tab">
             <div id="tabsAcompanhamento">
                 <ul>
                     <li>
@@ -398,7 +386,7 @@
                 </div>
             </div>
         </div>
-        <div class="tab-pane fade" id="pills-historico" style="background-color: rgb(242, 242, 242);" role="tabpanel" aria-labelledby="pills-historico-tab">
+        <div class="tab-pane fade" id="pills-historico" style="background-color: rgb(242, 242, 242); padding: 10px; margin-bottom: 10px;" role="tabpanel" aria-labelledby="pills-historico-tab">
             <h1>Histórico</h1>
         </div>
     </div>
