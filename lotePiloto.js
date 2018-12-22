@@ -10,7 +10,7 @@ function initializePeoplePicker(peoplePickerElementId) {
     schema['MaximumEntitySuggestions'] = 50;
     schema['Width'] = '280px';
 
-    // Render and initialize the picker. 
+    // Render and initialize the picker.
     // Pass the ID of the DOM element that contains the picker, an array of initial
     // PickerEntity objects to set the picker value, and a schema that defines
     // picker properties.
@@ -28,7 +28,7 @@ function getUserInfo() {
     var userInfo = '';
     for (var i = 0; i < users.length; i++) {
         var user = users[i];
-        for (var userProperty in user) { 
+        for (var userProperty in user) {
             userInfo += userProperty + ':  ' + user[userProperty] + '<br>';
         }
     }
@@ -48,7 +48,7 @@ function getUserId(loginName) {
     this.user = context.get_web().ensureUser(loginName);
     context.load(this.user);
     context.executeQueryAsync(
-         Function.createDelegate(null, ensureUserSuccess), 
+         Function.createDelegate(null, ensureUserSuccess),
          Function.createDelegate(null, onFail)
     );
 }
@@ -60,56 +60,6 @@ function ensureUserSuccess() {
 function onFail(sender, args) {
     alert('Query failed. Error: ' + args.get_message());
 }
-
-function InserirAgendamento() {
-    var campos = [];
-
-    $('#main [name]').each(function () {
-        var $this = $(this);
-
-        if ($this.is('[type=checkbox]') && $this.val() != undefined) {
-            campos.push([this.name, $this.val() == 'on']);
-        } else if ($this.val() != undefined) {
-            campos.push([this.name, $this.val()]);
-        }
-    });
-
-    var $promise = $.Deferred();
-
-    $().SPServices({
-        operation: "UpdateListItems",
-        async: false,
-        batchCmd: "New",
-        listName: "Agendamentos",
-        valuepairs: campos,
-        completefunc: function (xData, Status) {
-            if (Status != 'success') {
-                $promise.reject({
-                    errorCode: '0x99999999',
-                    errorText: 'Erro Remoto'
-                });
-
-                return;
-            }
-
-            var $response = $(xData.responseText);
-            var errorCode = $response.find('ErrorCode').text();
-
-            if (errorCode == '0x00000000') {
-                $promise.resolve({
-                    record: $response.find('z\\:row:first')
-                });
-            } else {
-                $promise.reject({
-                    errorCode: errorCode,
-                    errorText: $response.find('ErrorText').text()
-                });
-            }
-        }
-    });
-
-    return $promise;
-};
 
 function AtualizarAgendamento(id) {
     var campos = [];
@@ -125,6 +75,7 @@ function AtualizarAgendamento(id) {
     });
 
     var $promise = $.Deferred();
+    CalcularCamposCalculados();
 
     $().SPServices({
         operation: "UpdateListItems",
@@ -160,7 +111,15 @@ function AtualizarAgendamento(id) {
     });
 
     return $promise;
-};
+}
+
+function CalcularCamposCalculados() {
+    var $titulo = $('input[name=Title]');
+    var $codigoProduto = $('input[name=CodigoProduto]');
+    var $projeto = $('input[name=Projeto]');
+
+    $titulo.val($codigoProduto.val() + ' - ' + $projeto.val());
+}
 
 function CarregarAgendamento(id) {
     var $promise = $.Deferred();
@@ -198,10 +157,11 @@ function CarregarAgendamento(id) {
 
                 if ($elemento.is('[type=checkbox]')) {
                     $elemento.attr('checked', this.value == "1");
-                    $elemento.change();
                 } else {
                     $elemento.val(this.value);
                 }
+
+                $elemento.change();
             });
 
             $promise.resolve();
@@ -209,19 +169,88 @@ function CarregarAgendamento(id) {
     });
 
     return $promise;
-};
+}
 
-function ResetarAgendamento() {
-    $('#main [name]').each(function () {
-        var $this = $(this);
+function CarregarCategoriaProjeto() {
+    var $promise = $.Deferred();
 
-        if ($this.is('[type=checkbox]')) {
-            $this.attr('checked', false);
-            $this.change();
-        } else {
-            $this.val('');
+    $().SPServices({
+        operation: "GetList",
+        listName: "Agendamentos",
+        completefunc: function (Data, Status) {
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
+                });
+
+                return;
+            }
+
+            $(Data.responseXML).find('Field[DisplayName="Categoria do projeto"] CHOICE').each(function () {
+                $('select#categoriaDoProjeto').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+            });
+
+            $promise.resolve();
         }
     });
+
+    return $promise;
+}
+
+function CarregarFabricas() {
+    var $promise = $.Deferred();
+
+    $().SPServices({
+        operation: 'GetListItems',
+        listName: 'Fábricas Internas e Armazenamento de Fábricas Terceiras',
+        CAMLViewFields: '<ViewFields><FieldRef Name="Title" /><FieldRef Name="ID" /><FieldRef Name="Numero" /></ViewFields>',
+        completefunc: function (Data, Status) {
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
+                });
+
+                return;
+            }
+
+            $(Data.responseXML).SPFilterNode("z:row").each(function () {
+                $('select#fabrica').append('<option value="' + $(this).attr("ows_ID") + '">' + $(this).attr("ows_Title") + ' - ' + $(this).attr("ows_Numero") + '</option>')
+            });
+
+            $promise.resolve();
+        }
+    });
+
+    return $promise;
+}
+
+function CarregarLinhasDoProduto() {
+    var $promise = $.Deferred();
+
+    $().SPServices({
+        operation: "GetList",
+        listName: "Agendamentos",
+        completefunc: function (Data, Status) {
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
+                });
+
+                return;
+            }
+
+            $(Data.responseXML).find('Field[DisplayName="Linha do produto"] CHOICE').each(function () {
+                $('select#linhaDoProduto').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+            });
+
+            $promise.resolve();
+        }
+    });
+
+    return $promise;
 }
 
 function CarregarLinhasEquipamentos(fabrica, tipoLote) {
@@ -253,13 +282,12 @@ function CarregarLinhasEquipamentos(fabrica, tipoLote) {
     return $promise;
 }
 
-function CarregarFabricas() {
+function CarregarListaGrauComplexidade() {
     var $promise = $.Deferred();
 
     $().SPServices({
-        operation: 'GetListItems',
-        listName: 'Fábricas Internas e Armazenamento de Fábricas Terceiras',
-        CAMLViewFields: '<ViewFields><FieldRef Name="Title" /><FieldRef Name="ID" /><FieldRef Name="Numero" /></ViewFields>',
+        operation: 'GetList',
+        listName: 'Agendamentos',
         completefunc: function (Data, Status) {
             if (Status != 'success') {
                 $promise.reject({
@@ -270,9 +298,9 @@ function CarregarFabricas() {
                 return;
             }
 
-            $(Data.responseXML).SPFilterNode("z:row").each(function () {
-                $('select#fabrica').append('<option value="' + $(this).attr("ows_ID") + '">' + $(this).attr("ows_Title") + ' - ' + $(this).attr("ows_Numero") + '</option>')
-            })
+            $(Data.responseXML).find('Field[DisplayName="Grau de complexidade"] CHOICE').each(function () {
+                $('select#grauComplexidade').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+            });
 
             $promise.resolve();
         }
@@ -281,89 +309,86 @@ function CarregarFabricas() {
     return $promise;
 }
 
-function CarregarListaGrauComplexidade() {
+function CarregarListaMotivos() {
+    var $promise = $.Deferred();
+
     $().SPServices({
         operation: 'GetList',
         listName: 'Agendamentos',
         completefunc: function (Data, Status) {
-            if (Status == 'success') {
-                $(Data.responseXML).find('Field[DisplayName="Grau de complexidade"] CHOICE').each(function () {
-                    $('select#grauComplexidade').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
                 });
+
+                return;
             }
+
+            $(Data.responseXML).find('Field[DisplayName="Motivo"] CHOICE').each(function () {
+                $('select#motivo').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+            });
+
+            $promise.resolve();
         }
     });
-};
+
+    return $promise;
+}
 
 function CarregarListaStatus() {
-    $().SPServices({
-        operation: 'GetList',
-        listName: 'Agendamentos',
-        completefunc: function (Data, Status) {
-            if (Status == 'success') {
-                $(Data.responseXML).find('Field[DisplayName="Status"] CHOICE').each(function () {
-                    $('select#status').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
-                });
-            }
-        }
-    });
-};
+    var $promise = $.Deferred();
 
-function CarregarListaMotivos() {
     $().SPServices({
         operation: 'GetList',
         listName: 'Agendamentos',
         completefunc: function (Data, Status) {
-            if (Status == 'success') {
-                $(Data.responseXML).find('Field[DisplayName="Motivo"] CHOICE').each(function () {
-                    $('select#motivo').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
                 });
+
+                return;
             }
+
+            $(Data.responseXML).find('Field[DisplayName="Status"] CHOICE').each(function () {
+                $('select#status').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+            });
+
+            $promise.resolve();
         }
     });
-};
+
+    return $promise;
+}
 
 function CarregarListaTiposLotes() {
+    var $promise = $.Deferred();
+
     $().SPServices({
         operation: 'GetList',
         listName: 'Agendamentos',
         completefunc: function (Data, Status) {
-            if (Status == 'success') {
-                $(Data.responseXML).find('Field[DisplayName="Tipo de Lote"] CHOICE').each(function () {
-                    $('select#tipoDeLote').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
                 });
-            }
-        }
-    });
-};
 
-function CarregarCategoriaProjeto() {
-    $().SPServices({
-        operation: "GetList",
-        listName: "Agendamentos",
-        completefunc: function (Data, Status) {
-            if (Status == 'success') {
-                $(Data.responseXML).find('Field[DisplayName="Categoria do projeto"] CHOICE').each(function () {
-                    $('select#categoriaDoProjeto').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
-                });
+                return;
             }
-        }
-    });
-};
 
-function CarregarLinhasDoProduto() {
-    $().SPServices({
-        operation: "GetList",
-        listName: "Agendamentos",
-        completefunc: function (Data, Status) {
-            if (Status == 'success') {
-                $(Data.responseXML).find('Field[DisplayName="Linha do produto"] CHOICE').each(function () {
-                    $('select#linhaDoProduto').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
-                });
-            }
+            $(Data.responseXML).find('Field[DisplayName="Tipo de Lote"] CHOICE').each(function () {
+                $('select#tipoDeLote').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+            });
+
+            $promise.resolve();
         }
     });
-};
+
+    return $promise;
+}
 
 function EscolherAgendamento() {
     var agendamentoId = prompt('Digite o ID do agendamento');
@@ -375,10 +400,76 @@ function EscolherAgendamento() {
             alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
         });
     }
-};
+}
 
-function initializeAllPeoplePickers()
-{
+function InserirAgendamento() {
+    var campos = [];
+
+    $('#main [name]').each(function () {
+        var $this = $(this);
+
+        if ($this.is('[type=checkbox]') && $this.val() != undefined) {
+            campos.push([this.name, $this.val() == 'on']);
+        } else if ($this.val() != undefined) {
+            campos.push([this.name, $this.val()]);
+        }
+    });
+
+    var $promise = $.Deferred();
+    CalcularCamposCalculados();
+
+    $().SPServices({
+        operation: "UpdateListItems",
+        async: false,
+        batchCmd: "New",
+        listName: "Agendamentos",
+        valuepairs: campos,
+        completefunc: function (xData, Status) {
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
+                });
+
+                return;
+            }
+
+            var $response = $(xData.responseText);
+            var errorCode = $response.find('ErrorCode').text();
+
+            if (errorCode == '0x00000000') {
+                $promise.resolve({
+                    record: $response.find('z\\:row:first')
+                });
+            } else {
+                $promise.reject({
+                    errorCode: errorCode,
+                    errorText: $response.find('ErrorText').text()
+                });
+            }
+        }
+    });
+
+    return $promise;
+}
+
+function ResetarAgendamento() {
+    $('#main [name]').each(function () {
+        var $this = $(this);
+
+        if ($this.is('[type=checkbox]')) {
+            $this.attr('checked', false);
+        } else {
+            $this.val('');
+        }
+
+        $this.change();
+    });
+
+    $('select#status').val('Rascunho').change();
+}
+
+function initializeAllPeoplePickers() {
     initializePeoplePicker('peoplePickerRespDLPCL');
     initializePeoplePicker('peoplePickerRespEngEnvase');
     initializePeoplePicker('peoplePickerGerenteEngEnvase');
@@ -392,115 +483,119 @@ function initializeAllPeoplePickers()
     initializePeoplePicker('peoplePickerGerenteQualidade');
     initializePeoplePicker('peoplePickerRespFabrica');
     initializePeoplePicker('peoplePickerGerenteFabrica');
-    
-};
+}
 
 $(document).ready(function () {
-    CarregarLinhasDoProduto();
-    CarregarCategoriaProjeto();
-    CarregarListaStatus();
-    CarregarListaTiposLotes();
-    CarregarListaMotivos();
-    CarregarFabricas();
-    CarregarListaGrauComplexidade();
+    $.when(
+        CarregarCategoriaProjeto(),
+        CarregarFabricas(),
+        CarregarLinhasDoProduto(),
+        CarregarListaGrauComplexidade(),
+        CarregarListaMotivos(),
+        CarregarListaStatus(),
+        CarregarListaTiposLotes()
+    ).then(function () {
+        ResetarAgendamento();
+        initializeAllPeoplePickers();
 
-    initializeAllPeoplePickers();
+        $("#produtoControlResponsavelAmostra").hide();
+        $("#produtoControlQuantidadeAmostra").hide();
+        $("#produtoResponsavelAmostra").text('');
+        $("#produtoQuantidadeAmostra").text('');
 
-    $("#produtoControlResponsavelAmostra").hide();
-    $("#produtoControlQuantidadeAmostra").hide();
-    $("#produtoResponsavelAmostra").text('');
-    $("#produtoQuantidadeAmostra").text('');
+        $("#produtoEnvioAmostras").change(function () {
+            if (this.checked) {
+                $("#produtoResponsavelAmostra").text('');
+                $("#produtoQuantidadeAmostra").text('');
+                $("#produtoControlResponsavelAmostra").show();
+                $("#produtoControlQuantidadeAmostra").show();
+            } else {
+                $("#produtoControlResponsavelAmostra").hide();
+                $("#produtoControlQuantidadeAmostra").hide();
+            }
+        });
 
-    $("#produtoEnvioAmostras").change(function () {
-        if (this.checked) {
-            $("#produtoResponsavelAmostra").text('');
-            $("#produtoQuantidadeAmostra").text('');
-            $("#produtoControlResponsavelAmostra").show();
-            $("#produtoControlQuantidadeAmostra").show();
-        } else {
-            $("#produtoControlResponsavelAmostra").hide();
-            $("#produtoControlQuantidadeAmostra").hide();
-        }
-    });
+        $('#tipoDeLote').change(function () {
+            $('#tabsResponsaveis').show();
+            $('#tabsResponsaveis ul:first li').hide();
+            $('#tabsAcompanhamento').show();
+            $('#tabsAcompanhamento ul:first li').hide();
 
-    $('#tipoDeLote').change(function () {
-        $('#tabsResponsaveis').show();
-        $('#tabsResponsaveis ul:first li').hide();
-        $('#tabsAcompanhamento').show();
-        $('#tabsAcompanhamento ul:first li').hide();
+            switch (this.value) {
+                case 'Brinde':
+                    $('li a[href="#tab-RespDLPCL"]').parent().show();
+                    $('li a[href="#tab-RespQual"]').parent().show();
 
-        switch (this.value) {
-            case 'Brinde':
-                $('li a[href="#tab-RespDLPCL"]').parent().show();
-                $('li a[href="#tab-RespQual"]').parent().show();
+                    $('li a[href="#tab-AcompEngEnv"]').parent().show();
+                    $('li a[href="#tab-AcompEngFab"]').parent().show();
+                    $('li a[href="#tab-AcompInvDE"]').parent().show();
+                    $('li a[href="#tab-AcompInvDF"]').parent().show();
+                    $('li a[href="#tab-AcompFab"]').parent().show();
+                    $('li a[href="#tab-AcompMeioAmb"]').parent().show();
+                    break;
+                case 'Envase':
+                    $('li a[href="#tab-RespDLPCL"]').parent().show();
+                    $('li a[href="#tab-RespEngEnv"]').parent().show();
+                    $('li a[href="#tab-RespInvDF"]').parent().show();
+                    $('li a[href="#tab-RespQual"]').parent().show();
+                    $('li a[href="#tab-RespFab"]').parent().show();
 
-                $('li a[href="#tab-AcompEngEnv"]').parent().show();
-                $('li a[href="#tab-AcompEngFab"]').parent().show();
-                $('li a[href="#tab-AcompInvDE"]').parent().show();
-                $('li a[href="#tab-AcompInvDF"]').parent().show();
-                $('li a[href="#tab-AcompFab"]').parent().show();
-                $('li a[href="#tab-AcompMeioAmb"]').parent().show();
-                break;
-            case 'Envase':
-                $('li a[href="#tab-RespDLPCL"]').parent().show();
-                $('li a[href="#tab-RespEngEnv"]').parent().show();
-                $('li a[href="#tab-RespInvDF"]').parent().show();
-                $('li a[href="#tab-RespQual"]').parent().show();
-                $('li a[href="#tab-RespFab"]').parent().show();
+                    $('li a[href="#tab-AcompInvDE"]').parent().show();
+                    $('li a[href="#tab-AcompEngFab"]').parent().show();
+                    $('li a[href="#tab-AcompMeioAmb"]').parent().show();
+                    break;
+                case 'Fabricação':
+                    $('li a[href="#tab-RespDLPCL"]').parent().show();
+                    $('li a[href="#tab-RespEngFab"]').parent().show();
+                    $('li a[href="#tab-RespInvDF"]').parent().show();
+                    $('li a[href="#tab-RespQual"]').parent().show();
+                    $('li a[href="#tab-RespFab"]').parent().show();
 
-                $('li a[href="#tab-AcompInvDE"]').parent().show();
-                $('li a[href="#tab-AcompEngFab"]').parent().show();
-                $('li a[href="#tab-AcompMeioAmb"]').parent().show();
-                break;
-            case 'Fabricação':
-                $('li a[href="#tab-RespDLPCL"]').parent().show();
-                $('li a[href="#tab-RespEngFab"]').parent().show();
-                $('li a[href="#tab-RespInvDF"]').parent().show();
-                $('li a[href="#tab-RespQual"]').parent().show();
-                $('li a[href="#tab-RespFab"]').parent().show();
+                    $('li a[href="#tab-AcompEngEnv"]').parent().show();
+                    $('li a[href="#tab-AcompInvDE"]').parent().show();
+                    $('li a[href="#tab-AcompMeioAmb"]').parent().show();
+                    break;
+                case 'Picking':
+                    $('#tabsResponsaveis').hide();
+                    $('#tabsAcompanhamento').hide();
+                    break;
+            }
+        });
 
-                $('li a[href="#tab-AcompEngEnv"]').parent().show();
-                $('li a[href="#tab-AcompInvDE"]').parent().show();
-                $('li a[href="#tab-AcompMeioAmb"]').parent().show();
-                break;
-            case 'Picking':
-                $('#tabsResponsaveis').hide();
-                $('#tabsAcompanhamento').hide();
-                break;
-        }
-    });
+        $('#tipoDeLote').change();
 
-    $('#tipoDeLote').change();
+        $('#btnSalvar').click(function () {
+            var id = $('input[name="ID"]').val();
 
-    $('#btnSalvar').click(function () {
-        var id = $('input[name="ID"]').val();
-
-        if (id) {
-            AtualizarAgendamento(id).then(function (response) {
-                CarregarAgendamento(response.record.attr('ows_ID')).then(function () {
-                    alert("Agendamento Salvo");
+            if (id) {
+                AtualizarAgendamento(id).then(function (response) {
+                    CarregarAgendamento(response.record.attr('ows_ID')).then(function () {
+                        alert("Agendamento Salvo");
+                    });
+                }).fail(function (response) {
+                    alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
                 });
-            }).fail(function (response) {
-                alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
-            });
-        } else {
-            InserirAgendamento().then(function (response) {
-                CarregarAgendamento(response.record.attr('ows_ID')).then(function () {
-                    alert("Agendamento Salvo");
+            } else {
+                InserirAgendamento().then(function (response) {
+                    CarregarAgendamento(response.record.attr('ows_ID')).then(function () {
+                        alert("Agendamento Salvo");
+                    });
+                }).fail(function (response) {
+                    alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
                 });
-            }).fail(function (response) {
-                alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
-            });
-        }
+            }
 
-        return false;
+            return false;
+        });
+
+        $('#btnCarregar').click(function () {
+            EscolherAgendamento();
+        });
+
+        // if(!$('[type="text"][name="ID"]').val()) {
+        //     EscolherAgendamento();
+        // }
+    }).fail(function () {
+
     });
-
-    $('#btnCarregar').click(function () {
-        EscolherAgendamento();
-    });
-
-    // if(!$('[type="text"][name="ID"]').val()) {
-    //     EscolherAgendamento();
-    // }
 });

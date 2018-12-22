@@ -15,25 +15,22 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.SPServices/2014.02/jquery.SPServices.js"></script>
 <script src="/sites/DEV_LotePiloto/SiteAssets/JS/lotePiloto.js"></script>
 <div id="main">
+    <input type="hidden" name="Title" required />
     <div class="container" style="background-color: rgb(242, 242, 242); padding: 10px; margin-bottom: 10px">
         <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <label for="inputId">ID</label>
                 <input type="text" readonly class="form-control" id="inputId" name="ID">
             </div>
-            <div class="col-md-3">
-                <label for="inputTitulo">Titulo</label>
-                <input type="text" required="true" class="form-control" id="inputTitulo" name="Title">
-            </div>
-            <div class="col-md-3">
-                <label for="status">Status</label>
-                <select class="custom-select" id="status" name="Status">
+            <div class="col-md-4">
+                <label for="tipoDeLote">Tipo de Lote</label>
+                <select class="custom-select" id="tipoDeLote" name="TipoLote">
                     <option disabled selected>Selecione uma opção</option>
                 </select>
             </div>
-            <div class="col-md-3">
-                <label for="tipoDeLote">Tipo de Lote</label>
-                <select class="custom-select" id="tipoDeLote" name="TipoLote">
+            <div class="col-md-4">
+                <label for="status">Status</label>
+                <select class="custom-select" id="status" name="Status" disabled>
                     <option disabled selected>Selecione uma opção</option>
                 </select>
             </div>
