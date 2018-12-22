@@ -1,8 +1,11 @@
-<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 <link rel="stylesheet" href="/sites/DEV_LotePiloto/SiteAssets/CSS/bootstrap-custom.css">
 <link rel="stylesheet" href="/sites/DEV_LotePiloto/SiteAssets/CSS/bootstrap-custom-grid.css">
 <link rel="stylesheet" href="/sites/DEV_LotePiloto/SiteAssets/CSS/bootstrap-custom-reboot.css">
+<link rel="stylesheet" href="/sites/DEV_LotePiloto/SiteAssets/CSS/daterangepicker.css">
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.js"></script>
 <script type="text/javascript" src="/sites/DEV_LotePiloto/SiteAssets/bootstrap/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="/sites/DEV_LotePiloto/SiteAssets/JS/moment.min.js"></script>
+<script type="text/javascript" src="/sites/DEV_LotePiloto/SiteAssets/JS/daterangepicker.js"></script>
 <script type="text/javascript" src="/_layouts/15/MicrosoftAjax.js"></script>
 <script type="text/javascript" src="/_layouts/15/sp.core.js"></script>
 <script type="text/javascript" src="/_layouts/15/sp.runtime.js"></script>
@@ -12,9 +15,9 @@
 <script type="text/javascript" src="/_layouts/15/clientpeoplepicker.js"></script>
 <script type="text/javascript" src="/_layouts/15/autofill.js"></script>
 <script type="text/javascript" src="/_layouts/15/1033/sts_strings.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.SPServices/2014.02/jquery.SPServices.js"></script>
-<script src="/sites/DEV_LotePiloto/SiteAssets/JS/lotePiloto.js"></script>
-<div id="main">
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.SPServices/2014.02/jquery.SPServices.js"></script>
+<script type="text/javascript" src="/sites/DEV_LotePiloto/SiteAssets/JS/lotePiloto.js"></script>
+<div id="main" style="margin-bottom: 40px;">
     <input type="hidden" name="Title" required />
     <div class="container" style="background-color: rgb(242, 242, 242); padding: 10px; margin-bottom: 10px;">
         <div class="row">
@@ -96,7 +99,7 @@
                     <input type="text" class="form-control" id="produtoFormula" name="Formula">
                 </div>
                 <div class="col-md-6">
-                    <label for="produtoQuantidade">Quantidade (peças)</label>
+                    <label for="produtoQuantidade">Quantidade <span></span></label>
                     <input type="text" class="form-control" id="produtoQuantidade" name="QuantidadePecas">
                 </div>
             </div>
@@ -145,31 +148,29 @@
                     <label for="agendamentoCentroCusto">Centro de custo - PEP - NT</label>
                     <input type="text" class="form-control" id="agendamentoCentroCusto" name="CentroCusto">
                 </div>
-            </div>
-            <div class="row" style="margin-top: 10px;">
                 <div class="col-md-6">
                     <label for="grauComplexidade">Grau de complexidade</label>
                     <select class="custom-select" id="grauComplexidade" name="GrauComplexidade">
                         <option disabled selected>Selecione uma opção</option>
                     </select>
                 </div>
-                <div class="col-md-6">
-                    <label for="agendamentoDataInicioProgramado">Início programado</label>
-                    <input type="text" class="form-control" id="agendamentoDataInicioProgramado" name="InicioProgramado"/>
-                </div>
             </div>
             <div class="row" style="margin-top: 10px;">
-                <div class="col-md-3">
-                    <label for="agendamentoDuracaoHora">Duração (hh)</label>
-                    <input type="text" class="form-control" id="agendamentoDuracaoHora" name="DuracaoEstimadaHoras"/>
+                <div class="col-md-4">
+                    <label for="agendamentoDataInicioProgramado">Início programado</label>
+                    <input type="text" class="form-control date-time-picker" id="agendamentoDataInicioProgramado" name="InicioProgramado"/>
                 </div>
-                <div class="col-md-3">
-                    <label for="agendamentoDuracaoMinuto">Duração (mm)</label>
-                    <input type="text" class="form-control" id="agendamentoDuracaoMinuto" name="DuracaoEstimadaMinutos"/>
+                <div class="col-md-2">
+                    <label for="agendamentoDuracaoHoras">Duração (HH)</label>
+                    <input type="text" class="form-control" id="agendamentoDuracaoHoras" name="DuracaoEstimadaHoras" />
                 </div>
-                <div class="col-md-6">
-                    <label for="agendamentoFim">Fim programado (calculado)</label>
-                    <input type="text" class="form-control" id="agendamentoFim"/>
+                <div class="col-md-2">
+                    <label for="agendamentoDuracaoMinutos">Duração (mm)</label>
+                    <input type="text" class="form-control" id="agendamentoDuracaoMinutos" name="DuracaoEstimadaMinutos" />
+                </div>
+                <div class="col-md-4">
+                    <label for="agendamentoFim">Fim programado</label>
+                    <input type="text" class="form-control date-time-picker" id="agendamentoFim" readonly />
                 </div>
             </div>
             <div class="row" style="margin-top: 10px;">

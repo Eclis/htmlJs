@@ -595,6 +595,42 @@ $(document).ready(function () {
         // if(!$('[type="text"][name="ID"]').val()) {
         //     EscolherAgendamento();
         // }
+
+        $('.date-time-picker').daterangepicker({
+            opens: 'center',
+            singleDatePicker: true,
+            showDropdowns: true,
+            timePicker: true,
+            timePicker24Hour: true,
+            locale: {
+                format: 'DD/MM/YYYY HH:mm',
+                applyLabel: "Apply",
+                cancelLabel: 'Limpar',
+                daysOfWeek: [
+                    "Do",
+                    "Se",
+                    "Te",
+                    "Qu",
+                    "Qu",
+                    "Se",
+                    "Sa"
+                ],
+                monthNames: [
+                    "Janeiro",
+                    "Fevereiro",
+                    "Março",
+                    "Abril",
+                    "Maio",
+                    "Junho",
+                    "Julho",
+                    "Agosto",
+                    "Setembro",
+                    "Outubro",
+                    "Novembro",
+                    "Dezembro"
+                ]
+            }
+        });
     }).fail(function () {
 
     });
