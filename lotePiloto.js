@@ -226,6 +226,44 @@ function CarregarFabricas() {
     return $promise;
 }
 
+function CarregarHistorico(agendamentoId) {
+    var $promise = $.Deferred();
+
+    $().SPServices({
+        operation: 'GetListItems',
+        listName: 'Agendamentos - Histórico',
+        CAMLQuery: '<Query><Where><Eq><FieldRef Name="CodigoAgendamento" /><Value Type="Text">' + agendamentoId + '</Value></Eq></Where></Query>',
+        CAMLViewFields: '<ViewFields><FieldRef Name="Title" /><FieldRef Name="Area" /><FieldRef Name="Mensagem" /><FieldRef Name="CodigoAgendamento" /><FieldRef Name="Modified" /><FieldRef Name="Created" /><FieldRef Name="Author" /><FieldRef Name="Editor" /></ViewFields>',
+        completefunc: function (Data, Status) {
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
+                });
+
+                return;
+            }
+
+            var registros = [];
+
+            $(Data.responseText).find("z\\:row").each(function () {
+                var colunas = this.attributes;
+                var registro = {};
+
+                $.each(colunas, function () {
+                    registro[this.name.substr(4)] = this.value;
+                });
+
+                registros.push(registro);
+            });
+
+            $promise.resolve(registros);
+        }
+    });
+
+    return $promise;
+}
+
 function CarregarLinhasDoProduto() {
     var $promise = $.Deferred();
 
@@ -630,6 +668,29 @@ $(document).ready(function () {
                     "Dezembro"
                 ]
             }
+        });
+
+        CarregarHistorico(10267).then(function (registros) {
+            $.fn.dataTable.ext.errMode = 'throw';
+
+            $('#data-table').DataTable({
+                data: registros,
+                columns: [
+                    { data: 'id', title: 'ID'},
+                    { data: 'title', title: 'Ação' },
+                    { data: 'area', title: 'Área' },
+                    { data: 'mensagem', title: 'Mensagem' },
+                    { data: 'author', title: 'Criado por' },
+                    { data: 'created', title: 'Criado'}
+                ],
+                language: {
+                    decimal: ',',
+                    thousands: '.',
+                    url: 'https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Portuguese-Brasil.json'
+                },
+                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
+                order: [[ 0, 'desc' ]],
+            });
         });
     }).fail(function () {
 
