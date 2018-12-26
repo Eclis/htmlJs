@@ -536,20 +536,13 @@ $(document).ready(function () {
         ResetarAgendamento();
         initializeAllPeoplePickers();
 
-        $("#produtoControlResponsavelAmostra").hide();
-        $("#produtoControlQuantidadeAmostra").hide();
-        $("#produtoResponsavelAmostra").text('');
-        $("#produtoQuantidadeAmostra").text('');
-
         $("#produtoEnvioAmostras").change(function () {
             if (this.checked) {
+                $("#formResponsavelAmostra").show();
+            } else {
+                $("#formResponsavelAmostra").hide();
                 $("#produtoResponsavelAmostra").text('');
                 $("#produtoQuantidadeAmostra").text('');
-                $("#produtoControlResponsavelAmostra").show();
-                $("#produtoControlQuantidadeAmostra").show();
-            } else {
-                $("#produtoControlResponsavelAmostra").hide();
-                $("#produtoControlQuantidadeAmostra").hide();
             }
         });
 
