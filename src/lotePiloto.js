@@ -491,6 +491,25 @@ function InserirAgendamento() {
     return $promise;
 }
 
+function RegistrarBindings() {
+    var $status = $('select#status');
+
+    $status.change(function () {
+        $('.acoes a').each(function () {
+            var $botao = $(this);
+            var status = $botao.data('status');
+
+            if (status) {
+                if (status.indexOf($status.val()) > -1) {
+                    $botao.show();
+                } else {
+                    $botao.hide();
+                }
+            }
+        });
+    });
+}
+
 function ResetarAgendamento() {
     $('#main [name]').each(function () {
         var $this = $(this);
@@ -546,6 +565,7 @@ $(document).ready(function () {
         CarregarListaStatus(),
         CarregarListaTiposLotes()
     ).then(function () {
+        RegistrarBindings();
         ResetarAgendamento();
         initializeAllPeoplePickers();
 
