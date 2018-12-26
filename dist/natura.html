@@ -1,0 +1,490 @@
+<link rel="stylesheet" href="/sites/DEV_LotePiloto/SiteAssets/CSS/bootstrap-custom.css">
+<link rel="stylesheet" href="/sites/DEV_LotePiloto/SiteAssets/CSS/bootstrap-custom-grid.css">
+<link rel="stylesheet" href="/sites/DEV_LotePiloto/SiteAssets/CSS/bootstrap-custom-reboot.css">
+<link rel="stylesheet" href="/sites/DEV_LotePiloto/SiteAssets/CSS/daterangepicker.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script type="text/javascript" src="/sites/DEV_LotePiloto/SiteAssets/bootstrap/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="/sites/DEV_LotePiloto/SiteAssets/JS/moment.min.js"></script>
+<script type="text/javascript" src="/sites/DEV_LotePiloto/SiteAssets/JS/daterangepicker.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
+<script type="text/javascript" src="/_layouts/15/MicrosoftAjax.js"></script>
+<script type="text/javascript" src="/_layouts/15/sp.core.js"></script>
+<script type="text/javascript" src="/_layouts/15/sp.runtime.js"></script>
+<script type="text/javascript" src="/_layouts/15/sp.js"></script>
+<script type="text/javascript" src="/_layouts/15/clienttemplates.js"></script>
+<script type="text/javascript" src="/_layouts/15/clientforms.js"></script>
+<script type="text/javascript" src="/_layouts/15/clientpeoplepicker.js"></script>
+<script type="text/javascript" src="/_layouts/15/autofill.js"></script>
+<script type="text/javascript" src="/_layouts/15/1033/sts_strings.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.SPServices/2014.02/jquery.SPServices.js"></script>
+<script type="text/javascript" src="/sites/DEV_LotePiloto/SiteAssets/deploy/jose/lotePiloto.js"></script>
+<div id="main" style="margin-bottom: 40px;">
+    <input type="hidden" name="Title" required />
+    <div class="container" style="background-color: rgb(242, 242, 242); padding: 10px; margin-bottom: 10px;">
+        <div class="row">
+            <div class="col-md-4">
+                <label for="inputId">ID</label>
+                <input type="text" readonly class="form-control" id="inputId" name="ID">
+            </div>
+            <div class="col-md-4">
+                <label for="tipoDeLote">Tipo de Lote</label>
+                <select class="custom-select" id="tipoDeLote" name="TipoLote">
+                    <option disabled selected>Selecione uma opção</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="status">Status</label>
+                <select class="custom-select" id="status" name="Status" disabled>
+                    <option disabled selected>Selecione uma opção</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <ul class="nav nav-tabs" id="nav-tab" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="pills-produto-tab" data-toggle="pill" href="#pills-produto" role="tab" aria-controls="pills-produto"
+                aria-selected="true">Produto</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="pills-agendamento-tab" data-toggle="pill" href="#pills-agendamento" role="tab" aria-controls="pills-agendamento"
+                aria-selected="false">Agendamento</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="pills-responsaveis-tab" data-toggle="pill" href="#pills-responsaveis" role="tab" aria-controls="pills-responsaveis"
+                aria-selected="false">Responsáveis</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="pills-acompanhamento-tab" data-toggle="pill" href="#pills-acompanhamento" role="tab" aria-controls="pills-acompanhamento"
+                aria-selected="false">Acompanhamento</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="pills-historico-tab" data-toggle="pill" href="#pills-historico" role="tab" aria-controls="pills-historico"
+                aria-selected="false">Histórico</a>
+        </li>
+    </ul>
+    <div class="tab-content" id="pills-tabContent">
+        <div class="tab-pane fade show active" id="pills-produto" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel" aria-labelledby="pills-produto-tab">
+            <div class="row" style="margin-top: 10px;">
+                <div class="col-md-6">
+                    <label for="codigoProduto">Código do produto</label>
+                    <input type="text" class="form-control" id="codigoProduto" name="CodigoProduto">
+                </div>
+                <div class="col-md-6">
+                    <label for="linhaDoProduto">Linha do produto</label>
+                    <select class="custom-select" id="linhaDoProduto" name="LinhaProduto">
+                        <option disabled selected>Selecione uma opção</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 10px;">
+                <div class="col-md-12">
+                    <label for="produtoDescricao">Descrição do produto</label>
+                    <textarea class="form-control" id="produtoDescricao" name="DescricaoProduto" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 10px;">
+                <div class="col-md-6">
+                    <label for="produtoProjeto">Projeto</label>
+                    <input type="text" class="form-control" id="produtoProjeto" name="Projeto">
+                </div>
+                <div class="col-md-6">
+                    <label for="categoriaDoProjeto">Categoria do projeto</label>
+                    <select class="custom-select" id="categoriaDoProjeto" name="CategoriaProjeto">
+                        <option disabled selected>Selecione uma opção</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 10px;">
+                <div class="col-md-6">
+                    <label for="produtoFormula">Fórmula</label>
+                    <input type="text" class="form-control" id="produtoFormula" name="Formula">
+                </div>
+                <div class="col-md-6">
+                    <label for="produtoQuantidade">Quantidade <span></span></label>
+                    <input type="text" class="form-control" id="produtoQuantidade" name="QuantidadePecas">
+                </div>
+            </div>
+            <div class="row" style="margin-top: 10px;">
+                <div class="col-md-6">
+                    <label for="categoriaDoProjeto">Motivo</label>
+                    <select class="custom-select" id="motivo" name="Motivo">
+                        <option disabled selected>Selecione uma opção</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 10px;">
+                <div class="col-md-auto">
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="produtoEnvioAmostras" name="EnvioAmostras">
+                        <label class="custom-control-label" for="produtoEnvioAmostras">Solicitação de envio de amostras</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 10px;">
+                <div class="col-md-6">
+                    <label for="produtoResponsavelAmostra">Responsável pela amostra</label>
+                    <input type="text" class="form-control" id="produtoResponsavelAmostra" name="ResponsavelAmostra">
+                </div>
+                <div class="col-md-6">
+                    <label for="produtoQuantidadeAmostra">Quantidade de amostras</label>
+                    <input type="text" class="form-control" id="produtoQuantidadeAmostra" name="QuantidadeAmostra">
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="pills-agendamento" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel" aria-labelledby="pills-agendamento-tab">
+            <div class="row" style="margin-top: 10px;">
+                <div class="col-md-6">
+                    <label for="fabrica">Fábrica</label>
+                    <select class="custom-select" id="fabrica" name="Fabrica">
+                        <option disabled selected>Selecione uma opção</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="linhaEquipamento">Linha ou Equipamento</label>
+                    <input type="text" class="form-control" id="linhaEquipamento" name="LinhaEquipamento">
+                </div>
+            </div>
+            <div class="row" style="margin-top: 10px;">
+                <div class="col-md-6">
+                    <label for="agendamentoCentroCusto">Centro de custo - PEP - NT</label>
+                    <input type="text" class="form-control" id="agendamentoCentroCusto" name="CentroCusto">
+                </div>
+                <div class="col-md-6">
+                    <label for="grauComplexidade">Grau de complexidade</label>
+                    <select class="custom-select" id="grauComplexidade" name="GrauComplexidade">
+                        <option disabled selected>Selecione uma opção</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 10px;">
+                <div class="col-md-4">
+                    <label for="agendamentoDataInicioProgramado">Início programado</label>
+                    <input type="text" class="form-control date-time-picker" id="agendamentoDataInicioProgramado" name="InicioProgramado"/>
+                </div>
+                <div class="col-md-2">
+                    <label for="agendamentoDuracaoHoras">Duração (HH)</label>
+                    <input type="text" class="form-control" id="agendamentoDuracaoHoras" name="DuracaoEstimadaHoras" />
+                </div>
+                <div class="col-md-2">
+                    <label for="agendamentoDuracaoMinutos">Duração (mm)</label>
+                    <input type="text" class="form-control" id="agendamentoDuracaoMinutos" name="DuracaoEstimadaMinutos" />
+                </div>
+                <div class="col-md-4">
+                    <label for="agendamentoFim">Fim programado</label>
+                    <input type="text" class="form-control date-time-picker" id="agendamentoFim" readonly />
+                </div>
+            </div>
+            <div class="row" style="margin-top: 10px;">
+                <div class="col-md-12">
+                    <label for="agendamentoObservacoes">Observações</label>
+                    <textarea class="form-control" id="agendamentoObservacoes" name="Observacoes" rows="3"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="pills-responsaveis" style="background-color: rgb(242, 242, 242); padding: 10px; margin-bottom: 10px;" role="tabpanel" aria-labelledby="pills-responsaveis-tab">
+            <ul class="nav nav-tabs" id="nav-tab-responsaveis" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="pills-dlpcl-tab" data-toggle="pill" href="#pills-dlpcl" role="tab" aria-controls="pills-dlpcl"
+                        aria-selected="true">DL/PCL</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="pills-eng-envase-tab" data-toggle="pill" href="#pills-eng-envase" role="tab" aria-controls="pills-eng-envase"
+                        aria-selected="false">Eng. Envase</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="pills-eng-fabricacao-tab" data-toggle="pill" href="#pills-eng-fabricacao" role="tab" aria-controls="pills-eng-fabricacao"
+                        aria-selected="false">Eng. Fabricação</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="pills-inov-df-tab" data-toggle="pill" href="#pills-inov-df" role="tab" aria-controls="pills-inov-df"
+                        aria-selected="false">Inov. DF</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="pills-inov-de-tab" data-toggle="pill" href="#pills-inov-de" role="tab" aria-controls="pills-inov-de"
+                        aria-selected="false">Inov. DE</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="pills-qualidade-tab" data-toggle="pill" href="#pills-qualidade" role="tab" aria-controls="pills-qualidade"
+                        aria-selected="false">Qualidade</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="pills-fabrica-tab" data-toggle="pill" href="#pills-fabrica" role="tab" aria-controls="pills-fabrica"
+                        aria-selected="false">Fábrica</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="pills-tabContent-responsaveis">
+                <div class="tab-pane fade show active" id="pills-dlpcl" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel" aria-labelledby="pills-dlpcl-tab">
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-auto">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="acRespDLPCL">
+                                <label class="custom-control-label" for="acRespDLPCL">Haverá acompanhamento durante a execução do lote?</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-3">
+                            <label for="peoplePickerRespDLPCL">Responsável</label>
+                            <input type="text" class="form-control" id="peoplePickerRespDLPCL"/>
+                        </div>
+                        <div class="col-md-3">
+                            <a id="btnGetUserInfoDlpcl" href="#" class="btn btn-primary" role="button">Get user info</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="pills-eng-envase" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel" aria-labelledby="pills-eng-envase-tab">
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-auto">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="acRespEngEnvase">
+                                <label class="custom-control-label" for="acRespEngEnvase">Haverá acompanhamento durante a execução do lote?</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-3">
+                            <label for="peoplePickerRespEngEnvase">Responsável</label>
+                            <input type="text" class="form-control" id="peoplePickerRespEngEnvase"/>
+                        </div>
+                        <div class="col-md-3">
+                            <a id="btnGetUserInfoRespEngEnfase" href="#" class="btn btn-primary" role="button">Get user info</a>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="peoplePickerGerEngEnvase">Gerente</label>
+                            <input type="text" class="form-control" id="peoplePickerGerEngEnvase"/>
+                        </div>
+                        <div class="col-md-3">
+                            <a id="btnGetUserInfoGerEngEnfase" href="#" class="btn btn-primary" role="button">Get user info</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="pills-eng-fabricacao" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel" aria-labelledby="pills-eng-fabricacao-tab">
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-auto">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="acRespEngfabricacao">
+                                <label class="custom-control-label" for="acRespEngfabricacao">Haverá acompanhamento durante a execução do lote?</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-3">
+                            <label for="peoplePickerRespEngFabricacao">Responsável</label>
+                            <input type="text" class="form-control" id="peoplePickerRespEngFabricacao"/>
+                        </div>
+                        <div class="col-md-3">
+                            <a id="btnGetUserInfoRespEngFabricacao" href="#" class="btn btn-primary" role="button">Get user info</a>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="peoplePickerGerEngFabricacao">Gerente</label>
+                            <input type="text" class="form-control" id="peoplePickerGerEngFabricacao"/>
+                        </div>
+                        <div class="col-md-3">
+                            <a id="btnGetUserInfoGerEngFabricacao" href="#" class="btn btn-primary" role="button">Get user info</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="pills-inov-df" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel" aria-labelledby="pills-inov-df-tab">
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-auto">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="acRespInofDF">
+                                <label class="custom-control-label" for="acRespInofDF">Haverá acompanhamento durante a execução do lote?</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-3">
+                            <label for="peoplePickerRespInofDF">Responsável</label>
+                            <input type="text" class="form-control" id="peoplePickerRespInofDF"/>
+                        </div>
+                        <div class="col-md-3">
+                            <a id="btnGetUserInfoRespInofDF" href="#" class="btn btn-primary" role="button">Get user info</a>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="peoplePickerGerInofDF">Gerente</label>
+                            <input type="text" class="form-control" id="peoplePickerGerInofDF"/>
+                        </div>
+                        <div class="col-md-3">
+                            <a id="btnGetUserInfoGerInofDF" href="#" class="btn btn-primary" role="button">Get user info</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="pills-inov-de" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel" aria-labelledby="pills-inov-de-tab">
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-auto">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="acRespInofDE">
+                                <label class="custom-control-label" for="acRespInofDE">Haverá acompanhamento durante a execução do lote?</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-3">
+                            <label for="peoplePickerRespInofDE">Responsável</label>
+                            <input type="text" class="form-control" id="peoplePickerRespInofDE"/>
+                        </div>
+                        <div class="col-md-3">
+                            <a id="btnGetUserInfoRespInofDE" href="#" class="btn btn-primary" role="button">Get user info</a>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="peoplePickerGerInofDE">Gerente</label>
+                            <input type="text" class="form-control" id="peoplePickerGerInofDE"/>
+                        </div>
+                        <div class="col-md-3">
+                            <a id="btnGetUserInfoGerInofDE" href="#" class="btn btn-primary" role="button">Get user info</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="pills-inov-de" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel" aria-labelledby="pills-inov-de-tab">
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-auto">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="acRespInofDE">
+                                <label class="custom-control-label" for="acRespInofDE">Haverá acompanhamento durante a execução do lote?</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-3">
+                            <label for="peoplePickerRespInofDE">Responsável</label>
+                            <input type="text" class="form-control" id="peoplePickerRespInofDE"/>
+                        </div>
+                        <div class="col-md-3">
+                            <a id="btnGetUserInfoRespInofDE" href="#" class="btn btn-primary" role="button">Get user info</a>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="peoplePickerGerInofDE">Gerente</label>
+                            <input type="text" class="form-control" id="peoplePickerGerInofDE"/>
+                        </div>
+                        <div class="col-md-3">
+                            <a id="btnGetUserInfoGerInofDE" href="#" class="btn btn-primary" role="button">Get user info</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="pills-qualidade" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel" aria-labelledby="pills-qualidade-tab">
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-auto">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="acRespQualidade">
+                                <label class="custom-control-label" for="acRespQualidade">Haverá acompanhamento durante a execução do lote?</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-3">
+                            <label for="peoplePickerRespQualidade">Responsável</label>
+                            <input type="text" class="form-control" id="peoplePickerRespQualidade"/>
+                        </div>
+                        <div class="col-md-3">
+                            <a id="btnGetUserInfoRespQualidade" href="#" class="btn btn-primary" role="button">Get user info</a>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="peoplePickerGerQualidade">Gerente</label>
+                            <input type="text" class="form-control" id="peoplePickerGerQualidade"/>
+                        </div>
+                        <div class="col-md-3">
+                            <a id="btnGetUserInfoGerQualidade" href="#" class="btn btn-primary" role="button">Get user info</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="pills-fabrica" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel" aria-labelledby="pills-fabrica-tab">
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-auto">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="acRespFabrica">
+                                <label class="custom-control-label" for="acRespFabrica">Haverá acompanhamento durante a execução do lote?</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-3">
+                            <label for="peoplePickerRespFabrica">Responsável</label>
+                            <input type="text" class="form-control" id="peoplePickerRespFabrica"/>
+                        </div>
+                        <div class="col-md-3">
+                            <a id="btnGetUserInfoRespFabrica" href="#" class="btn btn-primary" role="button">Get user info</a>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="peoplePickerGerFabrica">Gerente</label>
+                            <input type="text" class="form-control" id="peoplePickerGerFabrica"/>
+                        </div>
+                        <div class="col-md-3">
+                            <a id="btnGetUserInfoGerFabrica" href="#" class="btn btn-primary" role="button">Get user info</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="pills-acompanhamento" style="background-color: rgb(242, 242, 242); padding: 10px; margin-bottom: 10px;" role="tabpanel" aria-labelledby="pills-acompanhamento-tab">
+            <div id="tabsAcompanhamento">
+                <ul>
+                    <li>
+                        <a href="#tab-AcompEngEnv">Eng. Envase</a>
+                    </li>
+                    <li>
+                        <a href="#tab-AcompEngFab">Eng. Fabricação</a>
+                    </li>
+                    <li>
+                        <a href="#tab-AcompInvDE">Inov. DE</a>
+                    </li>
+                    <li>
+                        <a href="#tab-AcompInvDF">Inov. DF</a>
+                    </li>
+                    <li>
+                        <a href="#tab-AcompFab">Fábrica</a>
+                    </li>
+                    <li>
+                        <a href="#tab-AcompMeioAmb">Meio Ambiente</a>
+                    </li>
+                </ul>
+                <div id="tab-AcompEngEnv">
+                    <div>
+                        Haverá acompanhamento Eng. Envase durante a execução do lote?
+                        <input type="checkbox" checked data-toggle="tootle" id="acEngEnv" />
+                    </div>
+                </div>
+                <div id="tab-AcompEngFab">
+                    <div>
+                        Haverá acompanhamento Eng. Fabricação durante a execução do lote?
+                        <input type="checkbox" checked data-toggle="tootle" id="acEngFab" />
+                    </div>
+                </div>
+                <div id="tab-AcompInvDE">
+                    <div>
+                        Haverá acompanhamento Inov. DE durante a execução do lote?
+                        <input type="checkbox" checked data-toggle="tootle" id="acInDE" />
+                    </div>
+                </div>
+                <div id="tab-AcompInvDF">
+                    <div>
+                        Haverá acompanhamento Inov. DF durante a execução do lote?
+                        <input type="checkbox" checked data-toggle="tootle" id="acInDF" />
+                    </div>
+                </div>
+                <div id="tab-AcompFab">
+                    <div>
+                        Haverá acompanhamento Fábrica durante a execução do lote?
+                        <input type="checkbox" checked data-toggle="tootle" id="acFab" />
+                    </div>
+                </div>
+                <div id="tab-AcompMeioAmb">
+                    <div>
+                        Haverá acompanhamento Meio Ambiente durante a execução do lote?
+                        <input type="checkbox" checked data-toggle="tootle" id="acMeioAmb" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="pills-historico" style="background-color: rgb(242, 242, 242); padding: 10px; margin-bottom: 10px;" role="tabpanel" aria-labelledby="pills-historico-tab">
+            <table id="data-table"></table>
+        </div>
+    </div>
+    <div>
+        <a id="btnSalvar" href="#" class="btn btn-primary" role="button">Salvar</a>
+        <a id="btnCarregar" href="#" class="btn btn-primary" role="button">Carregar</a>
+        <a href="#" class="btn btn-primary btn-concluir d-none" role="button" data-status='["rascunho"]'>Concluir</a>
+    </div>
+</div>
