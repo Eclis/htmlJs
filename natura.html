@@ -419,61 +419,115 @@
             </div>
         </div>
         <div class="tab-pane fade" id="pills-acompanhamento" style="background-color: rgb(242, 242, 242); padding: 10px; margin-bottom: 10px;" role="tabpanel" aria-labelledby="pills-acompanhamento-tab">
-            <div id="tabsAcompanhamento">
-                <ul>
-                    <li>
-                        <a href="#tab-AcompEngEnv">Eng. Envase</a>
-                    </li>
-                    <li>
-                        <a href="#tab-AcompEngFab">Eng. Fabricação</a>
-                    </li>
-                    <li>
-                        <a href="#tab-AcompInvDE">Inov. DE</a>
-                    </li>
-                    <li>
-                        <a href="#tab-AcompInvDF">Inov. DF</a>
-                    </li>
-                    <li>
-                        <a href="#tab-AcompFab">Fábrica</a>
-                    </li>
-                    <li>
-                        <a href="#tab-AcompMeioAmb">Meio Ambiente</a>
-                    </li>
-                </ul>
-                <div id="tab-AcompEngEnv">
-                    <div>
-                        Haverá acompanhamento Eng. Envase durante a execução do lote?
-                        <input type="checkbox" checked data-toggle="tootle" id="acEngEnv" />
+            <ul class="nav nav-tabs" id="nav-tab-acompanhamento" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="pills-dlpcl-acomp-tab" data-toggle="pill" href="#pills-dlpcl-acomp" role="tab" aria-controls="pills-dlpcl-acomp"
+                        aria-selected="true">DL/PCL</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="pills-eng-envase-acomp-tab" data-toggle="pill" href="#pills-eng-envase-acomp" role="tab" aria-controls="pills-eng-envase-acomp"
+                        aria-selected="false">Eng. Envase</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="pills-eng-fabricacao-acomp-tab" data-toggle="pill" href="#pills-eng-fabricacao-acomp" role="tab" aria-controls="pills-eng-fabricacao-acomp"
+                        aria-selected="false">Eng. Fabricação</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="pills-inov-df-acomp-tab" data-toggle="pill" href="#pills-inov-df-acomp" role="tab" aria-controls="pills-inov-df-acomp"
+                        aria-selected="false">Inov. DF</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="pills-inov-de-acomp-tab" data-toggle="pill" href="#pills-inov-de-acomp" role="tab" aria-controls="pills-inov-de-acomp"
+                        aria-selected="false">Inov. DE</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="pills-qualidade-acomp-tab" data-toggle="pill" href="#pills-qualidade-acomp" role="tab" aria-controls="pills-qualidade-acomp"
+                        aria-selected="false">Qualidade</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="pills-fabrica-acomp-tab" data-toggle="pill" href="#pills-fabrica-acomp" role="tab" aria-controls="pills-fabrica-acomp"
+                        aria-selected="false">Fábrica</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="pills-tabContent-acompanhamento">
+                <div class="tab-pane fade show active" id="pills-dlpcl-acomp" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel" aria-labelledby="pills-dlpcl-acomp-tab">
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-auto">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="acRespDLPCLAcomp">
+                                <label class="custom-control-label" for="acRespDLPCLAcomp">Haverá acompanhamento durante a execução do lote?</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div id="tab-AcompEngFab">
-                    <div>
-                        Haverá acompanhamento Eng. Fabricação durante a execução do lote?
-                        <input type="checkbox" checked data-toggle="tootle" id="acEngFab" />
+                <div class="tab-pane fade" id="pills-eng-envase-acomp" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel" aria-labelledby="pills-eng-envase-acomp-tab">
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-auto">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="acRespEngEnvaseAcomp">
+                                <label class="custom-control-label" for="acRespEngEnvaseAcomp">Haverá acompanhamento durante a execução do lote?</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div id="tab-AcompInvDE">
-                    <div>
-                        Haverá acompanhamento Inov. DE durante a execução do lote?
-                        <input type="checkbox" checked data-toggle="tootle" id="acInDE" />
+                <div class="tab-pane fade" id="pills-eng-fabricacao-acomp" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel" aria-labelledby="pills-eng-fabricacao-acomp-tab">
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-auto">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="acRespEngfabricacaoAcomp">
+                                <label class="custom-control-label" for="acRespEngfabricacaoAcomp">Haverá acompanhamento durante a execução do lote?</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div id="tab-AcompInvDF">
-                    <div>
-                        Haverá acompanhamento Inov. DF durante a execução do lote?
-                        <input type="checkbox" checked data-toggle="tootle" id="acInDF" />
+                <div class="tab-pane fade" id="pills-inov-df-acomp" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel" aria-labelledby="pills-inov-df-acomp-tab">
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-auto">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="acRespInofDFAcomp">
+                                <label class="custom-control-label" for="acRespInofDFAcomp">Haverá acompanhamento durante a execução do lote?</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div id="tab-AcompFab">
-                    <div>
-                        Haverá acompanhamento Fábrica durante a execução do lote?
-                        <input type="checkbox" checked data-toggle="tootle" id="acFab" />
+                <div class="tab-pane fade" id="pills-inov-de-acomp" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel" aria-labelledby="pills-inov-de-acomp-tab">
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-auto">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="acRespInofDEAcomp">
+                                <label class="custom-control-label" for="acRespInofDEAcomp">Haverá acompanhamento durante a execução do lote?</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div id="tab-AcompMeioAmb">
-                    <div>
-                        Haverá acompanhamento Meio Ambiente durante a execução do lote?
-                        <input type="checkbox" checked data-toggle="tootle" id="acMeioAmb" />
+                <div class="tab-pane fade" id="pills-inov-de-acomp" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel" aria-labelledby="pills-inov-de-acomp-tab">
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-auto">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="acRespInofDEAcomp">
+                                <label class="custom-control-label" for="acRespInofDEAcomp">Haverá acompanhamento durante a execução do lote?</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="pills-qualidade-acomp" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel" aria-labelledby="pills-qualidade-acomp-tab">
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-auto">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="acRespQualidadeAcomp">
+                                <label class="custom-control-label" for="acRespQualidadeAcomp">Haverá acompanhamento durante a execução do lote?</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="pills-fabrica-acomp" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel" aria-labelledby="pills-fabrica-acomp-tab">
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-auto">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="acRespFabricaAcomp">
+                                <label class="custom-control-label" for="acRespFabricaAcomp">Haverá acompanhamento durante a execução do lote?</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
