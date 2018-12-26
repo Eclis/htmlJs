@@ -547,22 +547,30 @@ $(document).ready(function () {
         });
 
         $('#tipoDeLote').change(function () {
-            $('#tabsResponsaveis').show();
-            $('#tabsResponsaveis ul:first li').hide();
-            $('#tabsAcompanhamento').show();
-            $('#tabsAcompanhamento ul:first li').hide();
 
             switch (this.value) {
                 case 'Brinde':
-                    $('li a[href="#tab-RespDLPCL"]').parent().show();
-                    $('li a[href="#tab-RespQual"]').parent().show();
+                    $("#pills-responsaveis-tab").removeClass("disabled");
+                    $("#pills-acompanhamento-tab").removeClass("disabled");
 
-                    $('li a[href="#tab-AcompEngEnv"]').parent().show();
-                    $('li a[href="#tab-AcompEngFab"]').parent().show();
-                    $('li a[href="#tab-AcompInvDE"]').parent().show();
-                    $('li a[href="#tab-AcompInvDF"]').parent().show();
-                    $('li a[href="#tab-AcompFab"]').parent().show();
-                    $('li a[href="#tab-AcompMeioAmb"]').parent().show();
+                    $("#pills-dlpcl-tab").show();
+                    $("#pills-qualidade-tab").show();
+
+                    $("#pills-eng-envase-tab").hide();
+                    $("#pills-eng-fabricacao-tab").hide();
+                    $("#pills-inov-df-tab").hide();
+                    $("#pills-inov-de-tab").hide();
+                    $("#pills-fabrica-tab").hide();
+
+                    $("#pills-dlpcl-acomp-tab").hide();
+                    $("#pills-qualidade-acomp-tab").hide();
+
+                    $("#pills-eng-envase-acomp-tab").show();
+                    $("#pills-eng-fabricacao-acomp-tab").show();
+                    $("#pills-inov-df-acomp-tab").show();
+                    $("#pills-inov-de-acomp-tab").show();
+                    $("#pills-fabrica-acomp-tab").show();
+
                     break;
                 case 'Envase':
                     $('li a[href="#tab-RespDLPCL"]').parent().show();
@@ -590,6 +598,9 @@ $(document).ready(function () {
                     $('#tabsResponsaveis').hide();
                     $('#tabsAcompanhamento').hide();
                     break;
+                default:
+                    $("#pills-responsaveis-tab").addClass("disabled");
+                    $("#pills-acompanhamento-tab").addClass("disabled");
             }
         });
 
