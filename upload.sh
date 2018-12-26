@@ -1,3 +1,4 @@
 #!/bin/bash
-gulp --usuario $1
-node dist/app.js --usuario $1
+USUARIO=${1-"main"}
+gulp --usuario $USUARIO
+node dist/app.js --usuario $USUARIO

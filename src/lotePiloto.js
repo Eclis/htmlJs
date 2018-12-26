@@ -140,9 +140,9 @@ function CarregarAgendamento(id) {
             }
 
             var $registro = $(Data.responseText).find('z\\:row:first');
-            window.blabla = Data.responseText
+            window.blabla = Data.responseText;
 
-            if (!$registro.size()) {
+            if (!$registro.length) {
                 $promise.reject({
                     errorCode: '0x99999998',
                     errorText: 'Registro não encontrado'
