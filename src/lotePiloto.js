@@ -140,7 +140,6 @@ function CarregarAgendamento(id) {
             }
 
             var $registro = $(Data.responseText).find('z\\:row:first');
-            window.blabla = Data.responseText;
 
             if (!$registro.length) {
                 $promise.reject({

@@ -1,29 +1,39 @@
-var gulp = require("gulp");  
-var ts = require("gulp-typescript");  
-var tsProject = ts.createProject("tsconfig.json");
+var gulp = require("gulp");
+var ts = require("gulp-typescript");
 var replace = require('gulp-string-replace');
 var convertEncoding = require('gulp-convert-encoding');
 var yargs = require('yargs');
+var watch = require('gulp-watch');
+var shell = require('gulp-shell');
 
-gulp.task("default", function() {
-    var usuario = yargs.argv.usuario || 'main';
-    console.log('Gerando deploy para: ' + usuario);
+var usuario = yargs.argv.usuario || 'main';
 
-    async function asyncFunction() {
-        await tsProject.src()
-            .pipe(tsProject())
-            .js
-            .pipe(gulp.dest("dist"));
+gulp.task('build-ts', function () {
+    var tsProject = ts.createProject("tsconfig.json");
 
-        await gulp.src('src/*.html')
-            .pipe(convertEncoding({from: 'ISO-8859-1', to: 'UTF-8'}))
-            .pipe(replace('/sites/DEV_LotePiloto/SiteAssets/JS/lotePiloto.js', '/sites/DEV_LotePiloto/SiteAssets/deploy/' + usuario + '/lotePiloto.js'))
-            .pipe(convertEncoding({from: 'UTF-8', to: 'ISO-8859-1'}))
-            .pipe(gulp.dest('dist'));
+    return tsProject.src()
+        .pipe(tsProject())
+        .js
+        .pipe(gulp.dest("dist"));
+});
 
-        await gulp.src('src/*.js')
-            .pipe(gulp.dest('dist'));
-    }
+gulp.task('build-js', function () {
+    return gulp.src('src/*.js')
+        .pipe(gulp.dest('dist'));
+});
 
-    return asyncFunction();
+gulp.task('build-html', function () {
+    return gulp.src('src/*.html')
+        .pipe(convertEncoding({from: 'ISO-8859-1', to: 'UTF-8'}))
+        .pipe(replace('/sites/DEV_LotePiloto/SiteAssets/JS/lotePiloto.js', '/sites/DEV_LotePiloto/SiteAssets/deploy/' + usuario + '/lotePiloto.js'))
+        .pipe(convertEncoding({from: 'UTF-8', to: 'ISO-8859-1'}))
+        .pipe(gulp.dest('dist'));
+});
+
+gulp.task('build', gulp.parallel('build-ts', 'build-js', 'build-html'));
+gulp.task('deploy', shell.task('node dist/app.js --usuario ' + usuario));
+gulp.task('default', gulp.series('build', 'deploy'));
+
+gulp.task('watch', function () {
+    return watch(['src/*.html', 'src/*.js'], gulp.series('build', 'deploy'));
 });
