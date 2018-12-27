@@ -1,0 +1,28 @@
+{
+  "name": "deployer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "gulp": "^4.0.0",
+    "gulp-convert-encoding": "^2.0.1",
+    "gulp-shell": "^0.6.5",
+    "gulp-string-replace": "^1.1.2",
+    "gulp-typescript": "^5.0.0",
+    "gulp-watch": "^5.0.1",
+    "typescript": "^3.2.2"
+  },
+  "dependencies": {
+    "@pnp/common": "^1.2.7",
+    "@pnp/logging": "^1.2.7",
+    "@pnp/nodejs": "^1.2.7",
+    "@pnp/odata": "^1.2.7",
+    "@pnp/sp": "^1.2.7",
+    "yargs": "^12.0.5"
+  }
+}
