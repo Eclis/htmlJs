@@ -69,6 +69,8 @@ function AtualizarAgendamento(id) {
 
         if($this.is('[type=checkbox]') && $this.val() != undefined) {
             campos.push([this.name, $this.val() == 'on']);
+        } else if($this.is('.date-time-picker')) {
+            campos.push([this.name, moment($this.val(), 'DD/MM/YYYY HH:mm').format('YYYY-MM-DDTHH:mm:ss[-00:00]')]);
         } else if($this.val() != undefined) {
             campos.push([this.name, $this.val()]);
         }
@@ -157,6 +159,10 @@ function CarregarAgendamento(id) {
 
                 if ($elemento.is('[type=checkbox]')) {
                     $elemento.attr('checked', this.value == "1");
+                } else if($elemento.is('.date-time-picker')) {
+                    $elemento.val(moment(this.value, 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm'));
+                    $elemento.data('daterangepicker').updateElement();
+                    $elemento.change();
                 } else {
                     $elemento.val(this.value);
                 }
@@ -448,6 +454,8 @@ function InserirAgendamento() {
 
         if ($this.is('[type=checkbox]') && $this.val() != undefined) {
             campos.push([this.name, $this.val() == 'on']);
+        } else if($this.is('.date-time-picker')) {
+            campos.push([this.name, moment($this.val(), 'DD/MM/YYYY HH:mm').format('YYYY-MM-DDTHH:mm:ss[-00:00]')]);
         } else if ($this.val() != undefined) {
             campos.push([this.name, $this.val()]);
         }
@@ -692,7 +700,7 @@ $(document).ready(function () {
             timePicker24Hour: true,
             locale: {
                 format: 'DD/MM/YYYY HH:mm',
-                applyLabel: "Apply",
+                applyLabel: "Aplicar",
                 cancelLabel: 'Limpar',
                 daysOfWeek: [
                     "Do",
