@@ -493,6 +493,8 @@ function InserirAgendamento() {
 
 function RegistrarBindings() {
     var $status = $('select#status');
+    var $tipoLote = $("select#tipoDeLote");
+    var $fabrica = $("select#fabrica");
 
     $status.change(function () {
         $('.acoes a').each(function () {
@@ -508,6 +510,17 @@ function RegistrarBindings() {
             }
         });
     });
+
+    $tipoLote.change(dispararCarregarLinhasEquipamentos);
+    $fabrica.change(dispararCarregarLinhasEquipamentos);
+}
+
+function dispararCarregarLinhasEquipamentos() {
+    var fabricaVal = $("select#fabrica :selected").text();
+    var tipoLoteVal =  $("select#tipoDeLote").val();
+    if (tipoLoteVal && fabricaVal) {
+        CarregarLinhasEquipamentos(fabricaVal, tipoLoteVal);
+    }
 }
 
 function ResetarAgendamento() {
