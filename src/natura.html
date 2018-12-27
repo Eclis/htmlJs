@@ -21,22 +21,22 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.SPServices/2014.02/jquery.SPServices.js"></script>
 <script type="text/javascript" src="/sites/DEV_LotePiloto/SiteAssets/JS/lotePiloto.js"></script>
 <div id="main" style="margin-bottom: 40px;">
-    <input type="hidden" name="Title" required />
+    <input type="hidden" name="Title" class="salvar-campo" required />
     <div class="container" style="background-color: rgb(242, 242, 242); padding: 10px; margin-bottom: 10px;">
         <div class="row">
             <div class="col-md-4">
                 <label for="inputId">ID</label>
-                <input type="text" readonly class="form-control" id="inputId" name="ID">
+                <input type="text" readonly class="form-control salvar-campo" id="inputId" name="ID">
             </div>
             <div class="col-md-4">
                 <label for="tipoDeLote">Tipo de Lote</label>
-                <select class="custom-select" id="tipoDeLote" name="TipoLote">
+                <select class="custom-select salvar-campo" id="tipoDeLote" name="TipoLote">
                     <option disabled selected>Selecione uma opção</option>
                 </select>
             </div>
             <div class="col-md-4">
                 <label for="status">Status</label>
-                <select class="custom-select" id="status" name="Status" disabled>
+                <select class="custom-select salvar-campo" id="status" name="Status" disabled>
                     <option disabled selected>Selecione uma opção</option>
                 </select>
             </div>
@@ -69,11 +69,11 @@
             <div class="row" style="margin-top: 10px;">
                 <div class="col-md-6">
                     <label for="codigoProduto">Código do produto</label>
-                    <input type="text" class="form-control" id="codigoProduto" name="CodigoProduto">
+                    <input type="text" class="form-control salvar-campo" id="codigoProduto" name="CodigoProduto">
                 </div>
                 <div class="col-md-6">
                     <label for="linhaDoProduto">Linha do produto</label>
-                    <select class="custom-select" id="linhaDoProduto" name="LinhaProduto">
+                    <select class="custom-select salvar-campo" id="linhaDoProduto" name="LinhaProduto">
                         <option disabled selected>Selecione uma opção</option>
                     </select>
                 </div>
@@ -81,17 +81,17 @@
             <div class="row" style="margin-top: 10px;">
                 <div class="col-md-12">
                     <label for="produtoDescricao">Descrição do produto</label>
-                    <textarea class="form-control" id="produtoDescricao" name="DescricaoProduto" rows="3"></textarea>
+                    <textarea class="form-control salvar-campo" id="produtoDescricao" name="DescricaoProduto" rows="3"></textarea>
                 </div>
             </div>
             <div class="row" style="margin-top: 10px;">
                 <div class="col-md-6">
                     <label for="produtoProjeto">Projeto</label>
-                    <input type="text" class="form-control" id="produtoProjeto" name="Projeto">
+                    <input type="text" class="form-control salvar-campo" id="produtoProjeto" name="Projeto">
                 </div>
                 <div class="col-md-6">
                     <label for="categoriaDoProjeto">Categoria do projeto</label>
-                    <select class="custom-select" id="categoriaDoProjeto" name="CategoriaProjeto">
+                    <select class="custom-select salvar-campo" id="categoriaDoProjeto" name="CategoriaProjeto">
                         <option disabled selected>Selecione uma opção</option>
                     </select>
                 </div>
@@ -99,17 +99,17 @@
             <div class="row" style="margin-top: 10px;">
                 <div class="col-md-6">
                     <label for="produtoFormula">Fórmula</label>
-                    <input type="text" class="form-control" id="produtoFormula" name="Formula">
+                    <input type="text" class="form-control salvar-campo" id="produtoFormula" name="Formula">
                 </div>
                 <div class="col-md-6">
                     <label for="produtoQuantidade">Quantidade <span></span></label>
-                    <input type="text" class="form-control" id="produtoQuantidade" name="QuantidadePecas">
+                    <input type="text" class="form-control salvar-campo" id="produtoQuantidade" name="QuantidadePecas">
                 </div>
             </div>
             <div class="row" style="margin-top: 10px;">
                 <div class="col-md-6">
                     <label for="categoriaDoProjeto">Motivo</label>
-                    <select class="custom-select" id="motivo" name="Motivo">
+                    <select class="custom-select salvar-campo" id="motivo" name="Motivo">
                         <option disabled selected>Selecione uma opção</option>
                     </select>
                 </div>
@@ -117,7 +117,7 @@
             <div class="row" style="margin-top: 10px;">
                 <div class="col-md-auto">
                     <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" id="produtoEnvioAmostras" name="EnvioAmostras">
+                        <input type="checkbox" class="custom-control-input salvar-campo" id="produtoEnvioAmostras" name="EnvioAmostras">
                         <label class="custom-control-label" for="produtoEnvioAmostras">Solicitação de envio de amostras</label>
                     </div>
                 </div>
@@ -125,11 +125,11 @@
             <div class="row" id="formResponsavelAmostra" style="margin-top: 10px;display:none">
                 <div class="col-md-6">
                     <label for="produtoResponsavelAmostra">Responsável pela amostra</label>
-                    <input type="text" class="form-control" id="produtoResponsavelAmostra" name="ResponsavelAmostra">
+                    <input type="text" class="form-control salvar-campo" id="produtoResponsavelAmostra" name="ResponsavelAmostra">
                 </div>
                 <div class="col-md-6">
                     <label for="produtoQuantidadeAmostra">Quantidade de amostras</label>
-                    <input type="text" class="form-control" id="produtoQuantidadeAmostra" name="QuantidadeAmostra">
+                    <input type="text" class="form-control salvar-campo" id="produtoQuantidadeAmostra" name="QuantidadeAmostra">
                 </div>
             </div>
         </div>
@@ -137,13 +137,13 @@
             <div class="row" style="margin-top: 10px;">
                 <div class="col-md-6">
                     <label for="fabrica">Fábrica</label>
-                    <select class="custom-select" id="fabrica" name="Fabrica">
+                    <select class="custom-select salvar-campo" id="fabrica" name="Fabrica">
                         <option disabled selected>Selecione uma opção</option>
                     </select>
                 </div>
                 <div class="col-md-6">
                     <label for="linhaEquipamento">Linha ou Equipamento</label>
-                    <select class="custom-select" id="linhaEquipamento" name="LinhaEquipamento">
+                    <select class="custom-select salvar-campo" id="linhaEquipamento" name="LinhaEquipamento">
                         <option disabled selected>Selecione uma opção</option>
                     </select>
                 </div>
@@ -151,11 +151,11 @@
             <div class="row" style="margin-top: 10px;">
                 <div class="col-md-6">
                     <label for="agendamentoCentroCusto">Centro de custo - PEP - NT</label>
-                    <input type="text" class="form-control" id="agendamentoCentroCusto" name="CentroCusto">
+                    <input type="text" class="form-control salvar-campo" id="agendamentoCentroCusto" name="CentroCusto">
                 </div>
                 <div class="col-md-6">
                     <label for="grauComplexidade">Grau de complexidade</label>
-                    <select class="custom-select" id="grauComplexidade" name="GrauComplexidade">
+                    <select class="custom-select salvar-campo" id="grauComplexidade" name="GrauComplexidade">
                         <option disabled selected>Selecione uma opção</option>
                     </select>
                 </div>
@@ -163,15 +163,15 @@
             <div class="row" style="margin-top: 10px;">
                 <div class="col-md-4">
                     <label for="agendamentoDataInicioProgramado">Início programado</label>
-                    <input type="text" class="form-control date-time-picker" id="agendamentoDataInicioProgramado" name="InicioProgramado"/>
+                    <input type="text" class="form-control salvar-campo date-time-picker" id="agendamentoDataInicioProgramado" name="InicioProgramado"/>
                 </div>
                 <div class="col-md-2">
                     <label for="agendamentoDuracaoHoras">Duração (HH)</label>
-                    <input type="text" class="form-control" id="agendamentoDuracaoHoras" name="DuracaoEstimadaHoras" />
+                    <input type="text" class="form-control salvar-campo" id="agendamentoDuracaoHoras" name="DuracaoEstimadaHoras" />
                 </div>
                 <div class="col-md-2">
                     <label for="agendamentoDuracaoMinutos">Duração (mm)</label>
-                    <input type="text" class="form-control" id="agendamentoDuracaoMinutos" name="DuracaoEstimadaMinutos" />
+                    <input type="text" class="form-control salvar-campo" id="agendamentoDuracaoMinutos" name="DuracaoEstimadaMinutos" />
                 </div>
                 <div class="col-md-4">
                     <label for="agendamentoFim">Fim programado</label>
@@ -181,7 +181,7 @@
             <div class="row" style="margin-top: 10px;">
                 <div class="col-md-12">
                     <label for="agendamentoObservacoes">Observações</label>
-                    <textarea class="form-control" id="agendamentoObservacoes" name="Observacoes" rows="3"></textarea>
+                    <textarea class="form-control salvar-campo" id="agendamentoObservacoes" name="Observacoes" rows="3"></textarea>
                 </div>
             </div>
         </div>

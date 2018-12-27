@@ -64,7 +64,7 @@ function onFail(sender, args) {
 function AtualizarAgendamento(id) {
     var campos = [];
 
-    $('#main [name]').each(function () {
+    $('#main .salvar-campo[name]').each(function () {
         var $this = $(this);
 
         if($this.is('[type=checkbox]') && $this.val() != undefined) {
@@ -311,7 +311,7 @@ function CarregarLinhasEquipamentos(fabrica, tipoLote) {
 
             $(Data.responseXML).SPFilterNode("z:row").each(function () {
                 $('select#linhaEquipamento').append('<option value="' + $(this).attr("ows_ID") + '">' + $(this).attr("ows_Title") + '</option>')
-            })
+            });
 
             $promise.resolve();
         }
