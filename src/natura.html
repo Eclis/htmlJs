@@ -103,7 +103,7 @@
                 </div>
                 <div class="col-md-6">
                     <label for="produtoQuantidade">Quantidade <span></span></label>
-                    <input type="text" class="form-control salvar-campo" id="produtoQuantidade" name="QuantidadePecas">
+                    <input type="number" class="form-control salvar-campo" id="produtoQuantidade" name="QuantidadePecas">
                 </div>
             </div>
             <div class="row" style="margin-top: 10px;">
@@ -129,7 +129,7 @@
                 </div>
                 <div class="col-md-6">
                     <label for="produtoQuantidadeAmostra">Quantidade de amostras</label>
-                    <input type="text" class="form-control salvar-campo" id="produtoQuantidadeAmostra" name="QuantidadeAmostra">
+                    <input type="number" class="form-control salvar-campo" id="produtoQuantidadeAmostra" name="QuantidadeAmostra">
                 </div>
             </div>
         </div>
@@ -167,15 +167,15 @@
                 </div>
                 <div class="col-md-2">
                     <label for="agendamentoDuracaoHoras">Duração (HH)</label>
-                    <input type="text" class="form-control salvar-campo" id="agendamentoDuracaoHoras" name="DuracaoEstimadaHoras" />
+                    <input type="number" min="0" max="23" class="form-control salvar-campo" id="agendamentoDuracaoHoras" name="DuracaoEstimadaHoras" />
                 </div>
                 <div class="col-md-2">
                     <label for="agendamentoDuracaoMinutos">Duração (mm)</label>
-                    <input type="text" class="form-control salvar-campo" id="agendamentoDuracaoMinutos" name="DuracaoEstimadaMinutos" />
+                    <input type="number" min="0" max="59" class="form-control salvar-campo" id="agendamentoDuracaoMinutos" name="DuracaoEstimadaMinutos" />
                 </div>
                 <div class="col-md-4">
                     <label for="agendamentoFim">Fim programado</label>
-                    <input type="text" class="form-control date-time-picker" id="agendamentoFim" readonly />
+                    <input type="text" class="form-control date-time-picker" id="agendamentoFim" readonly disabled/>
                 </div>
             </div>
             <div class="row" style="margin-top: 10px;">

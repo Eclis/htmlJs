@@ -159,6 +159,8 @@ function CarregarAgendamento(id) {
 
                 if ($elemento.is('[type=checkbox]')) {
                     $elemento.attr('checked', this.value == "1");
+                } else if ($elemento.is('[type=number]')) {
+                    $elemento.val(this.value | 0);
                 } else if($elemento.is('.date-time-picker')) {
                     $elemento.val(moment(this.value, 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm'));
                     $elemento.data('daterangepicker').updateElement();
