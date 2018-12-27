@@ -301,6 +301,7 @@ function CarregarLinhasDoProduto() {
 
 function CarregarLinhasEquipamentos(fabrica, tipoLote) {
     var $promise = $.Deferred();
+    var linhaEquipamento = $('select#linhaEquipamento');
 
     $().SPServices({
         operation: 'GetListItems',
@@ -308,6 +309,11 @@ function CarregarLinhasEquipamentos(fabrica, tipoLote) {
         CAMLQuery: '<Query><Where><And><And><Eq><FieldRef Name="Ativa" /><Value Type="Boolean">1</Value></Eq><Eq><FieldRef Name="Fabrica" /><Value Type="Lookup">' + fabrica + '</Value></Eq></And><Eq><FieldRef Name="TipoLote" /><Value Type="Choice">' + tipoLote + '</Value></Eq></And></Where></Query>',
         CAMLViewFields: '<ViewFields><FieldRef Name="Title" /><FieldRef Name="ID" /></ViewFields>',
         completefunc: function (Data, Status) {
+            linhaEquipamento.find('option')
+                .remove()
+                .end()
+                .append('<option disabled selected>Selecione uma opção</option>')
+            ;
             if (Status != 'success') {
                 $promise.reject({
                     errorCode: '0x99999999',
@@ -318,7 +324,7 @@ function CarregarLinhasEquipamentos(fabrica, tipoLote) {
             }
 
             $(Data.responseXML).SPFilterNode("z:row").each(function () {
-                $('select#linhaEquipamento').append('<option value="' + $(this).attr("ows_ID") + '">' + $(this).attr("ows_Title") + '</option>')
+                linhaEquipamento.append('<option value="' + $(this).attr("ows_ID") + '">' + $(this).attr("ows_Title") + '</option>')
             });
 
             $promise.resolve();
