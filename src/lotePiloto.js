@@ -64,7 +64,7 @@ function onFail(sender, args) {
 function AtualizarAgendamento(id) {
     var campos = [];
 
-    $('#main .salvar-campo[name]').each(function () {
+    $('#main [name].salvar-campo').each(function () {
         var $this = $(this);
 
         if($this.is('[type=checkbox]') && $this.val() != undefined) {
@@ -153,7 +153,7 @@ function CarregarAgendamento(id) {
             var atributos = $registro.get(0).attributes;
 
             $.each(atributos, function () {
-                var $elemento = $('#main [name=' + this.name.substr(4) + ' i]');
+                var $elemento = $('#main [name=' + this.name.substr(4) + ' i].salvar-campo');
 
                 if ($elemento.is('[type=checkbox]')) {
                     $elemento.attr('checked', this.value == "1");
@@ -443,7 +443,7 @@ function EscolherAgendamento() {
 function InserirAgendamento() {
     var campos = [];
 
-    $('#main [name]').each(function () {
+    $('#main [name].salvar-campo').each(function () {
         var $this = $(this);
 
         if ($this.is('[type=checkbox]') && $this.val() != undefined) {
@@ -524,7 +524,7 @@ function dispararCarregarLinhasEquipamentos() {
 }
 
 function ResetarAgendamento() {
-    $('#main [name]').each(function () {
+    $('#main [name].salvar-campo').each(function () {
         var $this = $(this);
 
         if ($this.is('[type=checkbox]')) {
