@@ -166,12 +166,13 @@ function CarregarAgendamento(id) {
                 } else if ($elemento.is('[type=number]')) {
                     $elemento.val(AtributoNumber(this.value));
                 } else if($elemento.is('.date-time-picker')) {
-                    console.log(this.name, this.value, moment(this.value, 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm'));
                     $elemento.val(moment(this.value, 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm'));
 
                     if ($elemento.is(':not([readonly])')) {
                         $elemento.data('daterangepicker').elementChanged();
                     }
+                } else if ($elemento.is('select.select-tabela')) {
+                    $elemento.val(this.value.slice(0, this.value.indexOf(';#')));
                 } else {
                     $elemento.val(this.value);
                 }
@@ -681,7 +682,6 @@ $(document).ready(function () {
         });
 
         $('#tipoDeLote').change(function () {
-
             switch (this.value) {
                 case 'Brinde':
                     $("#pills-responsaveis-tab").removeClass("disabled");
