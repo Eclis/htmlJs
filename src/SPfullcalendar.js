@@ -4,7 +4,6 @@ var TASK_LIST = "Agendamentos";
 var Fabrica_LIST = "Fábricas Internas e Armazenamento de Fábricas Terceiras";
 var coresFabricas = new Array();
 
-
 var FabricaRESTQuery = "/_api/Web/Lists/GetByTitle('" + Fabrica_LIST + "')/items?$select=ID,Chave"
 var FabricaSelecionada = "";
 var openFabricaCall = $.ajax({
