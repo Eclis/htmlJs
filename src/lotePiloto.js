@@ -160,7 +160,7 @@ function CarregarAgendamento(id) {
                 if ($elemento.is('[type=checkbox]')) {
                     $elemento.attr('checked', this.value == "1");
                 } else if ($elemento.is('[type=number]')) {
-                    $elemento.val(this.value | 0);
+                    $elemento.val(AtributoNumber(this.value);
                 } else if($elemento.is('.date-time-picker')) {
                     $elemento.val(moment(this.value, 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm'));
                     $elemento.data('daterangepicker').updateElement();
@@ -314,6 +314,7 @@ function CarregarLinhasEquipamentos(fabrica, tipoLote) {
                 .end()
                 .append('<option disabled selected>Selecione uma opção</option>')
             ;
+
             if (Status != 'success') {
                 $promise.reject({
                     errorCode: '0x99999999',
@@ -332,6 +333,42 @@ function CarregarLinhasEquipamentos(fabrica, tipoLote) {
     });
 
     return $promise;
+}
+
+function CarregarLinhasEquipamentosById(linhaEquipamentoId) {
+    var $promise = $.Deferred();
+    var linhaEquipamento = $('select#linhaEquipamento');
+    var $labelQuantidadePecas = $('label[for="produtoQuantidade"]')
+    $labelQuantidadePecas.text("Quantidade (peças)");
+
+    $().SPServices({
+        operation: 'GetListItems',
+        listName: 'Linhas e Equipamentos',
+        CAMLQuery: '<Query><Where><Eq><FieldRef Name="ID" /><Value Type="Number">' + linhaEquipamentoId + '</Value></Eq></Where></Query>',
+        CAMLViewFields: '<ViewFields><FieldRef Name="Title" /><FieldRef Name="ID" /></ViewFields>',
+        completefunc: function (Data, Status) {
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
+                });
+
+                return;
+            }
+
+            $(Data.responseXML).SPFilterNode("z:row").each(function () {
+                $labelQuantidadePecas.text("Quantidade (peças) de " + AtributoNumber($(this).attr("ows_CapacidadeMin")) + " até " + AtributoNumber($(this).attr("ows_CapacidadeMax")))
+            });
+
+            $promise.resolve();
+        }
+    });
+
+    return $promise;
+}
+
+function AtributoNumber(number) {
+    return number | 0;
 }
 
 function CarregarListaGrauComplexidade() {
@@ -511,6 +548,7 @@ function RegistrarBindings() {
     var $status = $('select#status');
     var $tipoLote = $("select#tipoDeLote");
     var $fabrica = $("select#fabrica");
+    var $linhaEquipamento = $("select#linhaEquipamento");
 
     $status.change(function () {
         $('.acoes a').each(function () {
@@ -529,6 +567,13 @@ function RegistrarBindings() {
 
     $tipoLote.change(dispararCarregarLinhasEquipamentos);
     $fabrica.change(dispararCarregarLinhasEquipamentos);
+
+    $linhaEquipamento.change(function () {
+        var valSelected = $("select#linhaEquipamento").val();
+        if (valSelected) {
+            CarregarLinhasEquipamentosById(valSelected)
+        }
+    })
 }
 
 function dispararCarregarLinhasEquipamentos() {
@@ -540,6 +585,9 @@ function dispararCarregarLinhasEquipamentos() {
 }
 
 function ResetarAgendamento() {
+    var $labelQuantidadePecas = $('label[for="produtoQuantidade"]')
+    $labelQuantidadePecas.text("Quantidade (peças)");
+
     $('#main [name].salvar-campo').each(function () {
         var $this = $(this);
 
@@ -592,7 +640,8 @@ $(document).ready(function () {
         CarregarListaGrauComplexidade(),
         CarregarListaMotivos(),
         CarregarListaStatus(),
-        CarregarListaTiposLotes()
+        CarregarListaTiposLotes(),
+        dispararCarregarLinhasEquipamentos()
     ).then(function () {
         RegistrarBindings();
         ResetarAgendamento();
