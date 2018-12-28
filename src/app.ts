@@ -11,8 +11,8 @@ sp.setup({
     sp: {
         fetchClientFactory: () => {
             return new SPFetchClient(settings.sp.url, settings.sp.id, settings.sp.secret);
-        },
-    },
+        }
+    }
 });
 
 async function asyncFunction() {

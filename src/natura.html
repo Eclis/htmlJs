@@ -24,10 +24,18 @@
     <input type="hidden" name="Title" class="salvar-campo" required />
     <div class="container" style="background-color: rgb(242, 242, 242); padding: 10px; margin-bottom: 10px;">
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-6">
                 <label for="inputId">ID</label>
                 <input type="text" readonly class="form-control salvar-campo" id="inputId" name="ID">
             </div>
+            <div class="col-md-6">
+                <label for="status">Status</label>
+                <select class="custom-select salvar-campo" id="status" name="Status" disabled>
+                    <option disabled selected>Selecione uma opção</option>
+                </select>
+            </div>
+        </div>
+        <div class="row" style="margin-top: 10px;">
             <div class="col-md-4">
                 <label for="tipoDeLote">Tipo de Lote</label>
                 <select class="custom-select salvar-campo" id="tipoDeLote" name="TipoLote">
@@ -35,8 +43,14 @@
                 </select>
             </div>
             <div class="col-md-4">
-                <label for="status">Status</label>
-                <select class="custom-select salvar-campo" id="status" name="Status" disabled>
+                <label for="fabrica">Fábrica</label>
+                <select class="custom-select salvar-campo" id="fabrica" name="Fabrica">
+                    <option disabled selected>Selecione uma opção</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="linhaEquipamento">Linha ou Equipamento</label>
+                <select class="custom-select salvar-campo" id="linhaEquipamento" name="LinhaEquipamento">
                     <option disabled selected>Selecione uma opção</option>
                 </select>
             </div>
@@ -134,20 +148,6 @@
             </div>
         </div>
         <div class="tab-pane fade" id="pills-agendamento" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel" aria-labelledby="pills-agendamento-tab">
-            <div class="row" style="margin-top: 10px;">
-                <div class="col-md-6">
-                    <label for="fabrica">Fábrica</label>
-                    <select class="custom-select salvar-campo" id="fabrica" name="Fabrica">
-                        <option disabled selected>Selecione uma opção</option>
-                    </select>
-                </div>
-                <div class="col-md-6">
-                    <label for="linhaEquipamento">Linha ou Equipamento</label>
-                    <select class="custom-select salvar-campo" id="linhaEquipamento" name="LinhaEquipamento">
-                        <option disabled selected>Selecione uma opção</option>
-                    </select>
-                </div>
-            </div>
             <div class="row" style="margin-top: 10px;">
                 <div class="col-md-6">
                     <label for="agendamentoCentroCusto">Centro de custo - PEP - NT</label>
@@ -486,9 +486,9 @@
         </div>
     </div>
     <div class="acoes">
-        <a id="btnSalvar" href="#" class="btn btn-primary" role="button">Salvar</a>
-        <a id="btnCarregar" href="#" class="btn btn-primary" role="button">Carregar</a>
-        <a href="#" class="btn btn-primary btn-concluir" role="button" data-status='["Rascunho", "Agendado"]'>Concluir</a>
+        <a href="#" class="btn btn-primary btn-salvar" role="button">Salvar</a>
+        <a href="#" class="btn btn-primary btn-carregar" role="button">Carregar</a>
+        <a href="#" class="btn btn-primary btn-concluir" role="button" data-status='["Rascunho"]'>Concluir</a>
         <a href="#" class="btn btn-primary btn-executado" role="button" data-status='["Agendado"]'>Executado</a>
     </div>
 </div>

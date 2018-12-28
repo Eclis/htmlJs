@@ -160,7 +160,7 @@ function CarregarAgendamento(id) {
                 if ($elemento.is('[type=checkbox]')) {
                     $elemento.attr('checked', this.value == "1");
                 } else if ($elemento.is('[type=number]')) {
-                    $elemento.val(AtributoNumber(this.value);
+                    $elemento.val(AtributoNumber(this.value));
                 } else if($elemento.is('.date-time-picker')) {
                     $elemento.val(moment(this.value, 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm'));
                     $elemento.data('daterangepicker').updateElement();
@@ -603,6 +603,20 @@ function ResetarAgendamento() {
     $('select#status').val('Rascunho').change();
 }
 
+function SalvarAgendamento() {
+    var id = $('input[name="ID"]').val();
+
+    if (id) {
+        return AtualizarAgendamento(id).then(function (response) {
+            return CarregarAgendamento(response.record.attr('ows_ID'));
+        });
+    }
+
+    return InserirAgendamento().then(function (response) {
+        return CarregarAgendamento(response.record.attr('ows_ID'));
+    });
+}
+
 function initializeAllPeoplePickers() {
     initializePeoplePicker('peoplePickerRespDLPCL');
     $("#peoplePickerRespDLPCL_TopSpan").addClass("form-control");
@@ -717,32 +731,23 @@ $(document).ready(function () {
 
         $('#tipoDeLote').change();
 
-        $('#btnSalvar').click(function () {
-            var id = $('input[name="ID"]').val();
-
-            if (id) {
-                AtualizarAgendamento(id).then(function (response) {
-                    CarregarAgendamento(response.record.attr('ows_ID')).then(function () {
-                        alert("Agendamento Salvo");
-                    });
-                }).fail(function (response) {
-                    alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
-                });
-            } else {
-                InserirAgendamento().then(function (response) {
-                    CarregarAgendamento(response.record.attr('ows_ID')).then(function () {
-                        alert("Agendamento Salvo");
-                    });
-                }).fail(function (response) {
-                    alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
-                });
-            }
+        $('.btn-salvar').click(function () {
+            SalvarAgendamento().then(function () {
+                alert("Agendamento Salvo");
+            }).fail(function () {
+                alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
+            });
 
             return false;
         });
 
-        $('#btnCarregar').click(function () {
+        $('.btn-carregar').click(function () {
             EscolherAgendamento();
+        });
+
+        $('.btn-concluir').click(function () {
+            $('select[name=Status]').val('Agendado');
+            SalvarAgendamento();
         });
 
         // if(!$('[type="text"][name="ID"]').val()) {
