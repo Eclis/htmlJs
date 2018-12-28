@@ -17,7 +17,6 @@ function CarregarTodosAgendamentos() {
 
             $(Data.responseXML).SPFilterNode("z:row").each(function () {
                 $('tbody#AgendamentoBody').append('<tr><td><a href="/sites/DEV_LotePiloto/SitePages/DevTeste.aspx" target="_self">'+$(this).attr("ows_ID")+'</a></td><td>'+$(this).attr("ows_CodigoProduto")+'</td><td>'+$(this).attr("ows_Title")+'</td><td>'+$(this).attr("ows_TipoLote")+'</td><td>'+$(this).attr("ows_Motivo")+'</td><td>'+$(this).attr("ows_Status")+'</td><td>'+$(this).attr("ows_RegistroAnalisesInicio")+'</td><td>'+$(this).attr("ows_Modified")+'</td><td>'+$(this).attr("ows_Editor")+'</td><td>'+$(this).attr("ows_InicioProgramado")+'</td><td>'+$(this).attr("ows__UIVersionString")+'</td></tr>');
-                // $('tbody#AgendamentoBody').append('<tr><td><a href="/sites/DEV_LotePiloto/SitePages/DevTeste.aspx?ID='+$(this).attr("ows_ID")+'" target="_self">'+$(this).attr("ows_ID")+'</a></td><td>'+$(this).attr("ows_CodigoProduto")+'</td><td>'+$(this).attr("ows_Title")+'</td><td>'+$(this).attr("ows_TipoLote")+'</td><td>'+$(this).attr("ows_Motivo")+'</td><td>'+$(this).attr("ows_Status")+'</td><td>'+$(this).attr("ows_RegistroAnalisesInicio")+'</td><td>'+$(this).attr("ows_Modified")+'</td><td>'+$(this).attr("ows_Editor")+'</td><td>'+$(this).attr("ows_InicioProgramado")+'</td><td>'+$(this).attr("ows__UIVersionString")+'</td></tr>')
             });
 
             $promise.resolve();
