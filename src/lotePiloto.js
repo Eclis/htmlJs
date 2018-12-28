@@ -64,11 +64,13 @@ function onFail(sender, args) {
 function AtualizarAgendamento(id) {
     var campos = [];
 
-    $('#main [name]').each(function () {
+    $('#main [name].salvar-campo').each(function () {
         var $this = $(this);
 
         if($this.is('[type=checkbox]') && $this.val() != undefined) {
             campos.push([this.name, $this.val() == 'on']);
+        } else if($this.is('.date-time-picker')) {
+            campos.push([this.name, moment($this.val(), 'DD/MM/YYYY HH:mm').format('YYYY-MM-DDTHH:mm:ss[-00:00]')]);
         } else if($this.val() != undefined) {
             campos.push([this.name, $this.val()]);
         }
@@ -153,10 +155,16 @@ function CarregarAgendamento(id) {
             var atributos = $registro.get(0).attributes;
 
             $.each(atributos, function () {
-                var $elemento = $('#main [name=' + this.name.substr(4) + ' i]');
+                var $elemento = $('#main [name=' + this.name.substr(4) + ' i].salvar-campo');
 
                 if ($elemento.is('[type=checkbox]')) {
                     $elemento.attr('checked', this.value == "1");
+                } else if ($elemento.is('[type=number]')) {
+                    $elemento.val(AtributoNumber(this.value));
+                } else if($elemento.is('.date-time-picker')) {
+                    $elemento.val(moment(this.value, 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm'));
+                    $elemento.data('daterangepicker').updateElement();
+                    $elemento.change();
                 } else {
                     $elemento.val(this.value);
                 }
@@ -293,11 +301,50 @@ function CarregarLinhasDoProduto() {
 
 function CarregarLinhasEquipamentos(fabrica, tipoLote) {
     var $promise = $.Deferred();
+    var linhaEquipamento = $('select#linhaEquipamento');
 
     $().SPServices({
         operation: 'GetListItems',
         listName: 'Linhas e Equipamentos',
         CAMLQuery: '<Query><Where><And><And><Eq><FieldRef Name="Ativa" /><Value Type="Boolean">1</Value></Eq><Eq><FieldRef Name="Fabrica" /><Value Type="Lookup">' + fabrica + '</Value></Eq></And><Eq><FieldRef Name="TipoLote" /><Value Type="Choice">' + tipoLote + '</Value></Eq></And></Where></Query>',
+        CAMLViewFields: '<ViewFields><FieldRef Name="Title" /><FieldRef Name="ID" /></ViewFields>',
+        completefunc: function (Data, Status) {
+            linhaEquipamento.find('option')
+                .remove()
+                .end()
+                .append('<option disabled selected>Selecione uma opção</option>')
+            ;
+
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
+                });
+
+                return;
+            }
+
+            $(Data.responseXML).SPFilterNode("z:row").each(function () {
+                linhaEquipamento.append('<option value="' + $(this).attr("ows_ID") + '">' + $(this).attr("ows_Title") + '</option>')
+            });
+
+            $promise.resolve();
+        }
+    });
+
+    return $promise;
+}
+
+function CarregarLinhasEquipamentosById(linhaEquipamentoId) {
+    var $promise = $.Deferred();
+    var linhaEquipamento = $('select#linhaEquipamento');
+    var $labelQuantidadePecas = $('label[for="produtoQuantidade"]')
+    $labelQuantidadePecas.text("Quantidade (peças)");
+
+    $().SPServices({
+        operation: 'GetListItems',
+        listName: 'Linhas e Equipamentos',
+        CAMLQuery: '<Query><Where><Eq><FieldRef Name="ID" /><Value Type="Number">' + linhaEquipamentoId + '</Value></Eq></Where></Query>',
         CAMLViewFields: '<ViewFields><FieldRef Name="Title" /><FieldRef Name="ID" /></ViewFields>',
         completefunc: function (Data, Status) {
             if (Status != 'success') {
@@ -310,14 +357,18 @@ function CarregarLinhasEquipamentos(fabrica, tipoLote) {
             }
 
             $(Data.responseXML).SPFilterNode("z:row").each(function () {
-                $('select#linhaEquipamento').append('<option value="' + $(this).attr("ows_ID") + '">' + $(this).attr("ows_Title") + '</option>')
-            })
+                $labelQuantidadePecas.text("Quantidade (peças) de " + AtributoNumber($(this).attr("ows_CapacidadeMin")) + " até " + AtributoNumber($(this).attr("ows_CapacidadeMax")))
+            });
 
             $promise.resolve();
         }
     });
 
     return $promise;
+}
+
+function AtributoNumber(number) {
+    return number | 0;
 }
 
 function CarregarListaGrauComplexidade() {
@@ -443,11 +494,13 @@ function EscolherAgendamento() {
 function InserirAgendamento() {
     var campos = [];
 
-    $('#main [name]').each(function () {
+    $('#main [name].salvar-campo').each(function () {
         var $this = $(this);
 
         if ($this.is('[type=checkbox]') && $this.val() != undefined) {
             campos.push([this.name, $this.val() == 'on']);
+        } else if($this.is('.date-time-picker')) {
+            campos.push([this.name, moment($this.val(), 'DD/MM/YYYY HH:mm').format('YYYY-MM-DDTHH:mm:ss[-00:00]')]);
         } else if ($this.val() != undefined) {
             campos.push([this.name, $this.val()]);
         }
@@ -495,6 +548,7 @@ function RegistrarBindings() {
     var $status = $('select#status');
     var $tipoLote = $("select#tipoDeLote");
     var $fabrica = $("select#fabrica");
+    var $linhaEquipamento = $("select#linhaEquipamento");
 
     $status.change(function () {
         $('.acoes a').each(function () {
@@ -513,6 +567,13 @@ function RegistrarBindings() {
 
     $tipoLote.change(dispararCarregarLinhasEquipamentos);
     $fabrica.change(dispararCarregarLinhasEquipamentos);
+
+    $linhaEquipamento.change(function () {
+        var valSelected = $("select#linhaEquipamento").val();
+        if (valSelected) {
+            CarregarLinhasEquipamentosById(valSelected)
+        }
+    })
 }
 
 function dispararCarregarLinhasEquipamentos() {
@@ -524,7 +585,10 @@ function dispararCarregarLinhasEquipamentos() {
 }
 
 function ResetarAgendamento() {
-    $('#main [name]').each(function () {
+    var $labelQuantidadePecas = $('label[for="produtoQuantidade"]')
+    $labelQuantidadePecas.text("Quantidade (peças)");
+
+    $('#main [name].salvar-campo').each(function () {
         var $this = $(this);
 
         if ($this.is('[type=checkbox]')) {
@@ -537,6 +601,20 @@ function ResetarAgendamento() {
     });
 
     $('select#status').val('Rascunho').change();
+}
+
+function SalvarAgendamento() {
+    var id = $('input[name="ID"]').val();
+
+    if (id) {
+        return AtualizarAgendamento(id).then(function (response) {
+            return CarregarAgendamento(response.record.attr('ows_ID'));
+        });
+    }
+
+    return InserirAgendamento().then(function (response) {
+        return CarregarAgendamento(response.record.attr('ows_ID'));
+    });
 }
 
 function initializeAllPeoplePickers() {
@@ -576,7 +654,8 @@ $(document).ready(function () {
         CarregarListaGrauComplexidade(),
         CarregarListaMotivos(),
         CarregarListaStatus(),
-        CarregarListaTiposLotes()
+        CarregarListaTiposLotes(),
+        dispararCarregarLinhasEquipamentos()
     ).then(function () {
         RegistrarBindings();
         ResetarAgendamento();
@@ -652,32 +731,23 @@ $(document).ready(function () {
 
         $('#tipoDeLote').change();
 
-        $('#btnSalvar').click(function () {
-            var id = $('input[name="ID"]').val();
-
-            if (id) {
-                AtualizarAgendamento(id).then(function (response) {
-                    CarregarAgendamento(response.record.attr('ows_ID')).then(function () {
-                        alert("Agendamento Salvo");
-                    });
-                }).fail(function (response) {
-                    alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
-                });
-            } else {
-                InserirAgendamento().then(function (response) {
-                    CarregarAgendamento(response.record.attr('ows_ID')).then(function () {
-                        alert("Agendamento Salvo");
-                    });
-                }).fail(function (response) {
-                    alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
-                });
-            }
+        $('.btn-salvar').click(function () {
+            SalvarAgendamento().then(function () {
+                alert("Agendamento Salvo");
+            }).fail(function () {
+                alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
+            });
 
             return false;
         });
 
-        $('#btnCarregar').click(function () {
+        $('.btn-carregar').click(function () {
             EscolherAgendamento();
+        });
+
+        $('.btn-concluir').click(function () {
+            $('select[name=Status]').val('Agendado');
+            SalvarAgendamento();
         });
 
         // if(!$('[type="text"][name="ID"]').val()) {
@@ -692,7 +762,7 @@ $(document).ready(function () {
             timePicker24Hour: true,
             locale: {
                 format: 'DD/MM/YYYY HH:mm',
-                applyLabel: "Apply",
+                applyLabel: "Aplicar",
                 cancelLabel: 'Limpar',
                 daysOfWeek: [
                     "Do",

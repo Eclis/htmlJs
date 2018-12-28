@@ -4,5 +4,6 @@ var settings = {
         secret: "C3G3+nakIMKOFfF+QKyBb0ft9BSNzuisSHRxIzXS+Ws=",  
         url: "https://naturabr.sharepoint.com/sites/DEV_LotePiloto",  
     }  
-}  
+};
+
 module.exports = settings;
