@@ -585,7 +585,7 @@ function dispararCarregarLinhasEquipamentos() {
 }
 
 function ResetarAgendamento() {
-    var $labelQuantidadePecas = $('label[for="produtoQuantidade"]')
+    var $labelQuantidadePecas = $('label[for="produtoQuantidade"]');
     $labelQuantidadePecas.text("Quantidade (peças)");
 
     $('#main [name].salvar-campo').each(function () {
@@ -593,6 +593,8 @@ function ResetarAgendamento() {
 
         if ($this.is('[type=checkbox]')) {
             $this.attr('checked', false);
+        } else if ($this.is('select')) {
+            $this.val('Selecione uma opção');
         } else {
             $this.val('');
         }
