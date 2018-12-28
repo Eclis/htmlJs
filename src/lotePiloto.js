@@ -155,7 +155,11 @@ function CarregarAgendamento(id) {
             var atributos = $registro.get(0).attributes;
 
             $.each(atributos, function () {
-                var $elemento = $('#main [name=' + this.name.substr(4) + ' i].salvar-campo');
+                if (this.value.startsWith('datetime;#')) {
+                    this.value = this.value.slice('datetime;#'.length);
+                }
+
+                var $elemento = $('#main [name=' + this.name.substr(4) + ' i]');
 
                 if ($elemento.is('[type=checkbox]')) {
                     $elemento.attr('checked', this.value == "1");
@@ -163,8 +167,12 @@ function CarregarAgendamento(id) {
                     $elemento.val(AtributoNumber(this.value));
                 } else if($elemento.is('.date-time-picker')) {
                     $elemento.val(moment(this.value, 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm'));
-                    $elemento.data('daterangepicker').updateElement();
-                    $elemento.change();
+
+                    if ($elemento.is(':not([readonly])')) {
+                        $elemento.data('daterangepicker').elementChanged();
+                    }
+                } else if ($elemento.is('select.select-tabela')) {
+                    $elemento.val(this.value.slice(0, this.value.indexOf(';#')));
                 } else {
                     $elemento.val(this.value);
                 }
@@ -674,7 +682,6 @@ $(document).ready(function () {
         });
 
         $('#tipoDeLote').change(function () {
-
             switch (this.value) {
                 case 'Brinde':
                     $("#pills-responsaveis-tab").removeClass("disabled");
@@ -756,7 +763,7 @@ $(document).ready(function () {
         //     EscolherAgendamento();
         // }
 
-        $('.date-time-picker').daterangepicker({
+        $('.date-time-picker:not([readonly])').daterangepicker({
             opens: 'center',
             singleDatePicker: true,
             showDropdowns: true,

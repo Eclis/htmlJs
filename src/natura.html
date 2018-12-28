@@ -38,19 +38,19 @@
         <div class="row" style="margin-top: 10px;">
             <div class="col-md-4">
                 <label for="tipoDeLote">Tipo de Lote</label>
-                <select class="custom-select salvar-campo" id="tipoDeLote" name="TipoLote">
+                <select class="custom-select salvar-campo select-enum" id="tipoDeLote" name="TipoLote">
                     <option disabled selected>Selecione uma opção</option>
                 </select>
             </div>
             <div class="col-md-4">
                 <label for="fabrica">Fábrica</label>
-                <select class="custom-select salvar-campo" id="fabrica" name="Fabrica">
+                <select class="custom-select salvar-campo select-tabela" id="fabrica" name="Fabrica">
                     <option disabled selected>Selecione uma opção</option>
                 </select>
             </div>
             <div class="col-md-4">
                 <label for="linhaEquipamento">Linha ou Equipamento</label>
-                <select class="custom-select salvar-campo" id="linhaEquipamento" name="LinhaEquipamento">
+                <select class="custom-select salvar-campo select-tabela" id="linhaEquipamento" name="LinhaEquipamento">
                     <option disabled selected>Selecione uma opção</option>
                 </select>
             </div>
@@ -87,7 +87,7 @@
                 </div>
                 <div class="col-md-6">
                     <label for="linhaDoProduto">Linha do produto</label>
-                    <select class="custom-select salvar-campo" id="linhaDoProduto" name="LinhaProduto">
+                    <select class="custom-select salvar-campo select-enum" id="linhaDoProduto" name="LinhaProduto">
                         <option disabled selected>Selecione uma opção</option>
                     </select>
                 </div>
@@ -105,7 +105,7 @@
                 </div>
                 <div class="col-md-6">
                     <label for="categoriaDoProjeto">Categoria do projeto</label>
-                    <select class="custom-select salvar-campo" id="categoriaDoProjeto" name="CategoriaProjeto">
+                    <select class="custom-select salvar-campo select-enum" id="categoriaDoProjeto" name="CategoriaProjeto">
                         <option disabled selected>Selecione uma opção</option>
                     </select>
                 </div>
@@ -123,7 +123,7 @@
             <div class="row" style="margin-top: 10px;">
                 <div class="col-md-6">
                     <label for="categoriaDoProjeto">Motivo</label>
-                    <select class="custom-select salvar-campo" id="motivo" name="Motivo">
+                    <select class="custom-select salvar-campo select-enum" id="motivo" name="Motivo">
                         <option disabled selected>Selecione uma opção</option>
                     </select>
                 </div>
@@ -155,7 +155,7 @@
                 </div>
                 <div class="col-md-6">
                     <label for="grauComplexidade">Grau de complexidade</label>
-                    <select class="custom-select salvar-campo" id="grauComplexidade" name="GrauComplexidade">
+                    <select class="custom-select salvar-campo select-enum" id="grauComplexidade" name="GrauComplexidade">
                         <option disabled selected>Selecione uma opção</option>
                     </select>
                 </div>
@@ -175,7 +175,7 @@
                 </div>
                 <div class="col-md-4">
                     <label for="agendamentoFim">Fim programado</label>
-                    <input type="text" class="form-control date-time-picker" id="agendamentoFim" readonly disabled/>
+                    <input type="text" class="form-control date-time-picker" id="agendamentoFim" name="FimProgramado" readonly />
                 </div>
             </div>
             <div class="row" style="margin-top: 10px;">
