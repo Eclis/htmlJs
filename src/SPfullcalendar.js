@@ -5,7 +5,7 @@ var Fabrica_LIST = "Fábricas Internas e Armazenamento de Fábricas Terceiras";
 var coresFabricas = new Array();
 
 var FabricaRESTQuery = "/_api/Web/Lists/GetByTitle('" + Fabrica_LIST + "')/items?$select=ID,Chave"
-var FabricaSelecionada = "";
+var FabricaSelecionada = "*";
 var openFabricaCall = $.ajax({
     url: _spPageContextInfo.webAbsoluteUrl + FabricaRESTQuery,
     type: "GET",
@@ -32,27 +32,25 @@ openFabricaCall.done(function (data, textStatus, jqXHR) {
 
         coresFabricas.push(cor);
 
-
         $('#fabrica-selector').append(
             $('<option/>')
                 .attr('value', data.d.results[index].ID)
                 .text(data.d.results[index].Chave)
         );
-
     }
-
-
 });
 
 $('#fabrica-selector').on('change', function () {
-    if (this.value && this.value != "*") {
-        FabricaSelecionada = this.value;
-        DisplayTasks();
-    }
-    else {
-        FabricaSelecionada = "";
-        DisplayTasks();
-    }
+    FabricaSelecionada = this.value;
+    DisplayTasks();
+    // if (this.value && this.value != "*") {
+    //     FabricaSelecionada = this.value;
+    //     DisplayTasks();
+    // }
+    // else {
+    //     FabricaSelecionada = "";
+    //     DisplayTasks();
+    // }
 });
 
 DisplayTasks();
@@ -102,13 +100,16 @@ function DisplayTasks() {
             endDate = end.format('YYYY-MM-DD');
 
             var RESTQuery = "";
-            if (FabricaSelecionada != "") {
+
+            if (FabricaSelecionada != "*") {
                 RESTQuery = "/_api/Web/Lists/GetByTitle('" + TASK_LIST + "')/items?$select=ID,Title,\
 			Status,InicioProgramado,FimProgramado,CodigoProduto,DescricaoProduto,TipoLote,Fabrica/ID,Fabrica/Chave&$expand=Fabrica&$filter=Fabrica/ID eq " + FabricaSelecionada;
             }
             else {
                 RESTQuery = "/_api/Web/Lists/GetByTitle('" + TASK_LIST + "')/items?$select=ID,Title,\
-			Status,InicioProgramado,FimProgramado,CodigoProduto,DescricaoProduto,TipoLote,Fabrica/ID,Fabrica/Chave&$expand=Fabrica"
+			Status,InicioProgramado,FimProgramado,CodigoProduto,DescricaoProduto,TipoLote,Fabrica/Chave&$expand=Fabrica/Chave&";
+            //     RESTQuery = "/_api/Web/Lists/GetByTitle('" + TASK_LIST + "')/items?$select=ID,Title,\
+			// Status,InicioProgramado,FimProgramado,CodigoProduto,DescricaoProduto,TipoLote,Fabrica/ID,Fabrica/Chave&$expand=Fabrica"
 
             }
 
