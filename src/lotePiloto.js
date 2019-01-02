@@ -180,6 +180,7 @@ function CarregarAgendamento(id) {
                 $elemento.change();
             });
 
+            ModificarStatus($('select#status').val());
             $promise.resolve();
         }
     });
@@ -552,26 +553,48 @@ function InserirAgendamento() {
     return $promise;
 }
 
+function InstanciarDateTimePicker() {
+    $('.date-time-picker:not([readonly])').daterangepicker({
+        opens: 'center',
+        singleDatePicker: true,
+        showDropdowns: true,
+        timePicker: true,
+        timePicker24Hour: true,
+        locale: {
+            format: 'DD/MM/YYYY HH:mm',
+            applyLabel: "Aplicar",
+            cancelLabel: 'Limpar',
+            daysOfWeek: [
+                "Do",
+                "Se",
+                "Te",
+                "Qu",
+                "Qu",
+                "Se",
+                "Sa"
+            ],
+            monthNames: [
+                "Janeiro",
+                "Fevereiro",
+                "Março",
+                "Abril",
+                "Maio",
+                "Junho",
+                "Julho",
+                "Agosto",
+                "Setembro",
+                "Outubro",
+                "Novembro",
+                "Dezembro"
+            ]
+        }
+    });
+}
+
 function RegistrarBindings() {
-    var $status = $('select#status');
     var $tipoLote = $("select#tipoDeLote");
     var $fabrica = $("select#fabrica");
     var $linhaEquipamento = $("select#linhaEquipamento");
-
-    $status.change(function () {
-        $('.acoes a').each(function () {
-            var $botao = $(this);
-            var status = $botao.data('status');
-
-            if (status) {
-                if (status.indexOf($status.val()) > -1) {
-                    $botao.show();
-                } else {
-                    $botao.hide();
-                }
-            }
-        });
-    });
 
     $tipoLote.change(dispararCarregarLinhasEquipamentos);
     $fabrica.change(dispararCarregarLinhasEquipamentos);
@@ -610,7 +633,7 @@ function ResetarAgendamento() {
         $this.change();
     });
 
-    $('select#status').val('Rascunho').change();
+    ModificarStatus('Rascunho');
 }
 
 function SalvarAgendamento() {
@@ -625,6 +648,100 @@ function SalvarAgendamento() {
     return InserirAgendamento().then(function (response) {
         return CarregarAgendamento(response.record.attr('ows_ID'));
     });
+}
+
+function ModificarBotoesPorStatus(status) {
+    var $btnConcluir = $('.btn-concluir');
+    var $btnExecutado = $('.btn-executado');
+
+    switch (status) {
+        case 'Rascunho':
+            $btnConcluir.show();
+            $btnExecutado.hide();
+            break;
+        case 'Agendado':
+            $btnConcluir.hide();
+            $btnExecutado.show();
+            break;
+    }
+}
+
+function ModificarCamposPorStatus(status) {
+    var $TipoLote = $('[name=TipoLote]');
+    var $Fabrica = $('[name=Fabrica]');
+    var $LinhaEquipamento = $('[name=LinhaEquipamento]');
+    var $CodigoProduto = $('[name=CodigoProduto]');
+    var $LinhaProduto = $('[name=LinhaProduto]');
+    var $DescricaoProduto = $('[name=DescricaoProduto]');
+    var $Projeto = $('[name=Projeto]');
+    var $CategoriaProjeto = $('[name=CategoriaProjeto]');
+    var $Formula = $('[name=Formula]');
+    var $QuantidadePecas = $('[name=QuantidadePecas]');
+    var $Motivo = $('[name=Motivo]');
+    var $EnvioAmostras = $('[name=EnvioAmostras]');
+    var $ResponsavelAmostra = $('[name=ResponsavelAmostra]');
+    var $QuantidadeAmostra = $('[name=QuantidadeAmostra]');
+    var $CentroCusto = $('[name=CentroCusto]');
+    var $GrauComplexidade = $('[name=GrauComplexidade]');
+    var $InicioProgramado = $('[name=InicioProgramado]');
+    var $DuracaoEstimadaHoras = $('[name=DuracaoEstimadaHoras]');
+    var $DuracaoEstimadaMinutos = $('[name=DuracaoEstimadaMinutos]');
+    var $Observacoes = $('[name=Observacoes]');
+
+    switch (status) {
+        case 'Rascunho':
+            $TipoLote.attr('disabled', false);
+            $Fabrica.attr('disabled', false);
+            $LinhaEquipamento.attr('disabled', false);
+            $CodigoProduto.attr('disabled', false);
+            $LinhaProduto.attr('disabled', false);
+            $DescricaoProduto.attr('disabled', false);
+            $Projeto.attr('disabled', false);
+            $CategoriaProjeto.attr('disabled', false);
+            $Formula.attr('disabled', false);
+            $QuantidadePecas.attr('disabled', false);
+            $Motivo.attr('disabled', false);
+            $EnvioAmostras.attr('disabled', false);
+            $ResponsavelAmostra.attr('disabled', false);
+            $QuantidadeAmostra.attr('disabled', false);
+            $CentroCusto.attr('disabled', false);
+            $GrauComplexidade.attr('disabled', false);
+            $InicioProgramado.attr('disabled', false);
+            $DuracaoEstimadaHoras.attr('disabled', false);
+            $DuracaoEstimadaMinutos.attr('disabled', false);
+            $Observacoes.attr('disabled', false);
+            break;
+        case 'Agendado':
+        case 'Registro das Análises':
+        default:
+            $TipoLote.attr('disabled', true);
+            $Fabrica.attr('disabled', true);
+            $LinhaEquipamento.attr('disabled', true);
+            $CodigoProduto.attr('disabled', true);
+            $LinhaProduto.attr('disabled', true);
+            $DescricaoProduto.attr('disabled', true);
+            $Projeto.attr('disabled', true);
+            $CategoriaProjeto.attr('disabled', true);
+            $Formula.attr('disabled', true);
+            $QuantidadePecas.attr('disabled', true);
+            $Motivo.attr('disabled', true);
+            $EnvioAmostras.attr('disabled', true);
+            $ResponsavelAmostra.attr('disabled', true);
+            $QuantidadeAmostra.attr('disabled', true);
+            $CentroCusto.attr('disabled', true);
+            $GrauComplexidade.attr('disabled', true);
+            $InicioProgramado.attr('disabled', true);
+            $DuracaoEstimadaHoras.attr('disabled', true);
+            $DuracaoEstimadaMinutos.attr('disabled', true);
+            $Observacoes.attr('disabled', true);
+            break;
+    }
+}
+
+function ModificarStatus(status) {
+    $('select#status').val(status);
+    ModificarBotoesPorStatus(status);
+    ModificarCamposPorStatus(status);
 }
 
 function initializeAllPeoplePickers() {
@@ -755,49 +872,16 @@ $(document).ready(function () {
         });
 
         $('.btn-concluir').click(function () {
-            $('select[name=Status]').val('Agendado');
+            ModificarStatus('Agendado');
             SalvarAgendamento();
         });
 
-        // if(!$('[type="text"][name="ID"]').val()) {
-        //     EscolherAgendamento();
-        // }
-
-        $('.date-time-picker:not([readonly])').daterangepicker({
-            opens: 'center',
-            singleDatePicker: true,
-            showDropdowns: true,
-            timePicker: true,
-            timePicker24Hour: true,
-            locale: {
-                format: 'DD/MM/YYYY HH:mm',
-                applyLabel: "Aplicar",
-                cancelLabel: 'Limpar',
-                daysOfWeek: [
-                    "Do",
-                    "Se",
-                    "Te",
-                    "Qu",
-                    "Qu",
-                    "Se",
-                    "Sa"
-                ],
-                monthNames: [
-                    "Janeiro",
-                    "Fevereiro",
-                    "Março",
-                    "Abril",
-                    "Maio",
-                    "Junho",
-                    "Julho",
-                    "Agosto",
-                    "Setembro",
-                    "Outubro",
-                    "Novembro",
-                    "Dezembro"
-                ]
-            }
+        $('.btn-executado').click(function () {
+            ModificarStatus('Registro das Análises');
+            SalvarAgendamento();
         });
+
+        InstanciarDateTimePicker();
 
         CarregarHistorico(10267).then(function (registros) {
             $.fn.dataTable.ext.errMode = 'throw';

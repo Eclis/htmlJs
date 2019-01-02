@@ -15,7 +15,7 @@ sp.setup({
     }
 });
 
-async function asyncFunction() {
+(async () => {
     let deployFolderItem = await sp.web.getFolderByServerRelativePath('/sites/DEV_LotePiloto/SiteAssets/deploy').getItem();
     let folder: Folder;
 
@@ -34,6 +34,4 @@ async function asyncFunction() {
     readFile('dist/lotePiloto.js', function (err, contents) {
         folder.files.add('lotePiloto.js', contents, true);
     });
-}
-
-asyncFunction();
+})();
