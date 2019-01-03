@@ -488,6 +488,14 @@ function CarregarListaTiposLotes() {
     return $promise;
 }
 
+function dispararCarregarLinhasEquipamentos() {
+    var fabricaVal = $("select#fabrica :selected").text();
+    var tipoLoteVal =  $("select#tipoDeLote").val();
+    if (tipoLoteVal && fabricaVal) {
+        CarregarLinhasEquipamentos(fabricaVal, tipoLoteVal);
+    }
+}
+
 function EscolherAgendamento() {
     var agendamentoId = prompt('Digite o ID do agendamento');
 
@@ -591,77 +599,30 @@ function InstanciarDateTimePicker() {
     });
 }
 
-function RegistrarBindings() {
-    var $tipoLote = $("select#tipoDeLote");
-    var $fabrica = $("select#fabrica");
-    var $linhaEquipamento = $("select#linhaEquipamento");
-
-    $tipoLote.change(dispararCarregarLinhasEquipamentos);
-    $fabrica.change(dispararCarregarLinhasEquipamentos);
-
-    $linhaEquipamento.change(function () {
-        var valSelected = $("select#linhaEquipamento").val();
-        if (valSelected) {
-            CarregarLinhasEquipamentosById(valSelected)
-        }
-    })
-}
-
-function dispararCarregarLinhasEquipamentos() {
-    var fabricaVal = $("select#fabrica :selected").text();
-    var tipoLoteVal =  $("select#tipoDeLote").val();
-    if (tipoLoteVal && fabricaVal) {
-        CarregarLinhasEquipamentos(fabricaVal, tipoLoteVal);
-    }
-}
-
-function ResetarAgendamento() {
-    var $labelQuantidadePecas = $('label[for="produtoQuantidade"]');
-    $labelQuantidadePecas.text("Quantidade (peças)");
-
-    $('#main [name].salvar-campo').each(function () {
-        var $this = $(this);
-
-        if ($this.is('[type=checkbox]')) {
-            $this.attr('checked', false);
-        } else if ($this.is('select')) {
-            $this.val('Selecione uma opção');
-        } else {
-            $this.val('');
-        }
-
-        $this.change();
-    });
-
-    ModificarStatus('Rascunho');
-}
-
-function SalvarAgendamento() {
-    var id = $('input[name="ID"]').val();
-
-    if (id) {
-        return AtualizarAgendamento(id).then(function (response) {
-            return CarregarAgendamento(response.record.attr('ows_ID'));
-        });
-    }
-
-    return InserirAgendamento().then(function (response) {
-        return CarregarAgendamento(response.record.attr('ows_ID'));
-    });
-}
-
 function ModificarBotoesPorStatus(status) {
     var $btnConcluir = $('.btn-concluir');
     var $btnExecutado = $('.btn-executado');
+    var $btnAprovar = $('.btn-aprovar');
+    var $btnReprovarAprovar = $('.btn-reprovar');
 
     switch (status) {
         case 'Rascunho':
             $btnConcluir.show();
             $btnExecutado.hide();
+            $btnAprovar.hide();
+            $btnReprovarAprovar.hide();
             break;
         case 'Agendado':
             $btnConcluir.hide();
             $btnExecutado.show();
+            $btnAprovar.hide();
+            $btnReprovarAprovar.hide();
+            break;
+        case 'Registro das Análises':
+            $btnConcluir.hide();
+            $btnExecutado.hide();
+            $btnAprovar.show();
+            $btnReprovarAprovar.show();
             break;
     }
 }
@@ -742,6 +703,63 @@ function ModificarStatus(status) {
     $('select#status').val(status);
     ModificarBotoesPorStatus(status);
     ModificarCamposPorStatus(status);
+}
+
+function RegistrarBindings() {
+    var $tipoLote = $("select#tipoDeLote");
+    var $fabrica = $("select#fabrica");
+    var $linhaEquipamento = $("select#linhaEquipamento");
+
+    $tipoLote.change(dispararCarregarLinhasEquipamentos);
+    $fabrica.change(dispararCarregarLinhasEquipamentos);
+
+    $linhaEquipamento.change(function () {
+        var valSelected = $("select#linhaEquipamento").val();
+        if (valSelected) {
+            CarregarLinhasEquipamentosById(valSelected)
+        }
+    })
+}
+
+function PegarUsuarioAtual() {
+    return $().SPServices.SPGetCurrentUser({
+        fieldName: "Email"
+    });
+}
+
+function ResetarAgendamento() {
+    var $labelQuantidadePecas = $('label[for="produtoQuantidade"]');
+    $labelQuantidadePecas.text("Quantidade (peças)");
+
+    $('#main [name].salvar-campo').each(function () {
+        var $this = $(this);
+
+        if ($this.is('[type=checkbox]')) {
+            $this.attr('checked', false);
+        } else if ($this.is('select')) {
+            $this.val('Selecione uma opção');
+        } else {
+            $this.val('');
+        }
+
+        $this.change();
+    });
+
+    ModificarStatus('Rascunho');
+}
+
+function SalvarAgendamento() {
+    var id = $('input[name="ID"]').val();
+
+    if (id) {
+        return AtualizarAgendamento(id).then(function (response) {
+            return CarregarAgendamento(response.record.attr('ows_ID'));
+        });
+    }
+
+    return InserirAgendamento().then(function (response) {
+        return CarregarAgendamento(response.record.attr('ows_ID'));
+    });
 }
 
 function initializeAllPeoplePickers() {
@@ -878,6 +896,16 @@ $(document).ready(function () {
 
         $('.btn-executado').click(function () {
             ModificarStatus('Registro das Análises');
+            SalvarAgendamento();
+        });
+
+        $('.btn-aprovar').click(function () {
+            ModificarStatus('Aprovado');
+            SalvarAgendamento();
+        });
+
+        $('.btn-reprovar').click(function () {
+            ModificarStatus('Reprovado');
             SalvarAgendamento();
         });
 
