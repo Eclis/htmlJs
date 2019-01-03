@@ -102,12 +102,10 @@ function DisplayTasks() {
             var RESTQuery = "";
 
             if (FabricaSelecionada != "*") {
-                RESTQuery = "/_api/Web/Lists/GetByTitle('" + TASK_LIST + "')/items?$select=ID,Title,\
-			Status,InicioProgramado,FimProgramado,CodigoProduto,DescricaoProduto,TipoLote,Fabrica/ID,Fabrica/Chave&$expand=Fabrica&$filter=Fabrica/ID eq " + FabricaSelecionada;
+                RESTQuery = "/_api/Web/Lists/GetByTitle('" + TASK_LIST + "')/items?$select=ID,Title,Status,InicioProgramado,FimProgramado,CodigoProduto,DescricaoProduto,TipoLote,Fabrica/ID,Fabrica/Chave&$expand=Fabrica&$filter=Fabrica/ID eq " + FabricaSelecionada;
             }
             else {
-                RESTQuery = "/_api/Web/Lists/GetByTitle('" + TASK_LIST + "')/items?$select=ID,Title,\
-			Status,InicioProgramado,FimProgramado,CodigoProduto,DescricaoProduto,TipoLote,Fabrica/Chave&$expand=Fabrica/Chave";
+                RESTQuery = "/_api/Web/Lists/GetByTitle('" + TASK_LIST + "')/items?$select=ID,Title,Status,InicioProgramado,FimProgramado,CodigoProduto,DescricaoProduto,TipoLote,Fabrica/ID,Fabrica/Chave&$expand=Fabrica";
             //     RESTQuery = "/_api/Web/Lists/GetByTitle('" + TASK_LIST + "')/items?$select=ID,Title,\
 			// Status,InicioProgramado,FimProgramado,CodigoProduto,DescricaoProduto,TipoLote,Fabrica/ID,Fabrica/Chave&$expand=Fabrica"
 
