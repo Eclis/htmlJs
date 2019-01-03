@@ -74,8 +74,10 @@
                 aria-selected="false">Acompanhamento</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="pills-historico-tab" data-toggle="pill" href="#pills-historico" role="tab" aria-controls="pills-historico"
-                aria-selected="false">Histórico</a>
+            <a class="nav-link" id="pills-analises-tab" data-toggle="pill" href="#pills-analises" role="tab" aria-controls="pills-analises" aria-selected="false">Análises</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="pills-historico-tab" data-toggle="pill" href="#pills-historico" role="tab" aria-controls="pills-historico" aria-selected="false">Histórico</a>
         </li>
     </ul>
     <div class="tab-content" id="pills-tabContent">
@@ -481,6 +483,15 @@
                 </div>
             </div>
         </div>
+        <div class="tab-pane fade" id="pills-analises" style="background-color: rgb(242, 242, 242); padding: 10px; margin-bottom: 10px;" role="tabpanel">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item"><a class="nav-link active" data-toggle="pill" href="#tab-analise-qualidade" role="tab">Qualidade</a></li>
+            </ul>
+            <div class="tab-content" id="tab-analise-conteudo">
+                <div class="tab-pane fade show active" id="tab-analise-qualidade" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel">
+                </div>
+            </div>
+        </div>
         <div class="tab-pane fade" id="pills-historico" style="background-color: rgb(242, 242, 242); padding: 10px; margin-bottom: 10px;" role="tabpanel" aria-labelledby="pills-historico-tab">
             <table id="data-table"></table>
         </div>
@@ -488,7 +499,9 @@
     <div class="acoes">
         <a href="#" class="btn btn-primary btn-salvar" role="button">Salvar</a>
         <a href="#" class="btn btn-primary btn-carregar" role="button">Carregar</a>
-        <a href="#" class="btn btn-primary btn-concluir" role="button" data-status='["Rascunho"]'>Concluir</a>
-        <a href="#" class="btn btn-primary btn-executado" role="button" data-status='["Agendado"]'>Executado</a>
+        <a href="#" class="btn btn-primary btn-concluir" role="button">Concluir Agendamento</a>
+        <a href="#" class="btn btn-primary btn-executado" role="button">Executado</a>
+        <a href="#" class="btn btn-primary btn-aprovar" role="button">Aprovar</a>
+        <a href="#" class="btn btn-primary btn-reprovar" role="button">Reprovar</a>
     </div>
 </div>
