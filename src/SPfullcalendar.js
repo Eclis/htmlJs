@@ -43,14 +43,6 @@ openFabricaCall.done(function (data, textStatus, jqXHR) {
 $('#fabrica-selector').on('change', function () {
     FabricaSelecionada = this.value;
     DisplayTasks();
-    // if (this.value && this.value != "*") {
-    //     FabricaSelecionada = this.value;
-    //     DisplayTasks();
-    // }
-    // else {
-    //     FabricaSelecionada = "";
-    //     DisplayTasks();
-    // }
 });
 
 DisplayTasks();
@@ -106,9 +98,6 @@ function DisplayTasks() {
             }
             else {
                 RESTQuery = "/_api/Web/Lists/GetByTitle('" + TASK_LIST + "')/items?$select=ID,Title,Status,InicioProgramado,FimProgramado,CodigoProduto,DescricaoProduto,TipoLote,Fabrica/ID,Fabrica/Chave&$expand=Fabrica";
-            //     RESTQuery = "/_api/Web/Lists/GetByTitle('" + TASK_LIST + "')/items?$select=ID,Title,\
-			// Status,InicioProgramado,FimProgramado,CodigoProduto,DescricaoProduto,TipoLote,Fabrica/ID,Fabrica/Chave&$expand=Fabrica"
-
             }
 
             var opencall = $.ajax({
