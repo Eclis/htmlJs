@@ -16,7 +16,19 @@ function CarregarTodosAgendamentos() {
             }
 
             $(Data.responseXML).SPFilterNode("z:row").each(function () {
-                $('tbody#AgendamentoBody').append('<tr><td><a href="/sites/DEV_LotePiloto/SitePages/DevTeste.aspx#ID='+$(this).attr("ows_ID")+' target="_self">'+$(this).attr("ows_ID")+'</a></td><td>'+$(this).attr("ows_CodigoProduto")+'</td><td>'+$(this).attr("ows_Title")+'</td><td>'+$(this).attr("ows_TipoLote")+'</td><td>'+$(this).attr("ows_Motivo")+'</td><td>'+$(this).attr("ows_Status")+'</td><td>'+$(this).attr("ows_RegistroAnalisesInicio")+'</td><td>'+$(this).attr("ows_Modified")+'</td><td>'+$(this).attr("ows_Editor")+'</td><td>'+$(this).attr("ows_InicioProgramado")+'</td><td>'+$(this).attr("ows__UIVersionString")+'</td></tr>');
+                var valID = (typeof $(this).attr("ows_ID") === "undefined") ? '' : $(this).attr("ows_ID");
+                var valCodigoProduto = (typeof $(this).attr("ows_CodigoProduto") === "undefined") ? '' : $(this).attr("ows_CodigoProduto");
+                var valTitle = (typeof $(this).attr("ows_Title") === "undefined") ? '' : $(this).attr("ows_Title");
+                var valTipoLote = (typeof $(this).attr("ows_TipoLote") === "undefined") ? '' : $(this).attr("ows_TipoLote");
+                var valMotivo = (typeof $(this).attr("ows_Motivo") === "undefined") ? '' : $(this).attr("ows_Motivo");
+                var valStatus = (typeof $(this).attr("ows_Status") === "undefined") ? '' : $(this).attr("ows_Status");
+                var valRegistroAnalisesInicio = (typeof $(this).attr("ows_RegistroAnalisesInicio") === "undefined") ? '' : $(this).attr("ows_RegistroAnalisesInicio");
+                var valModified = (typeof $(this).attr("ows_Modified") === "undefined") ? '' : $(this).attr("ows_Modified");
+                var valEditor = (typeof $(this).attr("ows_Editor") === "undefined") ? '' : $(this).attr("ows_Editor").split(";#")[1];
+                var valInicioProgramado = (typeof $(this).attr("ows_InicioProgramado") === "undefined") ? '' : $(this).attr("ows_InicioProgramado");
+                var valUIVersionString = (typeof $(this).attr("ows__UIVersionString") === "undefined") ? '' : $(this).attr("ows__UIVersionString");
+
+                $('tbody#AgendamentoBody').append('<tr><td><a href="/sites/DEV_LotePiloto/SitePages/LotePiloto.aspx?action=edit&loteid=' + valID + '" target="_self">' + valID + '</a></td><td>' + valCodigoProduto + '</td><td>' + valTitle + '</td><td>' + valTipoLote + '</td><td>' + valMotivo + '</td><td>' + valStatus + '</td><td>' + valRegistroAnalisesInicio + '</td><td>' + valModified + '</td><td>' + valEditor + '</td><td>' + valInicioProgramado + '</td><td><a href="/sites/DEV_LotePiloto/_layouts/15/Versions.aspx?list={8FEC2F9D-C97E-42EF-9B2C-0845CF7B2A52}&ID=' + valID + '&IsDlg=1" target="_blank">' + valUIVersionString + '</a></td></tr>');
             });
 
             $promise.resolve();
