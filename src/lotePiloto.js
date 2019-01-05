@@ -495,18 +495,6 @@ function dispararCarregarLinhasEquipamentos() {
     }
 }
 
-// function EscolherAgendamento() {
-//     var agendamentoId = prompt('Digite o ID do agendamento');
-
-//     if (agendamentoId) {
-//         ResetarAgendamento();
-
-//         CarregarAgendamento(agendamentoId).fail(function (response) {
-//             alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
-//         });
-//     }
-// }
-
 function InserirAgendamento() {
     var campos = [];
 
@@ -894,10 +882,6 @@ $(document).ready(function () {
                         return false;
                     });
 
-                    $('.btn-carregar').click(function () {
-                        EscolherAgendamento();
-                    });
-
                     $('.btn-concluir').click(function () {
                         ModificarStatus('Agendado');
                         SalvarAgendamento();
@@ -1042,10 +1026,6 @@ $(document).ready(function () {
                         });
 
                         return false;
-                    });
-
-                    $('.btn-carregar').click(function () {
-                        EscolherAgendamento();
                     });
 
                     $('.btn-concluir').click(function () {
