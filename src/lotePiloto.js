@@ -820,53 +820,111 @@ $(document).ready(function () {
                                 $("#pills-acompanhamento-tab").removeClass("disabled");
 
                                 $("#pills-dlpcl-tab").show();
-                                $("#pills-qualidade-tab").show();
-
                                 $("#pills-eng-envase-tab").hide();
                                 $("#pills-eng-fabricacao-tab").hide();
                                 $("#pills-inov-df-tab").hide();
                                 $("#pills-inov-de-tab").hide();
+                                $("#pills-qualidade-tab").show();
                                 $("#pills-fabrica-tab").hide();
 
                                 $("#pills-dlpcl-acomp-tab").hide();
-                                $("#pills-qualidade-acomp-tab").hide();
-
                                 $("#pills-eng-envase-acomp-tab").show();
                                 $("#pills-eng-fabricacao-acomp-tab").show();
                                 $("#pills-inov-df-acomp-tab").show();
                                 $("#pills-inov-de-acomp-tab").show();
+                                $("#pills-qualidade-acomp-tab").hide();
                                 $("#pills-fabrica-acomp-tab").show();
+                                $("#pills-meioambiente-acomp-tab").hide();
 
                                 break;
                             case 'Envase':
-                                $('li a[href="#tab-RespDLPCL"]').parent().show();
-                                $('li a[href="#tab-RespEngEnv"]').parent().show();
-                                $('li a[href="#tab-RespInvDF"]').parent().show();
-                                $('li a[href="#tab-RespQual"]').parent().show();
-                                $('li a[href="#tab-RespFab"]').parent().show();
+                                $("#pills-responsaveis-tab").removeClass("disabled");
+                                $("#pills-acompanhamento-tab").removeClass("disabled");
 
-                                $('li a[href="#tab-AcompInvDE"]').parent().show();
-                                $('li a[href="#tab-AcompEngFab"]').parent().show();
-                                $('li a[href="#tab-AcompMeioAmb"]').parent().show();
+                                $("#pills-dlpcl-tab").show();
+                                $("#pills-eng-envase-tab").show();
+                                $("#pills-eng-fabricacao-tab").hide();
+                                $("#pills-inov-df-tab").hide();
+                                $("#pills-inov-de-tab").show();
+                                $("#pills-qualidade-tab").show();
+                                $("#pills-fabrica-tab").show();
+
+                                $("#pills-dlpcl-acomp-tab").hide();
+                                $("#pills-eng-envase-acomp-tab").hide();
+                                $("#pills-eng-fabricacao-acomp-tab").show();
+                                $("#pills-inov-df-acomp-tab").hide();
+                                $("#pills-inov-de-acomp-tab").hide();
+                                $("#pills-qualidade-acomp-tab").hide();
+                                $("#pills-fabrica-acomp-tab").hide();
+                                $("#pills-meioambiente-acomp-tab").show();
+
                                 break;
                             case 'Fabricação':
-                                $('li a[href="#tab-RespDLPCL"]').parent().show();
-                                $('li a[href="#tab-RespEngFab"]').parent().show();
-                                $('li a[href="#tab-RespInvDF"]').parent().show();
-                                $('li a[href="#tab-RespQual"]').parent().show();
-                                $('li a[href="#tab-RespFab"]').parent().show();
+                                $("#pills-responsaveis-tab").removeClass("disabled");
+                                $("#pills-acompanhamento-tab").removeClass("disabled");
 
-                                $('li a[href="#tab-AcompEngEnv"]').parent().show();
-                                $('li a[href="#tab-AcompInvDE"]').parent().show();
-                                $('li a[href="#tab-AcompMeioAmb"]').parent().show();
+                                $("#pills-dlpcl-tab").show();
+                                $("#pills-eng-envase-tab").hide();
+                                $("#pills-eng-fabricacao-tab").show();
+                                $("#pills-inov-df-tab").show();
+                                $("#pills-inov-de-tab").hide();
+                                $("#pills-qualidade-tab").show();
+                                $("#pills-fabrica-tab").show();
+
+                                $("#pills-dlpcl-acomp-tab").hide();
+                                $("#pills-eng-envase-acomp-tab").show();
+                                $("#pills-eng-fabricacao-acomp-tab").hide();
+                                $("#pills-inov-df-acomp-tab").hide();
+                                $("#pills-inov-de-acomp-tab").show();
+                                $("#pills-qualidade-acomp-tab").hide();
+                                $("#pills-fabrica-acomp-tab").hide();
+                                $("#pills-meioambiente-acomp-tab").show();
+
                                 break;
                             case 'Picking':
-                                $('#tabsResponsaveis').hide();
-                                $('#tabsAcompanhamento').hide();
+                                $("#pills-responsaveis-tab").addClass("disabled");
+                                $("#pills-acompanhamento-tab").addClass("disabled");
+
+                                $("#pills-dlpcl-tab").hide();
+                                $("#pills-eng-envase-tab").hide();
+                                $("#pills-eng-fabricacao-tab").hide();
+                                $("#pills-inov-df-tab").hide();
+                                $("#pills-inov-de-tab").hide();
+                                $("#pills-qualidade-tab").hide();
+                                $("#pills-fabrica-tab").hide();
+
+                                $("#pills-dlpcl-acomp-tab").hide();
+                                $("#pills-eng-envase-acomp-tab").hide();
+                                $("#pills-eng-fabricacao-acomp-tab").hide();
+                                $("#pills-inov-df-acomp-tab").hide();
+                                $("#pills-inov-de-acomp-tab").hide();
+                                $("#pills-qualidade-acomp-tab").hide();
+                                $("#pills-fabrica-acomp-tab").hide();
+                                $("#pills-meioambiente-acomp-tab").hide();
+
                                 break;
                             default:
                                 $("#pills-responsaveis-tab").addClass("disabled");
                                 $("#pills-acompanhamento-tab").addClass("disabled");
+
+                                $("#pills-dlpcl-tab").hide();
+                                $("#pills-eng-envase-tab").hide();
+                                $("#pills-eng-fabricacao-tab").hide();
+                                $("#pills-inov-df-tab").hide();
+                                $("#pills-inov-de-tab").hide();
+                                $("#pills-qualidade-tab").hide();
+                                $("#pills-fabrica-tab").hide();
+
+                                $("#pills-dlpcl-acomp-tab").hide();
+                                $("#pills-eng-envase-acomp-tab").hide();
+                                $("#pills-eng-fabricacao-acomp-tab").hide();
+                                $("#pills-inov-df-acomp-tab").hide();
+                                $("#pills-inov-de-acomp-tab").hide();
+                                $("#pills-qualidade-acomp-tab").hide();
+                                $("#pills-fabrica-acomp-tab").hide();
+                                $("#pills-meioambiente-acomp-tab").hide();
+                                
+                                break;
                         }
                     });
 
