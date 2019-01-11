@@ -4,6 +4,7 @@ var replace = require('gulp-string-replace');
 var yargs = require('yargs');
 var watch = require('gulp-watch');
 var shell = require('gulp-shell');
+var notifier = require("node-notifier");
 
 var usuario = yargs.argv.usuario || 'main';
 
@@ -32,6 +33,15 @@ gulp.task('build', gulp.parallel('build-ts', 'build-js', 'build-html'));
 gulp.task('deploy', shell.task('node dist/app.js --usuario ' + usuario));
 gulp.task('default', gulp.series('build', 'deploy'));
 
+gulp.task('notify', function (resolve) {
+    notifier.notify({
+        title: 'Deployer',
+        message: 'Deploy Finalizado!',
+    });
+
+    resolve();
+});
+
 gulp.task('watch', function () {
-    return watch(['src/HTML/*.html', 'src/JS/*.js'], gulp.series('build', 'deploy'));
+    return watch(['src/HTML/*.html', 'src/JS/*.js'], gulp.series('build', 'deploy', 'notify'));
 });
