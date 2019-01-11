@@ -41,7 +41,14 @@ sp.setup({
         folder.files.add('natura.html', contents, true);
     });
 
+    readFile('dist/agendamentos.html', function (err, contents) {
+        folder.files.add('agendamentos.html', contents, true);
+    });
+
     readFile('dist/lotePiloto.js', function (err, contents) {
         jsFolder.files.add('lotePiloto.js', contents, true);
+    });
+    readFile('dist/agendamentos.js', function (err, contents) {
+        jsFolder.files.add('agendamentos.js', contents, true);
     });
 })();
