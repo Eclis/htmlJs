@@ -24,6 +24,7 @@ gulp.task('build-js', function () {
 gulp.task('build-html', function () {
     return gulp.src('src/HTML/*.html')
         .pipe(replace('/sites/DEV_LotePiloto/SiteAssets/deploy/main/JS/lotePiloto.js', '/sites/DEV_LotePiloto/SiteAssets/deploy/' + usuario + '/JS/lotePiloto.js'))
+        .pipe(replace('/sites/DEV_LotePiloto/SiteAssets/deploy/main/JS/agendamentos.js', '/sites/DEV_LotePiloto/SiteAssets/deploy/' + usuario + '/JS/agendamentos.js'))
         .pipe(gulp.dest('dist'));
 });
 
