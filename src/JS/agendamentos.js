@@ -8,7 +8,7 @@ function VerificarPermissoes() {
             if (($(xData.responseXML).find("Group[Name = 'Agendamento - DLL']").length == 1)||
             ($(xData.responseXML).find("Group[Name = 'Agendamento - Planta Piloto']").length == 1)||
             ($(xData.responseXML).find("Group[Name = 'Administradores Lote Piloto']").length == 1)) {
-                $(".row").append("<a class='btn btn-primary' id='btnNovo' href='/sites/DEV_LotePiloto/SitePages/LotePiloto.aspx?action=new' target='_self'>Novo</a>");
+                $(".row").append("<a class='btn btn-primary' id='btnNovo' href='/sites/DEV_LotePiloto/SitePages/LotePiloto.aspx?action=new' target='_self'>Novo</a>"); 
             }
             else {
                 $(".row").remove("#btnNovo");
