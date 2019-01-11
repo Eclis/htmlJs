@@ -23,7 +23,7 @@ gulp.task('build-js', function () {
 
 gulp.task('build-html', function () {
     return gulp.src('src/*.html')
-        .pipe(replace('/sites/DEV_LotePiloto/SiteAssets/JS/lotePiloto.js', '/sites/DEV_LotePiloto/SiteAssets/deploy/' + usuario + '/lotePiloto.js'))
+        .pipe(replace('/sites/DEV_LotePiloto/SiteAssets/deploy/main/lotePiloto.js', '/sites/DEV_LotePiloto/SiteAssets/deploy/' + usuario + '/lotePiloto.js'))
         .pipe(gulp.dest('dist'));
 });
 
