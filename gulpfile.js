@@ -17,13 +17,13 @@ gulp.task('build-ts', function () {
 });
 
 gulp.task('build-js', function () {
-    return gulp.src('src/*.js')
+    return gulp.src('src/JS/*.js')
         .pipe(gulp.dest('dist'));
 });
 
 gulp.task('build-html', function () {
-    return gulp.src('src/*.html')
-        .pipe(replace('/sites/DEV_LotePiloto/SiteAssets/deploy/main/lotePiloto.js', '/sites/DEV_LotePiloto/SiteAssets/deploy/' + usuario + '/lotePiloto.js'))
+    return gulp.src('src/HTML/*.html')
+        .pipe(replace('/sites/DEV_LotePiloto/SiteAssets/deploy/main/JS/lotePiloto.js', '/sites/DEV_LotePiloto/SiteAssets/deploy/' + usuario + '/JS/lotePiloto.js'))
         .pipe(gulp.dest('dist'));
 });
 
