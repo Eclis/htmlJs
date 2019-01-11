@@ -1,3 +1,22 @@
+function VerificarPermissoes() {
+    $().SPServices({
+
+        operation: "GetGroupCollectionFromUser",
+        userLoginName: $().SPServices.SPGetCurrentUser(),
+        async: false,
+        completefunc: function (xData, Status) {
+            if (($(xData.responseXML).find("Group[Name = 'Agendamento - DLL']").length == 1)||
+            ($(xData.responseXML).find("Group[Name = 'Agendamento - Planta Piloto']").length == 1)||
+            ($(xData.responseXML).find("Group[Name = 'Administradores Lote Piloto']").length == 1)) {
+                $(".row").append("<a class='btn btn-primary' id='btnNovo' href='/sites/DEV_LotePiloto/SitePages/LotePiloto.aspx?action=new' target='_self'>Novo</a>");
+            }
+            else {
+                $(".row").remove("#btnNovo");
+            }
+        }
+    });
+}
+
 function CarregarTodosAgendamentos() {
     var $promise = $.Deferred();
 
@@ -40,5 +59,6 @@ function CarregarTodosAgendamentos() {
 
 
 $(document).ready(function () {
+    VerificarPermissoes();
     CarregarTodosAgendamentos();
 });
