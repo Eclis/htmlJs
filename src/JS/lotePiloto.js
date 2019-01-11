@@ -67,7 +67,7 @@ function initializePeoplePicker(peoplePickerElementId, groupName) {
     schema['PrincipalAccountType'] = 'User,DL,SecGroup,SPGroup';
     schema['SearchPrincipalSource'] = 15;
     schema['ResolvePrincipalSource'] = 15;
-    schema['AllowMultipleValues'] = true;
+    schema['AllowMultipleValues'] = false;
     schema['MaximumEntitySuggestions'] = 50;
     schema['Width'] = '280px';
 
@@ -80,7 +80,7 @@ function initializePeoplePicker(peoplePickerElementId, groupName) {
     // Pass the ID of the DOM element that contains the picker, an array of initial
     // PickerEntity objects to set the picker value, and a schema that defines
     // picker properties.
-    this.SPClientPeoplePicker_InitStandaloneControlWrapper(peoplePickerElementId, null, schema);
+    SPClientPeoplePicker_InitStandaloneControlWrapper(peoplePickerElementId, null, schema);
 }
 
 // Query the picker for user information.
@@ -1157,6 +1157,9 @@ $(document).ready(function () {
                     });
 
                     $('#tipoDeLote').change();
+
+                    ResetarAgendamento();
+                    CarregarAgendamento(getUrlParameter('loteid'));
 
                     $('.btn-salvar').click(function () {
                         SalvarAgendamento().then(function () {
