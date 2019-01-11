@@ -1,6 +1,67 @@
-// Render and initialize the client-side People Picker.
-function initializePeoplePicker(peoplePickerElementId) {
+//Retorna id do grupo SharePoint passando o nome dele como parâmetro
+//Caso não encontre o grupo, retorna string vazia
+function getGroupIDByName(groupName) {
+    var ctx = SP.ClientContext.get_current();
+    var group = ctx.get_web().get_siteGroups().getByName(groupName);
+    ctx.load(group);
+    ctx.executeQueryAsync(
+        function () {
+            var membershipGroupId = group.get_id();
+            return membershipGroupId;
+        },
+        function (sender, args) {
+            return '';
+        }
+    );
+}
 
+
+//Função para adicionar anexos (Utilizado na aba de Análises)
+function AddAttachments(listName, itemId, controlName) {
+    var digest = "";
+    $.ajax({
+        url: "/_api/contextinfo",
+        method: "POST",
+        headers: {
+            "ACCEPT": "application/json;odata=verbose",
+            "content-type": "application/json;odata=verbose"
+        },
+        success: function (data) {
+            digest = data.d.GetContextWebInformation.FormDigestValue;
+        },
+        error: function (data) {
+        }
+    }).done(function () {
+        var fileInput = $(controlName);
+        var fileName = fileInput[0].files[0].name;
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            var fileData = e.target.result;
+            var res11 = $.ajax({
+                url: "/_api/web/lists/getbytitle('" + listName + "')/items(" + itemId + ")/AttachmentFiles/ add(FileName='" + fileName + "')",
+                method: "POST",
+                binaryStringRequestBody: true,
+                data: fileData,
+                processData: false,
+                headers: {
+                    "ACCEPT": "application/json;odata=verbose",
+                    "X-RequestDigest": digest,
+                    "content-length": fileData.byteLength
+                },
+                success: function (data) {
+                },
+                error: function (data) {
+                }
+            });
+        };
+        reader.readAsArrayBuffer(fileInput[0].files[0]);
+    });
+}
+
+// Render and initialize the client-side People Picker.
+function initializePeoplePicker(peoplePickerElementId, groupName) {
+
+    var groupId = getGroupIDByName(groupName);
     // Create a schema to store picker properties, and set the properties.
     var schema = {};
     schema['PrincipalAccountType'] = 'User,DL,SecGroup,SPGroup';
@@ -9,6 +70,11 @@ function initializePeoplePicker(peoplePickerElementId) {
     schema['AllowMultipleValues'] = true;
     schema['MaximumEntitySuggestions'] = 50;
     schema['Width'] = '280px';
+
+    if (groupID !== '') {
+        schema['SharePointGroupID'] = groupID;
+    }
+
 
     // Render and initialize the picker.
     // Pass the ID of the DOM element that contains the picker, an array of initial
@@ -762,31 +828,31 @@ function SalvarAgendamento() {
 }
 
 function initializeAllPeoplePickers() {
-    initializePeoplePicker('peoplePickerRespDLPCL');
+    initializePeoplePicker('peoplePickerRespDLPCL', 'Área - DL PCL');
     $("#peoplePickerRespDLPCL_TopSpan").addClass("form-control");
-    initializePeoplePicker('peoplePickerRespEngEnvase');
+    initializePeoplePicker('peoplePickerRespEngEnvase','Área - Engenharia de Envase');
     $("#peoplePickerRespEngEnvase_TopSpan").addClass("form-control");
-    initializePeoplePicker('peoplePickerGerenteEngEnvase');
+    initializePeoplePicker('peoplePickerGerenteEngEnvase','Área - Engenharia de Envase');
     $("#peoplePickerGerenteEngEnvase_TopSpan").addClass("form-control");
-    initializePeoplePicker('peoplePickerRespEngFab');
+    initializePeoplePicker('peoplePickerRespEngFab','Área - Engenharia de Fabricação');
     $("#peoplePickerRespEngFab_TopSpan").addClass("form-control");
-    initializePeoplePicker('peoplePickerGerenteEngFab');
+    initializePeoplePicker('peoplePickerGerenteEngFab','Área - Engenharia de Fabricação');
     $("#peoplePickerGerenteEngFab_TopSpan").addClass("form-control");
-    initializePeoplePicker('peoplePickerRespInDF');
+    initializePeoplePicker('peoplePickerRespInDF','Área - Inovação DF');
     $("#peoplePickerRespInDF_TopSpan").addClass("form-control");
-    initializePeoplePicker('peoplePickerGerenteInDF');
+    initializePeoplePicker('peoplePickerGerenteInDF','Área - Inovação DF');
     $("#peoplePickerGerenteInDF_TopSpan").addClass("form-control");
-    initializePeoplePicker('peoplePickerRespInvDE');
+    initializePeoplePicker('peoplePickerRespInvDE','Área - Inovação DE');
     $("#peoplePickerRespInvDE_TopSpan").addClass("form-control");
-    initializePeoplePicker('peoplePickerGerenteInvDE');
+    initializePeoplePicker('peoplePickerGerenteInvDE','Área - Inovação DE');
     $("#peoplePickerGerenteInvDE_TopSpan").addClass("form-control");
-    initializePeoplePicker('peoplePickerRespQualidade');
+    initializePeoplePicker('peoplePickerRespQualidade','Área - Qualidade');
     $("#peoplePickerRespQualidade_TopSpan").addClass("form-control");
-    initializePeoplePicker('peoplePickerGerenteQualidade');
+    initializePeoplePicker('peoplePickerGerenteQualidade','Área - Qualidade');
     $("#peoplePickerGerenteQualidade_TopSpan").addClass("form-control");
-    initializePeoplePicker('peoplePickerRespFabrica');
+    initializePeoplePicker('peoplePickerRespFabrica','Área - Fábrica');
     $("#peoplePickerRespFabrica_TopSpan").addClass("form-control");
-    initializePeoplePicker('peoplePickerGerenteFabrica');
+    initializePeoplePicker('peoplePickerGerenteFabrica','Área - Fábrica');
     $("#peoplePickerGerenteFabrica_TopSpan").addClass("form-control");
 }
 
@@ -935,7 +1001,7 @@ $(document).ready(function () {
                                 $("#pills-qualidade-acomp-tab").hide();
                                 $("#pills-fabrica-acomp-tab").hide();
                                 $("#pills-meioambiente-acomp-tab").hide();
-                                
+
                                 break;
                         }
                     });
