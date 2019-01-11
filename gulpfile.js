@@ -32,5 +32,5 @@ gulp.task('deploy', shell.task('node dist/app.js --usuario ' + usuario));
 gulp.task('default', gulp.series('build', 'deploy'));
 
 gulp.task('watch', function () {
-    return watch(['src/*.html', 'src/*.js'], gulp.series('build', 'deploy'));
+    return watch(['src/HTML/*.html', 'src/JS/*.js'], gulp.series('build', 'deploy'));
 });
