@@ -952,6 +952,10 @@ $(document).ready(function () {
                         return false;
                     });
 
+                    $('.btn-carregar').click(function () {
+                        EscolherAgendamento();
+                    });
+
                     $('.btn-concluir').click(function () {
                         ModificarStatus('Agendado');
                         SalvarAgendamento();
