@@ -27,11 +27,21 @@ sp.setup({
         folder = result.folder;
     }
 
+    let jsFolder: Folder;
+
+    try {
+        let jsFolderItem = await folder.folders.getByName('JS').getItem();
+        jsFolder = jsFolderItem.folder;
+    } catch (e) {
+        let result = await folder.folders.add('JS');
+        jsFolder = result.folder;
+    }
+
     readFile('dist/natura.html', function (err, contents) {
         folder.files.add('natura.html', contents, true);
     });
 
     readFile('dist/lotePiloto.js', function (err, contents) {
-        folder.files.add('lotePiloto.js', contents, true);
+        jsFolder.files.add('lotePiloto.js', contents, true);
     });
 })();
