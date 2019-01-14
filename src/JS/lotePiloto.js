@@ -85,6 +85,8 @@ function onFail(sender, args) {
 }
 
 function AtualizarAgendamento(id) {
+    var $promise = $.Deferred();
+    CalcularCamposCalculaveis();
     var campos = [];
 
     $('#main [name].salvar-campo').each(function () {
@@ -98,9 +100,6 @@ function AtualizarAgendamento(id) {
             campos.push([this.name, $this.val()]);
         }
     });
-
-    var $promise = $.Deferred();
-    CalcularCamposCalculaveis();
 
     $().SPServices({
         operation: "UpdateListItems",
@@ -653,6 +652,8 @@ function GravarCodigoAgendamento($record) {
 }
 
 function InserirAgendamento() {
+    var $promise = $.Deferred();
+    CalcularCamposCalculaveis();
     var campos = [];
 
     $('#main [name].salvar-campo').each(function () {
@@ -666,9 +667,6 @@ function InserirAgendamento() {
             campos.push([this.name, $this.val()]);
         }
     });
-
-    var $promise = $.Deferred();
-    CalcularCamposCalculaveis();
 
     $().SPServices({
         operation: "UpdateListItems",
