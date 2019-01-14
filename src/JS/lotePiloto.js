@@ -148,6 +148,7 @@ function CalcularCamposCalculados() {
 
 function CarregarAgendamento(id) {
     var $promise = $.Deferred();
+
     $().SPServices({
         operation: 'GetListItems',
         listName: 'Agendamentos',
@@ -175,6 +176,7 @@ function CarregarAgendamento(id) {
             }
 
             var atributos = $registro.get(0).attributes;
+            var selectsACarregar = [];
 
             $.each(atributos, function () {
                 if (this.value.startsWith('datetime;#')) {
@@ -185,29 +187,63 @@ function CarregarAgendamento(id) {
 
                 if ($elemento.is('[type=checkbox]')) {
                     $elemento.attr('checked', this.value == "1");
+                    $elemento.change();
                 } else if ($elemento.is('[type=number]')) {
                     $elemento.val(AtributoNumber(this.value));
+                    $elemento.change();
                 } else if ($elemento.is('.date-time-picker')) {
                     $elemento.val(moment(this.value, 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm'));
 
                     if ($elemento.is(':not([readonly])')) {
                         $elemento.data('daterangepicker').elementChanged();
                     }
+
+                    $elemento.change();
                 } else if ($elemento.is('select.select-tabela')) {
-                    $elemento.val(this.value.slice(0, this.value.indexOf(';#')));
+                    selectsACarregar[$elemento.attr('name')] = {
+                        elemento: $elemento,
+                        valor: this.value.slice(0, this.value.indexOf(';#'))
+                    };
+                } else if ($elemento.is('select')) {
+                    selectsACarregar[$elemento.attr('name')] = {
+                        elemento: $elemento,
+                        valor: this.value
+                    };
                 } else {
                     $elemento.val(this.value);
+                    $elemento.change();
                 }
-
-                $elemento.change();
             });
 
+            CarregarSelects(selectsACarregar);
             ModificarStatus($('select#status').val());
             $promise.resolve();
         }
     });
 
     return $promise;
+}
+
+function CarregarSelects(selectsACarregar) {
+    var sorter = new Toposort();
+
+    Object.keys(selectsACarregar).forEach(function (index) {
+        sorter.add(index, DependenciasTabelas(index));
+    });
+
+    $.each(sorter.sort().reverse(), function (index, value) {
+        var select = selectsACarregar[value];
+        select.elemento.val(select.valor);
+        select.elemento.change();
+    });
+}
+
+function DependenciasTabelas(campo) {
+    if (campo == 'LinhaEquipamento') {
+        return ['TipoLote', 'Fabrica'];
+    }
+
+    return [];
 }
 
 function CarregarCategoriaProjeto() {
@@ -339,12 +375,12 @@ function CarregarLinhasEquipamentos(fabrica, tipoLote) {
         listName: 'Linhas e Equipamentos',
         CAMLQuery: '<Query><Where><And><And><Eq><FieldRef Name="Ativa" /><Value Type="Boolean">1</Value></Eq><Eq><FieldRef Name="Fabrica" /><Value Type="Lookup">' + fabrica + '</Value></Eq></And><Eq><FieldRef Name="TipoLote" /><Value Type="Choice">' + tipoLote + '</Value></Eq></And></Where></Query>',
         CAMLViewFields: '<ViewFields><FieldRef Name="Title" /><FieldRef Name="ID" /></ViewFields>',
+        async: false,
         completefunc: function (Data, Status) {
             linhaEquipamento.find('option')
                 .remove()
                 .end()
-                .append('<option disabled selected>Selecione uma opção</option>')
-                ;
+                .append('<option disabled selected>Selecione uma opção</option>');
 
             if (Status != 'success') {
                 $promise.reject({
@@ -513,6 +549,7 @@ function CarregarListaTiposLotes() {
 function dispararCarregarLinhasEquipamentos() {
     var fabricaVal = $("select#fabrica :selected").text();
     var tipoLoteVal = $("select#tipoDeLote").val();
+
     if (tipoLoteVal && fabricaVal) {
         CarregarLinhasEquipamentos(fabricaVal, tipoLoteVal);
     }
@@ -1100,7 +1137,7 @@ function InitializeAllPeoplePickers() {
 
 function InitializePeoplePicker(elementId, groupName) {
     var $promise = $.Deferred();
-    var $GroupIdPromise = QueryGroupIdByName(groupName);
+    var $groupIdPromise = QueryGroupIdByName(groupName);
     var schema = {};
     schema['PrincipalAccountType'] = 'User,DL,SecGroup,SPGroup';
     schema['SearchPrincipalSource'] = 15;
@@ -1109,7 +1146,7 @@ function InitializePeoplePicker(elementId, groupName) {
     schema['MaximumEntitySuggestions'] = 50;
     schema['Width'] = '280px';
 
-    $GroupIdPromise.then(function (groupId) {
+    $groupIdPromise.then(function (groupId) {
         schema['SharePointGroupID'] = groupId;
         SPClientPeoplePicker_InitStandaloneControlWrapper(elementId, null, schema);
         $promise.resolve();
