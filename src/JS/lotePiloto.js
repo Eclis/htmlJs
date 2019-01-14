@@ -583,6 +583,80 @@ function InserirAgendamento() {
     return $promise;
 }
 
+function ExcluirResponsaveisAgendamentosPorCodigoAgendamento(codigoAgendamento) {
+    $().SPServices.SPUpdateMultipleListItems({
+        async: false,
+        batchCmd: "Delete",
+        listName: "AgendamentosResponsaveis",
+        CAMLQuery: "<Query>"
+            + "<Where>" +
+            +"<Eq>" +
+            +"<FieldRef Name='CodigoAgendamento' />" +
+            +"<Value Type='Text'>" + codigoAgendamento + "</Value>" +
+            +"</Eq>" +
+            +"</Where>" +
+            "</Query>",
+        completefunc: function (xData, Status) {
+            alert("Agendamentos Responsáveis Concluídos - Código do Agendamento: " + codigoAgendamento);
+        }
+    });
+
+}
+
+function InserirResponsavelAgendamento(codigoAgendamento) {
+
+    // var vpTitle = (typeof $('#campo').text === "undefined") ? '' : $('#campo').text;
+
+    // var vpTitle = (typeof $('#campo').text === "undefined") ? ['Title',''] : ['Title',$('#campo').text];
+    // var vpCodigoAgendamento = (typeof $('#campo').text === "undefined") ? ['CodigoAgendamento',''] : ['CodigoAgendamento',$('#campo').text];
+    // var vpTipoResponsavel = (typeof $('#campo').text === "undefined") ? ['TipoResponsavel',''] : ['TipoResponsavel',$('#campo').text];
+    // var vpPessoa = (typeof $('#campo').text === "undefined") ? ['Pessoa',''] : ['Pessoa',$('#campo').text];
+
+
+    var vpCodigoAgendamento = codigoAgendamento;
+    var vpTipoResponsavel = 'DL/PCL - Responsável';
+    var vpTitle = codigoAgendamento + ' - ' + vpTipoResponsavel;
+    var vpPessoa = 21;
+
+    var campos = [['Title', vpTitle], ['CodigoAgendamento', vpCodigoAgendamento], ['TipoResponsavel', vpTipoResponsavel], ['Pessoa', vpPessoa]];
+
+    var $promise = $.Deferred();
+
+    $().SPServices({
+        operation: "UpdateListItems",
+        async: false,
+        batchCmd: "New",
+        listName: "Agendamentos - Responsáveis",
+        valuepairs: campos,
+        completefunc: function (xData, Status) {
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
+                });
+
+                return;
+            }
+
+            var $response = $(xData.responseText);
+            var errorCode = $response.find('ErrorCode').text();
+
+            if (errorCode == '0x00000000') {
+                $promise.resolve({
+                    record: $response.find('z\\:row:first')
+                });
+            } else {
+                $promise.reject({
+                    errorCode: errorCode,
+                    errorText: $response.find('ErrorText').text()
+                });
+            }
+        }
+    });
+
+    return $promise;
+}
+
 function InstanciarDateTimePicker() {
     $('.date-time-picker:not([readonly])').daterangepicker({
         opens: 'center',
@@ -870,9 +944,70 @@ function RegistrarBindings() {
     var $fabrica = $("select#fabrica");
     var $linhaEquipamento = $("select#linhaEquipamento");
 
+    var $acRespEngEnvaseAcomp = $("#acRespEngEnvaseAcomp");
+    var $acRespEngfabricacaoAcomp = $("#acRespEngfabricacaoAcomp");
+    var $acRespInofDFAcomp = $("#acRespInofDFAcomp");
+    var $acRespInofDEAcomp = $("#acRespInofDEAcomp");
+    var $acRespFabricaAcomp = $("#acRespFabricaAcomp");
+    var $acRespMeioAmbienteAcomp = $("#acRespMeioAmbienteAcomp");
+
     $tipoLote.change(function () {
         ModificarAbasPorTipoDeLote(this.value);
         dispararCarregarLinhasEquipamentos();
+    });
+
+    $acRespEngEnvaseAcomp.change(function () {
+        if ($acRespEngEnvaseAcomp.checked) {
+            $("#AbaAcRespsEngEnvase").show();
+        }
+        else {
+            $("#AbaAcRespsEngEnvase").hide();
+        }
+    });
+
+    $acRespEngfabricacaoAcomp.change(function () {
+        if ($acRespEngfabricacaoAcomp.checked) {
+            $("#AbaAcRespsEngFabricacao").show();
+        }
+        else {
+            $("#AbaAcRespsEngFabricacao").hide();
+        }
+    });
+
+    $acRespInofDFAcomp.change(function () {
+        if ($acRespInofDFAcomp.checked) {
+            $("#AbaAcRespsInovDF").show();
+        }
+        else {
+            $("#AbaAcRespsInovDF").hide();
+        }
+    });
+
+    $acRespInofDEAcomp.change(function () {
+        if ($acRespInofDEAcomp.checked) {
+            $("#AbaAcRespsInovDE").show();
+        }
+        else {
+            $("#AbaAcRespsInovDE").hide();
+        }
+    });
+
+    $acRespFabricaAcomp.change(function () {
+        if ($acRespFabricaAcomp.checked) {
+            $("#AbaAcRespsFabrica").show();
+        }
+        else {
+            $("#AbaAcRespsFabrica").hide();
+        }
+    });
+
+    $acRespMeioAmbienteAcomp.change(function () {
+        if ($acRespMeioAmbienteAcomp.checked) {
+            $("#AbaAcRespsMeioAmbiente").show();
+        }
+        else {
+            $("#AbaAcRespsMeioAmbiente").hide();
+        }
     });
 
     $fabrica.change(dispararCarregarLinhasEquipamentos);
@@ -932,19 +1067,34 @@ function SalvarAgendamento() {
 
 function InitializeAllPeoplePickers() {
     return $.when(
-        InitializePeoplePicker('peoplePickerRespDLPCL', 'Área - DL PCL'),
-        InitializePeoplePicker('peoplePickerRespEngEnvase','Área - Engenharia de Envase'),
-        InitializePeoplePicker('peoplePickerGerenteEngEnvase','Área - Engenharia de Envase'),
-        InitializePeoplePicker('peoplePickerRespEngFab','Área - Engenharia de Fabricação'),
-        InitializePeoplePicker('peoplePickerGerenteEngFab','Área - Engenharia de Fabricação'),
-        InitializePeoplePicker('peoplePickerRespInDF','Área - Inovação DF'),
-        InitializePeoplePicker('peoplePickerGerenteInDF','Área - Inovação DF'),
-        InitializePeoplePicker('peoplePickerRespInvDE','Área - Inovação DE'),
-        InitializePeoplePicker('peoplePickerGerenteInvDE','Área - Inovação DE'),
-        InitializePeoplePicker('peoplePickerRespQualidade','Área - Qualidade'),
-        InitializePeoplePicker('peoplePickerGerenteQualidade','Área - Qualidade'),
-        InitializePeoplePicker('peoplePickerRespFabrica','Área - Fábrica'),
-        InitializePeoplePicker('peoplePickerGerenteFabrica','Área - Fábrica')
+        //Aba Responsáveis Peoplepicker
+        InitializePeoplePicker('peoplePickerAbaRespRespDLPCL', 'Área - DL PCL'),
+        InitializePeoplePicker('peoplePickerAbaRespRespEngEnvase', 'Área - Engenharia de Envase'),
+        InitializePeoplePicker('peoplePickerAbaRespGerEngEnvase', 'Área - Engenharia de Envase'),
+        InitializePeoplePicker('peoplePickerAbaRespRespEngFabricacao', 'Área - Engenharia de Fabricação'),
+        InitializePeoplePicker('peoplePickerAbaRespGerEngFabricacao', 'Área - Engenharia de Fabricação'),
+        InitializePeoplePicker('peoplePickerAbaRespRespInovDF', 'Área - Inovação DF'),
+        InitializePeoplePicker('peoplePickerAbaRespGerInovDF', 'Área - Inovação DF'),
+        InitializePeoplePicker('peoplePickerAbaRespRespInovDE', 'Área - Inovação DE'),
+        InitializePeoplePicker('peoplePickerAbaRespGerInovDE', 'Área - Inovação DE'),
+        InitializePeoplePicker('peoplePickerAbaRespRespQualidade', 'Área - Qualidade'),
+        InitializePeoplePicker('peoplePickerAbaRespGerQualidade', 'Área - Qualidade'),
+        InitializePeoplePicker('peoplePickerAbaRespCoordProgFabrica', 'Área - Fábrica'),
+        InitializePeoplePicker('peoplePickerAbaRespCoordManFabrica', 'Área - Fábrica'),
+        InitializePeoplePicker('peoplePickerAbaRespGerFabrica', 'Área - Fábrica'),
+        //Aba Acompanhamentos
+        InitializePeoplePicker('peoplePickerAbaAcRespEngFabricacao', 'Área - Engenharia de Fabricação'),
+        InitializePeoplePicker('peoplePickerAbaAcGerEngFabricacao', 'Área - Engenharia de Fabricação'),
+        InitializePeoplePicker('peoplePickerAbaAcRespInovDF', 'Área - Inovação DF'),
+        InitializePeoplePicker('peoplePickerAbaAcGerInovDF', 'Área - Inovação DF'),
+        InitializePeoplePicker('peoplePickerAbaAcRespEngEnvase', 'Área - Engenharia de Envase'),
+        InitializePeoplePicker('peoplePickerAbaAcGerEngEnvase', 'Área - Engenharia de Envase'),
+        InitializePeoplePicker('peoplePickerAbaAcRespInovDE', 'Área - Inovação DE'),
+        InitializePeoplePicker('peoplePickerAbaAcGerInovDE', 'Área - Inovação DE'),
+        InitializePeoplePicker('peoplePickerAbaAcCoordProgFabrica', 'Área - Fábrica'),
+        InitializePeoplePicker('peoplePickerAbaAcCoordManFabrica', 'Área - Fábrica'),
+        InitializePeoplePicker('peoplePickerAbaAcGerFabrica', 'Fábrica - Gerente'),
+        InitializePeoplePicker('peoplePickerAbaAcRespMeioAmbiente', 'Área - Meio Ambiente')
     );
 }
 
