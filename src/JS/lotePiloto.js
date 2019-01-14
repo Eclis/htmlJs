@@ -959,7 +959,7 @@ function InitializePeoplePicker(elementId, groupName) {
     schema['MaximumEntitySuggestions'] = 50;
     schema['Width'] = '280px';
 
-    $GroupIdPromise.then(function () {
+    $GroupIdPromise.then(function (groupId) {
         schema['SharePointGroupID'] = groupId;
         SPClientPeoplePicker_InitStandaloneControlWrapper(elementId, null, schema);
         $promise.resolve();
