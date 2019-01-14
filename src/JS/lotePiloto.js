@@ -100,7 +100,7 @@ function AtualizarAgendamento(id) {
     });
 
     var $promise = $.Deferred();
-    CalcularCamposCalculados();
+    CalcularCamposCalculaveis();
 
     $().SPServices({
         operation: "UpdateListItems",
@@ -138,7 +138,7 @@ function AtualizarAgendamento(id) {
     return $promise;
 }
 
-function CalcularCamposCalculados() {
+function CalcularCamposCalculaveis() {
     var $titulo = $('input[name=Title]');
     var $codigoProduto = $('input[name=CodigoProduto]');
     var $projeto = $('input[name=Projeto]');
@@ -228,7 +228,7 @@ function CarregarSelects(selectsACarregar) {
     var sorter = new Toposort();
 
     Object.keys(selectsACarregar).forEach(function (index) {
-        sorter.add(index, DependenciasTabelas(index));
+        sorter.add(index, ListarDependenciasPorSelect(index));
     });
 
     $.each(sorter.sort().reverse(), function (index, value) {
@@ -236,14 +236,6 @@ function CarregarSelects(selectsACarregar) {
         select.elemento.val(select.valor);
         select.elemento.change();
     });
-}
-
-function DependenciasTabelas(campo) {
-    if (campo == 'LinhaEquipamento') {
-        return ['TipoLote', 'Fabrica'];
-    }
-
-    return [];
 }
 
 function CarregarCategoriaProjeto() {
@@ -546,6 +538,37 @@ function CarregarListaTiposLotes() {
     return $promise;
 }
 
+function CarregarAgendamentoIdOffset() {
+    var $promise = $.Deferred();
+
+    $().SPServices({
+        operation: 'GetListItems',
+        listName: 'Configuração – Sequência',
+        CAMLQuery: '<Query><Where><Eq><FieldRef Name="Identificador" /><Value Type="Choice">Agendamento</Value></Eq></Where></Query>',
+        CAMLViewFields: '<ViewFields><FieldRef Name="Title" /><FieldRef Name="ID" /></ViewFields>',
+        completefunc: function (Data, Status) {
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
+                });
+
+                return;
+            }
+
+            var $result = $(Data.responseText).find('z\\:row:first');
+
+            if ($result.length > 0) {
+                $promise.resolve(AtributoNumber($result.attr('ows_ultimovalor')));
+            } else {
+                $promise.resolve(0);
+            }
+        }
+    });
+
+    return $promise;
+}
+
 function dispararCarregarLinhasEquipamentos() {
     var fabricaVal = $("select#fabrica :selected").text();
     var tipoLoteVal = $("select#tipoDeLote").val();
@@ -567,6 +590,68 @@ function EscolherAgendamento() {
     }
 }
 
+function ExcluirResponsaveisAgendamentosPorCodigoAgendamento(codigoAgendamento) {
+    $().SPServices.SPUpdateMultipleListItems({
+        async: false,
+        batchCmd: "Delete",
+        listName: "AgendamentosResponsaveis",
+        CAMLQuery: "<Query>"
+            + "<Where>" +
+            +"<Eq>" +
+            +"<FieldRef Name='CodigoAgendamento' />" +
+            +"<Value Type='Text'>" + codigoAgendamento + "</Value>" +
+            +"</Eq>" +
+            +"</Where>" +
+            "</Query>",
+        completefunc: function (xData, Status) {
+            alert("Agendamentos Responsáveis Concluídos - Código do Agendamento: " + codigoAgendamento);
+        }
+    });
+
+}
+
+function GravarCodigoAgendamento($record) {
+    return CarregarAgendamentoIdOffset().then(function (offset) {
+        var $promise = $.Deferred();
+
+        $().SPServices({
+            operation: "UpdateListItems",
+            batchCmd: 'Update',
+            listName: 'Agendamentos',
+            ID: $record.attr('ows_id'),
+            valuepairs: [['CodigoAgendamento', offset + AtributoNumber($record.attr('ows_id'))]],
+            completefunc: function (xData, Status) {
+                if (Status != 'success') {
+                    $promise.reject({
+                        errorCode: '0x99999999',
+                        errorText: 'Erro Remoto'
+                    });
+
+                    return;
+                }
+
+                var $response = $(xData.responseText);
+                var errorCode = $response.find('ErrorCode').text();
+
+                if (errorCode == '0x00000000') {
+                    $promise.resolve({
+                        record: $response.find('z\\:row:first')
+                    });
+                } else {
+                    $promise.reject({
+                        errorCode: errorCode,
+                        errorText: $response.find('ErrorText').text()
+                    });
+                }
+
+                $promise.resolve();
+            }
+        });
+
+        return $promise;
+    });
+}
+
 function InserirAgendamento() {
     var campos = [];
 
@@ -583,11 +668,10 @@ function InserirAgendamento() {
     });
 
     var $promise = $.Deferred();
-    CalcularCamposCalculados();
+    CalcularCamposCalculaveis();
 
     $().SPServices({
         operation: "UpdateListItems",
-        async: false,
         batchCmd: "New",
         listName: "Agendamentos",
         valuepairs: campos,
@@ -617,27 +701,9 @@ function InserirAgendamento() {
         }
     });
 
-    return $promise;
-}
-
-function ExcluirResponsaveisAgendamentosPorCodigoAgendamento(codigoAgendamento) {
-    $().SPServices.SPUpdateMultipleListItems({
-        async: false,
-        batchCmd: "Delete",
-        listName: "AgendamentosResponsaveis",
-        CAMLQuery: "<Query>"
-            + "<Where>" +
-            +"<Eq>" +
-            +"<FieldRef Name='CodigoAgendamento' />" +
-            +"<Value Type='Text'>" + codigoAgendamento + "</Value>" +
-            +"</Eq>" +
-            +"</Where>" +
-            "</Query>",
-        completefunc: function (xData, Status) {
-            alert("Agendamentos Responsáveis Concluídos - Código do Agendamento: " + codigoAgendamento);
-        }
+    return $promise.then(function (response) {
+        return GravarCodigoAgendamento(response.record);
     });
-
 }
 
 function InserirResponsavelAgendamento(codigoAgendamento) {
@@ -730,6 +796,14 @@ function InstanciarDateTimePicker() {
             ]
         }
     });
+}
+
+function ListarDependenciasPorSelect(campo) {
+    if (campo == 'LinhaEquipamento') {
+        return ['TipoLote', 'Fabrica'];
+    }
+
+    return [];
 }
 
 function ModificarBotoesPorStatus(status) {
@@ -1169,7 +1243,7 @@ function RegistrarBotoes() {
     $('.btn-salvar').click(function () {
         SalvarAgendamento().then(function () {
             alert("Agendamento Salvo");
-        }).fail(function () {
+        }).fail(function (response) {
             alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
         });
 
