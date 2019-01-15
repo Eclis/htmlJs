@@ -678,6 +678,7 @@ function GravarCodigoAgendamento($record) {
     });
 }
 
+
 function InserirAgendamento() {
     var $promise = $.Deferred();
     CalcularCamposCalculaveis();
@@ -836,6 +837,7 @@ function ModificarBotoesPorStatus(status) {
     var $btnExecutado = $('.btn-executado');
     var $btnAprovar = $('.btn-aprovar');
     var $btnReprovarAprovar = $('.btn-reprovar');
+    var $btnDerivar = $('.btn-derivar');
     var $btnCancelar = $('.btn-cancelar-agendamento');
     var $btnSalvar = $('.btn-salvar');
 
@@ -845,6 +847,7 @@ function ModificarBotoesPorStatus(status) {
             $btnExecutado.hide();
             $btnAprovar.hide();
             $btnReprovarAprovar.hide();
+            $btnDerivar.show();
             $btnCancelar.hide();
             break;
         case 'Cancelado':
@@ -854,12 +857,14 @@ function ModificarBotoesPorStatus(status) {
             $btnReprovarAprovar.hide();
             $btnCancelar.hide();
             $btnSalvar.hide();
+            $btnDerivar.hide();
             break;
         case 'Agendado':
             $btnConcluir.hide();
             $btnExecutado.show();
             $btnAprovar.hide();
             $btnReprovarAprovar.hide();
+            $btnDerivar.show();
             $btnCancelar.show();
             break;
         case 'Registro das Análises':
@@ -868,6 +873,10 @@ function ModificarBotoesPorStatus(status) {
             $btnCancelar.hide();
             $btnAprovar.show();
             $btnReprovarAprovar.show();
+            $btnDerivar.hide();
+            break;
+        case 'Aguardando Reagendamento':
+            $btnDerivar.show();
             break;
     }
 }
@@ -1290,6 +1299,20 @@ function getUrlParameter(name) {
     return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
 }
 
+function DerivarAgendamento() {
+    document.getElementById('inputId').value = "";
+    document.getElementById('codigoProduto').value="";
+    document.getElementById('produtoDescricao').value="";
+    $('select#status').val('Rascunho');
+    window.history.pushState("object", "", "main.aspx?action=new");
+}
+
+function ValidarQtdPecas(){
+    var quantidadePecas = document.getElementById('produtoQuantidade').value;
+
+}
+
+
 function RegistrarBotoes() {
     $('.btn-salvar').click(function () {
         SalvarAgendamento().then(function () {
@@ -1323,6 +1346,10 @@ function RegistrarBotoes() {
     $('.btn-reprovar').click(function () {
         ModificarStatus('Reprovado');
         SalvarAgendamento();
+    });
+
+    $('.btn-derivar').click(function () {
+        DerivarAgendamento();
     });
 
     $('.btn-cancelar-agendamento').click(function () {
