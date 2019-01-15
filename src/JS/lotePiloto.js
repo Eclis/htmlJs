@@ -1995,12 +1995,13 @@ function ModificarBotoesPorStatus(status) {
     switch (status) {
         case 'Rascunho':
             $btnConcluir.show();
+            if (VerificarPermissoesDerivar()) $btnDerivar.show();
             break;
         case 'Agendado':
             $btnExecutado.show();
             if (VerificarPermissoesCancelar()) $btnCancelar.show();
             if (VerificarPermissoesNaoExecutado()) $btnNaoExecutado.show();
-            $btnDerivar.show();
+            if (VerificarPermissoesDerivar()) $btnDerivar.show();
             break;
         case 'Registro das Análises':
             $btnAprovar.show();
@@ -2008,7 +2009,7 @@ function ModificarBotoesPorStatus(status) {
             $btnDerivar.hide();
             break;
         case 'Aguardando Reagendamento':
-            $btnDerivar.show();
+            if (VerificarPermissoesDerivar()) $btnDerivar.show();
             break;
     }
 }
@@ -2559,6 +2560,35 @@ function VerificarPermissoesCancelar() {
         async: false,
         completefunc: function (xData, Status) {
             $.each(listGruposPermitidosBtnCancelar, function (k, v) {
+                if (($(xData.responseXML).find("Group[Name='" + v + "']").length >= 1)) {
+                    result = true;
+                    return false;
+                } else {
+                    result = false;
+                }
+            });
+
+        }
+    });
+
+    return result;
+}
+
+var listGruposPermitidosBtnDerivar = [
+    'Administradores Lote Piloto',
+    'Agendamento - DLL',
+    'Agendamento - Planta Piloto',
+    'Área - DL PCL'
+]
+
+function VerificarPermissoesDerivar() {
+    var result = false;
+    $().SPServices({
+        operation: "GetGroupCollectionFromUser",
+        userLoginName: $().SPServices.SPGetCurrentUser(),
+        async: false,
+        completefunc: function (xData, Status) {
+            $.each(listGruposPermitidosBtnDerivar, function (k, v) {
                 if (($(xData.responseXML).find("Group[Name='" + v + "']").length >= 1)) {
                     result = true;
                     return false;
