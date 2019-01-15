@@ -1076,6 +1076,7 @@ function RegistrarBindings() {
     $tipoLote.change(function () {
         ModificarAbasPorTipoDeLote(this.value);
         dispararCarregarLinhasEquipamentos();
+        dispararCarregarFabricas();
     });
 
     $acRespEngEnvaseAcomp.change(function () {
@@ -1289,12 +1290,12 @@ function RegistrarBotoes() {
 $(document).ready(function () {
     $.when(
         CarregarCategoriaProjeto(),
-        CarregarFabricas(),
         CarregarLinhasDoProduto(),
         CarregarListaGrauComplexidade(),
         CarregarListaMotivos(),
         CarregarListaStatus(),
         CarregarListaTiposLotes(),
+        dispararCarregarFabricas(),
         InitializeAllPeoplePickers()
     ).then(function () {
         InstanciarDateTimePicker();
