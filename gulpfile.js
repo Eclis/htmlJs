@@ -19,6 +19,8 @@ gulp.task('build-ts', function () {
 
 gulp.task('build-js', function () {
     return gulp.src('src/JS/*.js')
+        .pipe(replace('/sites/DEV_LotePiloto/SiteAssets/main.aspx', '/sites/DEV_LotePiloto/SiteAssets/' + usuario + '.aspx'))
+        .pipe(replace('/sites/DEV_LotePiloto/SiteAssets/main-agendamentos.aspx', '/sites/DEV_LotePiloto/SiteAssets/' + usuario + '-agendamentos.aspx'))
         .pipe(gulp.dest('dist'));
 });
 
@@ -26,6 +28,8 @@ gulp.task('build-html', function () {
     return gulp.src('src/HTML/*.html')
         .pipe(replace('/sites/DEV_LotePiloto/SiteAssets/deploy/main/JS/lotePiloto.js', '/sites/DEV_LotePiloto/SiteAssets/deploy/' + usuario + '/JS/lotePiloto.js'))
         .pipe(replace('/sites/DEV_LotePiloto/SiteAssets/deploy/main/JS/agendamentos.js', '/sites/DEV_LotePiloto/SiteAssets/deploy/' + usuario + '/JS/agendamentos.js'))
+        .pipe(replace('/sites/DEV_LotePiloto/SiteAssets/main.aspx', '/sites/DEV_LotePiloto/SiteAssets/' + usuario + '.aspx'))
+        .pipe(replace('/sites/DEV_LotePiloto/SiteAssets/main-agendamentos.aspx', '/sites/DEV_LotePiloto/SiteAssets/' + usuario + '-agendamentos.aspx'))
         .pipe(gulp.dest('dist'));
 });
 

@@ -1,3 +1,22 @@
+function VerificarPermissoes() {
+    $().SPServices({
+
+        operation: "GetGroupCollectionFromUser",
+        userLoginName: $().SPServices.SPGetCurrentUser(),
+        async: false,
+        completefunc: function (xData, Status) {
+            if (($(xData.responseXML).find("Group[Name = 'Agendamento - DLL']").length == 1)||
+            ($(xData.responseXML).find("Group[Name = 'Agendamento - Planta Piloto']").length == 1)||
+            ($(xData.responseXML).find("Group[Name = 'Administradores Lote Piloto']").length == 1)) {
+                $(".row").append("<a class='btn btn-primary' id='btnNovo' href='/sites/DEV_LotePiloto/SiteAssets/main.aspx?action=new' target='_self'>Novo</a>");
+            }
+            else {
+                $(".row").remove("#btnNovo");
+            }
+        }
+    });
+}
+
 function CarregarTodosAgendamentos() {
     var $promise = $.Deferred();
 
@@ -28,7 +47,7 @@ function CarregarTodosAgendamentos() {
                 var valInicioProgramado = (typeof $(this).attr("ows_InicioProgramado") === "undefined") ? '' : $(this).attr("ows_InicioProgramado");
                 var valUIVersionString = (typeof $(this).attr("ows__UIVersionString") === "undefined") ? '' : $(this).attr("ows__UIVersionString");
 
-                $('tbody#AgendamentoBody').append('<tr><td><a href="/sites/DEV_LotePiloto/SitePages/LotePiloto.aspx?action=edit&loteid=' + valID + '" target="_self">' + valID + '</a></td><td>' + valCodigoProduto + '</td><td>' + valTitle + '</td><td>' + valTipoLote + '</td><td>' + valMotivo + '</td><td>' + valStatus + '</td><td>' + valRegistroAnalisesInicio + '</td><td>' + valModified + '</td><td>' + valEditor + '</td><td>' + valInicioProgramado + '</td><td><a href="/sites/DEV_LotePiloto/_layouts/15/Versions.aspx?list={8FEC2F9D-C97E-42EF-9B2C-0845CF7B2A52}&ID=' + valID + '&IsDlg=1" target="_blank">' + valUIVersionString + '</a></td></tr>');
+                $('tbody#AgendamentoBody').append('<tr><td><a href="/sites/DEV_LotePiloto/SiteAssets/main.aspx?action=edit&loteid=' + valID + '" target="_self">' + valID + '</a></td><td>' + valCodigoProduto + '</td><td>' + valTitle + '</td><td>' + valTipoLote + '</td><td>' + valMotivo + '</td><td>' + valStatus + '</td><td>' + valRegistroAnalisesInicio + '</td><td>' + valModified + '</td><td>' + valEditor + '</td><td>' + valInicioProgramado + '</td><td><a href="/sites/DEV_LotePiloto/_layouts/15/Versions.aspx?list={8FEC2F9D-C97E-42EF-9B2C-0845CF7B2A52}&ID=' + valID + '&IsDlg=1" target="_blank">' + valUIVersionString + '</a></td></tr>');
             });
 
             $promise.resolve();
@@ -40,5 +59,6 @@ function CarregarTodosAgendamentos() {
 
 
 $(document).ready(function () {
+    VerificarPermissoes();
     CarregarTodosAgendamentos();
 });

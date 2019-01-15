@@ -1,20 +1,43 @@
-// Render and initialize the client-side People Picker.
-function initializePeoplePicker(peoplePickerElementId) {
-
-    // Create a schema to store picker properties, and set the properties.
-    var schema = {};
-    schema['PrincipalAccountType'] = 'User,DL,SecGroup,SPGroup';
-    schema['SearchPrincipalSource'] = 15;
-    schema['ResolvePrincipalSource'] = 15;
-    schema['AllowMultipleValues'] = true;
-    schema['MaximumEntitySuggestions'] = 50;
-    schema['Width'] = '280px';
-
-    // Render and initialize the picker.
-    // Pass the ID of the DOM element that contains the picker, an array of initial
-    // PickerEntity objects to set the picker value, and a schema that defines
-    // picker properties.
-    this.SPClientPeoplePicker_InitStandaloneControlWrapper(peoplePickerElementId, null, schema);
+//Função para adicionar anexos (Utilizado na aba de Análises)
+function AddAttachments(listName, itemId, controlName) {
+    var digest = "";
+    $.ajax({
+        url: "/_api/contextinfo",
+        method: "POST",
+        headers: {
+            "ACCEPT": "application/json;odata=verbose",
+            "content-type": "application/json;odata=verbose"
+        },
+        success: function (data) {
+            digest = data.d.GetContextWebInformation.FormDigestValue;
+        },
+        error: function (data) {
+        }
+    }).done(function () {
+        var fileInput = $(controlName);
+        var fileName = fileInput[0].files[0].name;
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            var fileData = e.target.result;
+            var res11 = $.ajax({
+                url: "/_api/web/lists/getbytitle('" + listName + "')/items(" + itemId + ")/AttachmentFiles/ add(FileName='" + fileName + "')",
+                method: "POST",
+                binaryStringRequestBody: true,
+                data: fileData,
+                processData: false,
+                headers: {
+                    "ACCEPT": "application/json;odata=verbose",
+                    "X-RequestDigest": digest,
+                    "content-length": fileData.byteLength
+                },
+                success: function (data) {
+                },
+                error: function (data) {
+                }
+            });
+        };
+        reader.readAsArrayBuffer(fileInput[0].files[0]);
+    });
 }
 
 // Query the picker for user information.
@@ -62,6 +85,8 @@ function onFail(sender, args) {
 }
 
 function AtualizarAgendamento(id) {
+    var $promise = $.Deferred();
+    CalcularCamposCalculaveis();
     var campos = [];
 
     $('#main [name].salvar-campo').each(function () {
@@ -75,9 +100,6 @@ function AtualizarAgendamento(id) {
             campos.push([this.name, $this.val()]);
         }
     });
-
-    var $promise = $.Deferred();
-    CalcularCamposCalculados();
 
     $().SPServices({
         operation: "UpdateListItems",
@@ -115,7 +137,7 @@ function AtualizarAgendamento(id) {
     return $promise;
 }
 
-function CalcularCamposCalculados() {
+function CalcularCamposCalculaveis() {
     var $titulo = $('input[name=Title]');
     var $codigoProduto = $('input[name=CodigoProduto]');
     var $projeto = $('input[name=Projeto]');
@@ -125,6 +147,7 @@ function CalcularCamposCalculados() {
 
 function CarregarAgendamento(id) {
     var $promise = $.Deferred();
+
     $().SPServices({
         operation: 'GetListItems',
         listName: 'Agendamentos',
@@ -152,6 +175,7 @@ function CarregarAgendamento(id) {
             }
 
             var atributos = $registro.get(0).attributes;
+            var selectsACarregar = [];
 
             $.each(atributos, function () {
                 if (this.value.startsWith('datetime;#')) {
@@ -162,29 +186,55 @@ function CarregarAgendamento(id) {
 
                 if ($elemento.is('[type=checkbox]')) {
                     $elemento.attr('checked', this.value == "1");
+                    $elemento.change();
                 } else if ($elemento.is('[type=number]')) {
                     $elemento.val(AtributoNumber(this.value));
+                    $elemento.change();
                 } else if ($elemento.is('.date-time-picker')) {
                     $elemento.val(moment(this.value, 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm'));
 
                     if ($elemento.is(':not([readonly])')) {
                         $elemento.data('daterangepicker').elementChanged();
                     }
+
+                    $elemento.change();
                 } else if ($elemento.is('select.select-tabela')) {
-                    $elemento.val(this.value.slice(0, this.value.indexOf(';#')));
+                    selectsACarregar[$elemento.attr('name')] = {
+                        elemento: $elemento,
+                        valor: this.value.slice(0, this.value.indexOf(';#'))
+                    };
+                } else if ($elemento.is('select')) {
+                    selectsACarregar[$elemento.attr('name')] = {
+                        elemento: $elemento,
+                        valor: this.value
+                    };
                 } else {
                     $elemento.val(this.value);
+                    $elemento.change();
                 }
-
-                $elemento.change();
             });
 
+            CarregarSelects(selectsACarregar);
             ModificarStatus($('select#status').val());
             $promise.resolve();
         }
     });
 
     return $promise;
+}
+
+function CarregarSelects(selectsACarregar) {
+    var sorter = new Toposort();
+
+    Object.keys(selectsACarregar).forEach(function (index) {
+        sorter.add(index, ListarDependenciasPorSelect(index));
+    });
+
+    $.each(sorter.sort().reverse(), function (index, value) {
+        var select = selectsACarregar[value];
+        select.elemento.val(select.valor);
+        select.elemento.change();
+    });
 }
 
 function CarregarCategoriaProjeto() {
@@ -323,12 +373,12 @@ function CarregarLinhasEquipamentos(fabrica, tipoLote) {
         listName: 'Linhas e Equipamentos',
         CAMLQuery: '<Query><Where><And><And><Eq><FieldRef Name="Ativa" /><Value Type="Boolean">1</Value></Eq><Eq><FieldRef Name="Fabrica" /><Value Type="Lookup">' + fabrica + '</Value></Eq></And><Eq><FieldRef Name="TipoLote" /><Value Type="Choice">' + tipoLote + '</Value></Eq></And></Where></Query>',
         CAMLViewFields: '<ViewFields><FieldRef Name="Title" /><FieldRef Name="ID" /></ViewFields>',
+        async: false,
         completefunc: function (Data, Status) {
             linhaEquipamento.find('option')
                 .remove()
                 .end()
-                .append('<option disabled selected>Selecione uma opção</option>')
-                ;
+                .append('<option disabled selected>Selecione uma opção</option>');
 
             if (Status != 'success') {
                 $promise.reject({
@@ -493,9 +543,41 @@ function CarregarListaTiposLotes() {
     return $promise;
 }
 
+function CarregarAgendamentoIdOffset() {
+    var $promise = $.Deferred();
+
+    $().SPServices({
+        operation: 'GetListItems',
+        listName: 'Configuração – Sequência',
+        CAMLQuery: '<Query><Where><Eq><FieldRef Name="Identificador" /><Value Type="Choice">Agendamento</Value></Eq></Where></Query>',
+        CAMLViewFields: '<ViewFields><FieldRef Name="Title" /><FieldRef Name="ID" /></ViewFields>',
+        completefunc: function (Data, Status) {
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
+                });
+
+                return;
+            }
+
+            var $result = $(Data.responseText).find('z\\:row:first');
+
+            if ($result.length > 0) {
+                $promise.resolve(AtributoNumber($result.attr('ows_ultimovalor')));
+            } else {
+                $promise.resolve(0);
+            }
+        }
+    });
+
+    return $promise;
+}
+
 function dispararCarregarLinhasEquipamentos() {
     var fabricaVal = $("select#fabrica :selected").text();
     var tipoLoteVal = $("select#tipoDeLote").val();
+
     if (tipoLoteVal && fabricaVal) {
         CarregarLinhasEquipamentos(fabricaVal, tipoLoteVal);
     }
@@ -520,7 +602,71 @@ function EscolherAgendamento() {
     }
 }
 
+function ExcluirResponsaveisAgendamentosPorCodigoAgendamento(codigoAgendamento) {
+    $().SPServices.SPUpdateMultipleListItems({
+        async: false,
+        batchCmd: "Delete",
+        listName: "AgendamentosResponsaveis",
+        CAMLQuery: "<Query>"
+            + "<Where>" +
+            +"<Eq>" +
+            +"<FieldRef Name='CodigoAgendamento' />" +
+            +"<Value Type='Text'>" + codigoAgendamento + "</Value>" +
+            +"</Eq>" +
+            +"</Where>" +
+            "</Query>",
+        completefunc: function (xData, Status) {
+            alert("Agendamentos Responsáveis Concluídos - Código do Agendamento: " + codigoAgendamento);
+        }
+    });
+
+}
+
+function GravarCodigoAgendamento($record) {
+    return CarregarAgendamentoIdOffset().then(function (offset) {
+        var $promise = $.Deferred();
+
+        $().SPServices({
+            operation: "UpdateListItems",
+            batchCmd: 'Update',
+            listName: 'Agendamentos',
+            ID: $record.attr('ows_id'),
+            valuepairs: [['CodigoAgendamento', offset + AtributoNumber($record.attr('ows_id'))]],
+            completefunc: function (xData, Status) {
+                if (Status != 'success') {
+                    $promise.reject({
+                        errorCode: '0x99999999',
+                        errorText: 'Erro Remoto'
+                    });
+
+                    return;
+                }
+
+                var $response = $(xData.responseText);
+                var errorCode = $response.find('ErrorCode').text();
+
+                if (errorCode == '0x00000000') {
+                    $promise.resolve({
+                        record: $response.find('z\\:row:first')
+                    });
+                } else {
+                    $promise.reject({
+                        errorCode: errorCode,
+                        errorText: $response.find('ErrorText').text()
+                    });
+                }
+
+                $promise.resolve();
+            }
+        });
+
+        return $promise;
+    });
+}
+
 function InserirAgendamento() {
+    var $promise = $.Deferred();
+    CalcularCamposCalculaveis();
     var campos = [];
 
     $('#main [name].salvar-campo').each(function () {
@@ -535,14 +681,66 @@ function InserirAgendamento() {
         }
     });
 
+    $().SPServices({
+        operation: "UpdateListItems",
+        batchCmd: "New",
+        listName: "Agendamentos",
+        valuepairs: campos,
+        completefunc: function (xData, Status) {
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
+                });
+
+                return;
+            }
+
+            var $response = $(xData.responseText);
+            var errorCode = $response.find('ErrorCode').text();
+
+            if (errorCode == '0x00000000') {
+                $promise.resolve({
+                    record: $response.find('z\\:row:first')
+                });
+            } else {
+                $promise.reject({
+                    errorCode: errorCode,
+                    errorText: $response.find('ErrorText').text()
+                });
+            }
+        }
+    });
+
+    return $promise.then(function (response) {
+        return GravarCodigoAgendamento(response.record);
+    });
+}
+
+function InserirResponsavelAgendamento(codigoAgendamento) {
+
+    // var vpTitle = (typeof $('#campo').text === "undefined") ? '' : $('#campo').text;
+
+    // var vpTitle = (typeof $('#campo').text === "undefined") ? ['Title',''] : ['Title',$('#campo').text];
+    // var vpCodigoAgendamento = (typeof $('#campo').text === "undefined") ? ['CodigoAgendamento',''] : ['CodigoAgendamento',$('#campo').text];
+    // var vpTipoResponsavel = (typeof $('#campo').text === "undefined") ? ['TipoResponsavel',''] : ['TipoResponsavel',$('#campo').text];
+    // var vpPessoa = (typeof $('#campo').text === "undefined") ? ['Pessoa',''] : ['Pessoa',$('#campo').text];
+
+
+    var vpCodigoAgendamento = codigoAgendamento;
+    var vpTipoResponsavel = 'DL/PCL - Responsável';
+    var vpTitle = codigoAgendamento + ' - ' + vpTipoResponsavel;
+    var vpPessoa = 21;
+
+    var campos = [['Title', vpTitle], ['CodigoAgendamento', vpCodigoAgendamento], ['TipoResponsavel', vpTipoResponsavel], ['Pessoa', vpPessoa]];
+
     var $promise = $.Deferred();
-    CalcularCamposCalculados();
 
     $().SPServices({
         operation: "UpdateListItems",
         async: false,
         batchCmd: "New",
-        listName: "Agendamentos",
+        listName: "Agendamentos - Responsáveis",
         valuepairs: campos,
         completefunc: function (xData, Status) {
             if (Status != 'success') {
@@ -609,6 +807,14 @@ function InstanciarDateTimePicker() {
             ]
         }
     });
+}
+
+function ListarDependenciasPorSelect(campo) {
+    if (campo == 'LinhaEquipamento') {
+        return ['TipoLote', 'Fabrica'];
+    }
+
+    return [];
 }
 
 function ModificarBotoesPorStatus(status) {
@@ -715,6 +921,144 @@ function ModificarStatus(status) {
     $('select#status').val(status);
     ModificarBotoesPorStatus(status);
     ModificarCamposPorStatus(status);
+    // ModificarAbasPorStatus(status);
+}
+
+function ModificarAbasPorTipoDeLote(tipoDeLote) {
+    switch (tipoDeLote) {
+        case 'Brinde':
+            $("#pills-responsaveis-tab").removeClass("disabled");
+            $("#pills-acompanhamento-tab").removeClass("disabled");
+
+            $("#pills-dlpcl-tab").show();
+            $("#pills-eng-envase-tab").hide();
+            $("#pills-eng-fabricacao-tab").hide();
+            $("#pills-inov-df-tab").hide();
+            $("#pills-inov-de-tab").hide();
+            $("#pills-qualidade-tab").show();
+            $("#pills-fabrica-tab").hide();
+
+            $("#pills-dlpcl-acomp-tab").hide();
+            $("#pills-eng-envase-acomp-tab").show();
+            $("#pills-eng-fabricacao-acomp-tab").show();
+            $("#pills-inov-df-acomp-tab").show();
+            $("#pills-inov-de-acomp-tab").show();
+            $("#pills-qualidade-acomp-tab").hide();
+            $("#pills-fabrica-acomp-tab").show();
+            $("#pills-meioambiente-acomp-tab").hide();
+            break;
+        case 'Envase':
+            $("#pills-responsaveis-tab").removeClass("disabled");
+            $("#pills-acompanhamento-tab").removeClass("disabled");
+
+            $("#pills-dlpcl-tab").show();
+            $("#pills-eng-envase-tab").show();
+            $("#pills-eng-fabricacao-tab").hide();
+            $("#pills-inov-df-tab").hide();
+            $("#pills-inov-de-tab").show();
+            $("#pills-qualidade-tab").show();
+            $("#pills-fabrica-tab").show();
+
+            $("#pills-dlpcl-acomp-tab").hide();
+            $("#pills-eng-envase-acomp-tab").hide();
+            $("#pills-eng-fabricacao-acomp-tab").show();
+            $("#pills-inov-df-acomp-tab").hide();
+            $("#pills-inov-de-acomp-tab").hide();
+            $("#pills-qualidade-acomp-tab").hide();
+            $("#pills-fabrica-acomp-tab").hide();
+            $("#pills-meioambiente-acomp-tab").show();
+
+            break;
+        case 'Fabricação':
+            $("#pills-responsaveis-tab").removeClass("disabled");
+            $("#pills-acompanhamento-tab").removeClass("disabled");
+
+            $("#pills-dlpcl-tab").show();
+            $("#pills-eng-envase-tab").hide();
+            $("#pills-eng-fabricacao-tab").show();
+            $("#pills-inov-df-tab").show();
+            $("#pills-inov-de-tab").hide();
+            $("#pills-qualidade-tab").show();
+            $("#pills-fabrica-tab").show();
+
+            $("#pills-dlpcl-acomp-tab").hide();
+            $("#pills-eng-envase-acomp-tab").show();
+            $("#pills-eng-fabricacao-acomp-tab").hide();
+            $("#pills-inov-df-acomp-tab").hide();
+            $("#pills-inov-de-acomp-tab").show();
+            $("#pills-qualidade-acomp-tab").hide();
+            $("#pills-fabrica-acomp-tab").hide();
+            $("#pills-meioambiente-acomp-tab").show();
+
+            break;
+        case 'Picking':
+            $("#pills-responsaveis-tab").addClass("disabled");
+            $("#pills-acompanhamento-tab").addClass("disabled");
+
+            $("#pills-dlpcl-tab").hide();
+            $("#pills-eng-envase-tab").hide();
+            $("#pills-eng-fabricacao-tab").hide();
+            $("#pills-inov-df-tab").hide();
+            $("#pills-inov-de-tab").hide();
+            $("#pills-qualidade-tab").hide();
+            $("#pills-fabrica-tab").hide();
+
+            $("#pills-dlpcl-acomp-tab").hide();
+            $("#pills-eng-envase-acomp-tab").hide();
+            $("#pills-eng-fabricacao-acomp-tab").hide();
+            $("#pills-inov-df-acomp-tab").hide();
+            $("#pills-inov-de-acomp-tab").hide();
+            $("#pills-qualidade-acomp-tab").hide();
+            $("#pills-fabrica-acomp-tab").hide();
+            $("#pills-meioambiente-acomp-tab").hide();
+            break;
+        default:
+            $("#pills-responsaveis-tab").addClass("disabled");
+            $("#pills-acompanhamento-tab").addClass("disabled");
+
+            $("#pills-dlpcl-tab").hide();
+            $("#pills-eng-envase-tab").hide();
+            $("#pills-eng-fabricacao-tab").hide();
+            $("#pills-inov-df-tab").hide();
+            $("#pills-inov-de-tab").hide();
+            $("#pills-qualidade-tab").hide();
+            $("#pills-fabrica-tab").hide();
+
+            $("#pills-dlpcl-acomp-tab").hide();
+            $("#pills-eng-envase-acomp-tab").hide();
+            $("#pills-eng-fabricacao-acomp-tab").hide();
+            $("#pills-inov-df-acomp-tab").hide();
+            $("#pills-inov-de-acomp-tab").hide();
+            $("#pills-qualidade-acomp-tab").hide();
+            $("#pills-fabrica-acomp-tab").hide();
+            $("#pills-meioambiente-acomp-tab").hide();
+            break;
+    }
+
+    if ($('#nav-tab .show.active').is('.disabled')) {
+        $('#pills-produto-tab').tab('show');
+    }
+}
+
+function QueryGroupIdByName(groupName) {
+    var $promise = $.Deferred();
+    var ctx = SP.ClientContext.get_current();
+    var group = ctx.get_web().get_siteGroups().getByName(groupName);
+    ctx.load(group);
+
+    ctx.executeQueryAsync(function () {
+        $promise.resolve(group.get_id());
+    }, function (sender, args) {
+        $promise.reject();
+    });
+
+    return $promise;
+}
+
+function PegarUsuarioAtual() {
+    return $().SPServices.SPGetCurrentUser({
+        fieldName: "Email"
+    });
 }
 
 function RegistrarBindings() {
@@ -722,8 +1066,72 @@ function RegistrarBindings() {
     var $fabrica = $("select#fabrica");
     var $linhaEquipamento = $("select#linhaEquipamento");
 
-    $tipoLote.change(dispararCarregarFabricas);
-    $tipoLote.change(dispararCarregarLinhasEquipamentos);
+    var $acRespEngEnvaseAcomp = $("#acRespEngEnvaseAcomp");
+    var $acRespEngfabricacaoAcomp = $("#acRespEngfabricacaoAcomp");
+    var $acRespInofDFAcomp = $("#acRespInofDFAcomp");
+    var $acRespInofDEAcomp = $("#acRespInofDEAcomp");
+    var $acRespFabricaAcomp = $("#acRespFabricaAcomp");
+    var $acRespMeioAmbienteAcomp = $("#acRespMeioAmbienteAcomp");
+
+    $tipoLote.change(function () {
+        ModificarAbasPorTipoDeLote(this.value);
+        dispararCarregarLinhasEquipamentos();
+    });
+
+    $acRespEngEnvaseAcomp.change(function () {
+        if ($acRespEngEnvaseAcomp.checked) {
+            $("#AbaAcRespsEngEnvase").show();
+        }
+        else {
+            $("#AbaAcRespsEngEnvase").hide();
+        }
+    });
+
+    $acRespEngfabricacaoAcomp.change(function () {
+        if ($acRespEngfabricacaoAcomp.checked) {
+            $("#AbaAcRespsEngFabricacao").show();
+        }
+        else {
+            $("#AbaAcRespsEngFabricacao").hide();
+        }
+    });
+
+    $acRespInofDFAcomp.change(function () {
+        if ($acRespInofDFAcomp.checked) {
+            $("#AbaAcRespsInovDF").show();
+        }
+        else {
+            $("#AbaAcRespsInovDF").hide();
+        }
+    });
+
+    $acRespInofDEAcomp.change(function () {
+        if ($acRespInofDEAcomp.checked) {
+            $("#AbaAcRespsInovDE").show();
+        }
+        else {
+            $("#AbaAcRespsInovDE").hide();
+        }
+    });
+
+    $acRespFabricaAcomp.change(function () {
+        if ($acRespFabricaAcomp.checked) {
+            $("#AbaAcRespsFabrica").show();
+        }
+        else {
+            $("#AbaAcRespsFabrica").hide();
+        }
+    });
+
+    $acRespMeioAmbienteAcomp.change(function () {
+        if ($acRespMeioAmbienteAcomp.checked) {
+            $("#AbaAcRespsMeioAmbiente").show();
+        }
+        else {
+            $("#AbaAcRespsMeioAmbiente").hide();
+        }
+    });
+
     $fabrica.change(dispararCarregarLinhasEquipamentos);
 
     $linhaEquipamento.change(function () {
@@ -731,12 +1139,16 @@ function RegistrarBindings() {
         if (valSelected) {
             CarregarLinhasEquipamentosById(valSelected)
         }
-    })
-}
+    });
 
-function PegarUsuarioAtual() {
-    return $().SPServices.SPGetCurrentUser({
-        fieldName: "Email"
+    $("#produtoEnvioAmostras").change(function () {
+        if (this.checked) {
+            $("#formResponsavelAmostra").show();
+        } else {
+            $("#formResponsavelAmostra").hide();
+            $("#produtoResponsavelAmostra").text('');
+            $("#produtoQuantidadeAmostra").text('');
+        }
     });
 }
 
@@ -775,33 +1187,60 @@ function SalvarAgendamento() {
     });
 }
 
-function initializeAllPeoplePickers() {
-    initializePeoplePicker('peoplePickerRespDLPCL');
-    $("#peoplePickerRespDLPCL_TopSpan").addClass("form-control");
-    initializePeoplePicker('peoplePickerRespEngEnvase');
-    $("#peoplePickerRespEngEnvase_TopSpan").addClass("form-control");
-    initializePeoplePicker('peoplePickerGerenteEngEnvase');
-    $("#peoplePickerGerenteEngEnvase_TopSpan").addClass("form-control");
-    initializePeoplePicker('peoplePickerRespEngFab');
-    $("#peoplePickerRespEngFab_TopSpan").addClass("form-control");
-    initializePeoplePicker('peoplePickerGerenteEngFab');
-    $("#peoplePickerGerenteEngFab_TopSpan").addClass("form-control");
-    initializePeoplePicker('peoplePickerRespInDF');
-    $("#peoplePickerRespInDF_TopSpan").addClass("form-control");
-    initializePeoplePicker('peoplePickerGerenteInDF');
-    $("#peoplePickerGerenteInDF_TopSpan").addClass("form-control");
-    initializePeoplePicker('peoplePickerRespInvDE');
-    $("#peoplePickerRespInvDE_TopSpan").addClass("form-control");
-    initializePeoplePicker('peoplePickerGerenteInvDE');
-    $("#peoplePickerGerenteInvDE_TopSpan").addClass("form-control");
-    initializePeoplePicker('peoplePickerRespQualidade');
-    $("#peoplePickerRespQualidade_TopSpan").addClass("form-control");
-    initializePeoplePicker('peoplePickerGerenteQualidade');
-    $("#peoplePickerGerenteQualidade_TopSpan").addClass("form-control");
-    initializePeoplePicker('peoplePickerRespFabrica');
-    $("#peoplePickerRespFabrica_TopSpan").addClass("form-control");
-    initializePeoplePicker('peoplePickerGerenteFabrica');
-    $("#peoplePickerGerenteFabrica_TopSpan").addClass("form-control");
+function InitializeAllPeoplePickers() {
+    return $.when(
+        //Aba Responsáveis Peoplepicker
+        InitializePeoplePicker('peoplePickerAbaRespRespDLPCL', 'Área - DL PCL'),
+        InitializePeoplePicker('peoplePickerAbaRespRespEngEnvase', 'Área - Engenharia de Envase'),
+        InitializePeoplePicker('peoplePickerAbaRespGerEngEnvase', 'Área - Engenharia de Envase'),
+        InitializePeoplePicker('peoplePickerAbaRespRespEngFabricacao', 'Área - Engenharia de Fabricação'),
+        InitializePeoplePicker('peoplePickerAbaRespGerEngFabricacao', 'Área - Engenharia de Fabricação'),
+        InitializePeoplePicker('peoplePickerAbaRespRespInovDF', 'Área - Inovação DF'),
+        InitializePeoplePicker('peoplePickerAbaRespGerInovDF', 'Área - Inovação DF'),
+        InitializePeoplePicker('peoplePickerAbaRespRespInovDE', 'Área - Inovação DE'),
+        InitializePeoplePicker('peoplePickerAbaRespGerInovDE', 'Área - Inovação DE'),
+        InitializePeoplePicker('peoplePickerAbaRespRespQualidade', 'Área - Qualidade'),
+        InitializePeoplePicker('peoplePickerAbaRespGerQualidade', 'Área - Qualidade'),
+        InitializePeoplePicker('peoplePickerAbaRespCoordProgFabrica', 'Área - Fábrica'),
+        InitializePeoplePicker('peoplePickerAbaRespCoordManFabrica', 'Área - Fábrica'),
+        InitializePeoplePicker('peoplePickerAbaRespGerFabrica', 'Área - Fábrica'),
+        //Aba Acompanhamentos
+        InitializePeoplePicker('peoplePickerAbaAcRespEngFabricacao', 'Área - Engenharia de Fabricação'),
+        InitializePeoplePicker('peoplePickerAbaAcGerEngFabricacao', 'Área - Engenharia de Fabricação'),
+        InitializePeoplePicker('peoplePickerAbaAcRespInovDF', 'Área - Inovação DF'),
+        InitializePeoplePicker('peoplePickerAbaAcGerInovDF', 'Área - Inovação DF'),
+        InitializePeoplePicker('peoplePickerAbaAcRespEngEnvase', 'Área - Engenharia de Envase'),
+        InitializePeoplePicker('peoplePickerAbaAcGerEngEnvase', 'Área - Engenharia de Envase'),
+        InitializePeoplePicker('peoplePickerAbaAcRespInovDE', 'Área - Inovação DE'),
+        InitializePeoplePicker('peoplePickerAbaAcGerInovDE', 'Área - Inovação DE'),
+        InitializePeoplePicker('peoplePickerAbaAcCoordProgFabrica', 'Área - Fábrica'),
+        InitializePeoplePicker('peoplePickerAbaAcCoordManFabrica', 'Área - Fábrica'),
+        InitializePeoplePicker('peoplePickerAbaAcGerFabrica', 'Fábrica - Gerente'),
+        InitializePeoplePicker('peoplePickerAbaAcRespMeioAmbiente', 'Área - Meio Ambiente')
+    );
+}
+
+function InitializePeoplePicker(elementId, groupName) {
+    var $promise = $.Deferred();
+    var $groupIdPromise = QueryGroupIdByName(groupName);
+    var schema = {};
+    schema['PrincipalAccountType'] = 'User,DL,SecGroup,SPGroup';
+    schema['SearchPrincipalSource'] = 15;
+    schema['ResolvePrincipalSource'] = 15;
+    schema['AllowMultipleValues'] = false;
+    schema['MaximumEntitySuggestions'] = 50;
+    schema['Width'] = '280px';
+
+    $groupIdPromise.then(function (groupId) {
+        schema['SharePointGroupID'] = groupId;
+        SPClientPeoplePicker_InitStandaloneControlWrapper(elementId, null, schema);
+        $promise.resolve();
+    }).fail(function () {
+        SPClientPeoplePicker_InitStandaloneControlWrapper(elementId, null, schema);
+        $promise.resolve();
+    });
+
+    return $promise;
 }
 
 function getUrlParameter(name) {
@@ -811,373 +1250,83 @@ function getUrlParameter(name) {
     return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
 }
 
+function RegistrarBotoes() {
+    $('.btn-salvar').click(function () {
+        SalvarAgendamento().then(function () {
+            alert("Agendamento Salvo");
+        }).fail(function (response) {
+            alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
+        });
+
+        return false;
+    });
+
+    $('.btn-carregar').click(function () {
+        EscolherAgendamento();
+    });
+
+    $('.btn-concluir').click(function () {
+        ModificarStatus('Agendado');
+        SalvarAgendamento();
+    });
+
+    $('.btn-executado').click(function () {
+        ModificarStatus('Registro das Análises');
+        SalvarAgendamento();
+    });
+
+    $('.btn-aprovar').click(function () {
+        ModificarStatus('Aprovado');
+        SalvarAgendamento();
+    });
+
+    $('.btn-reprovar').click(function () {
+        ModificarStatus('Reprovado');
+        SalvarAgendamento();
+    });
+}
+
 $(document).ready(function () {
-    switch (getUrlParameter('action')) {
-        case 'new':
-            {
-                $.when(
-                    CarregarCategoriaProjeto(),
-                    CarregarLinhasDoProduto(),
-                    CarregarListaGrauComplexidade(),
-                    CarregarListaMotivos(),
-                    CarregarListaStatus(),
-                    CarregarListaTiposLotes(),
-                    dispararCarregarFabricas(),
-                    dispararCarregarLinhasEquipamentos()
-                ).then(function () {
-                    RegistrarBindings();
-                    ResetarAgendamento();
-                    initializeAllPeoplePickers();
+    $.when(
+        CarregarCategoriaProjeto(),
+        CarregarFabricas(),
+        CarregarLinhasDoProduto(),
+        CarregarListaGrauComplexidade(),
+        CarregarListaMotivos(),
+        CarregarListaStatus(),
+        CarregarListaTiposLotes(),
+        InitializeAllPeoplePickers()
+    ).then(function () {
+        InstanciarDateTimePicker();
+        RegistrarBindings();
+        ResetarAgendamento();
+        RegistrarBotoes();
 
-                    $("#produtoEnvioAmostras").change(function () {
-                        if (this.checked) {
-                            $("#formResponsavelAmostra").show();
-                        } else {
-                            $("#formResponsavelAmostra").hide();
-                            $("#produtoResponsavelAmostra").text('');
-                            $("#produtoQuantidadeAmostra").text('');
-                        }
-                    });
+        if (getUrlParameter('action') == 'edit') {
+            CarregarAgendamento(getUrlParameter('loteid'));
 
-                    $('#tipoDeLote').change(function () {
-                        switch (this.value) {
-                            case 'Brinde':
-                                $("#pills-responsaveis-tab").removeClass("disabled");
-                                $("#pills-acompanhamento-tab").removeClass("disabled");
+            CarregarHistorico(10267).then(function (registros) {
+                $.fn.dataTable.ext.errMode = 'throw';
 
-                                $("#pills-dlpcl-tab").show();
-                                $("#pills-eng-envase-tab").hide();
-                                $("#pills-eng-fabricacao-tab").hide();
-                                $("#pills-inov-df-tab").hide();
-                                $("#pills-inov-de-tab").hide();
-                                $("#pills-qualidade-tab").show();
-                                $("#pills-fabrica-tab").hide();
-
-                                $("#pills-dlpcl-acomp-tab").hide();
-                                $("#pills-eng-envase-acomp-tab").show();
-                                $("#pills-eng-fabricacao-acomp-tab").show();
-                                $("#pills-inov-df-acomp-tab").show();
-                                $("#pills-inov-de-acomp-tab").show();
-                                $("#pills-qualidade-acomp-tab").hide();
-                                $("#pills-fabrica-acomp-tab").show();
-                                $("#pills-meioambiente-acomp-tab").hide();
-
-                                break;
-                            case 'Envase':
-                                $("#pills-responsaveis-tab").removeClass("disabled");
-                                $("#pills-acompanhamento-tab").removeClass("disabled");
-
-                                $("#pills-dlpcl-tab").show();
-                                $("#pills-eng-envase-tab").show();
-                                $("#pills-eng-fabricacao-tab").hide();
-                                $("#pills-inov-df-tab").hide();
-                                $("#pills-inov-de-tab").show();
-                                $("#pills-qualidade-tab").show();
-                                $("#pills-fabrica-tab").show();
-
-                                $("#pills-dlpcl-acomp-tab").hide();
-                                $("#pills-eng-envase-acomp-tab").hide();
-                                $("#pills-eng-fabricacao-acomp-tab").show();
-                                $("#pills-inov-df-acomp-tab").hide();
-                                $("#pills-inov-de-acomp-tab").hide();
-                                $("#pills-qualidade-acomp-tab").hide();
-                                $("#pills-fabrica-acomp-tab").hide();
-                                $("#pills-meioambiente-acomp-tab").show();
-
-                                break;
-                            case 'Fabricação':
-                                $("#pills-responsaveis-tab").removeClass("disabled");
-                                $("#pills-acompanhamento-tab").removeClass("disabled");
-
-                                $("#pills-dlpcl-tab").show();
-                                $("#pills-eng-envase-tab").hide();
-                                $("#pills-eng-fabricacao-tab").show();
-                                $("#pills-inov-df-tab").show();
-                                $("#pills-inov-de-tab").hide();
-                                $("#pills-qualidade-tab").show();
-                                $("#pills-fabrica-tab").show();
-
-                                $("#pills-dlpcl-acomp-tab").hide();
-                                $("#pills-eng-envase-acomp-tab").show();
-                                $("#pills-eng-fabricacao-acomp-tab").hide();
-                                $("#pills-inov-df-acomp-tab").hide();
-                                $("#pills-inov-de-acomp-tab").show();
-                                $("#pills-qualidade-acomp-tab").hide();
-                                $("#pills-fabrica-acomp-tab").hide();
-                                $("#pills-meioambiente-acomp-tab").show();
-
-                                break;
-                            case 'Picking':
-                                $("#pills-responsaveis-tab").addClass("disabled");
-                                $("#pills-acompanhamento-tab").addClass("disabled");
-
-                                $("#pills-dlpcl-tab").hide();
-                                $("#pills-eng-envase-tab").hide();
-                                $("#pills-eng-fabricacao-tab").hide();
-                                $("#pills-inov-df-tab").hide();
-                                $("#pills-inov-de-tab").hide();
-                                $("#pills-qualidade-tab").hide();
-                                $("#pills-fabrica-tab").hide();
-
-                                $("#pills-dlpcl-acomp-tab").hide();
-                                $("#pills-eng-envase-acomp-tab").hide();
-                                $("#pills-eng-fabricacao-acomp-tab").hide();
-                                $("#pills-inov-df-acomp-tab").hide();
-                                $("#pills-inov-de-acomp-tab").hide();
-                                $("#pills-qualidade-acomp-tab").hide();
-                                $("#pills-fabrica-acomp-tab").hide();
-                                $("#pills-meioambiente-acomp-tab").hide();
-
-                                break;
-                            default:
-                                $("#pills-responsaveis-tab").addClass("disabled");
-                                $("#pills-acompanhamento-tab").addClass("disabled");
-
-                                $("#pills-dlpcl-tab").hide();
-                                $("#pills-eng-envase-tab").hide();
-                                $("#pills-eng-fabricacao-tab").hide();
-                                $("#pills-inov-df-tab").hide();
-                                $("#pills-inov-de-tab").hide();
-                                $("#pills-qualidade-tab").hide();
-                                $("#pills-fabrica-tab").hide();
-
-                                $("#pills-dlpcl-acomp-tab").hide();
-                                $("#pills-eng-envase-acomp-tab").hide();
-                                $("#pills-eng-fabricacao-acomp-tab").hide();
-                                $("#pills-inov-df-acomp-tab").hide();
-                                $("#pills-inov-de-acomp-tab").hide();
-                                $("#pills-qualidade-acomp-tab").hide();
-                                $("#pills-fabrica-acomp-tab").hide();
-                                $("#pills-meioambiente-acomp-tab").hide();
-
-                                break;
-                        }
-                    });
-
-                    $('#tipoDeLote').change();
-
-                    $('.btn-salvar').click(function () {
-                        SalvarAgendamento().then(function () {
-                            alert("Agendamento Salvo");
-                        }).fail(function () {
-                            alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
-                        });
-
-                        return false;
-                    });
-
-                    $('.btn-carregar').click(function () {
-                        EscolherAgendamento();
-                    });
-
-                    $('.btn-concluir').click(function () {
-                        ModificarStatus('Agendado');
-                        SalvarAgendamento();
-                    });
-
-                    $('.btn-executado').click(function () {
-                        ModificarStatus('Registro das Análises');
-                        SalvarAgendamento();
-                    });
-
-                    $('.btn-aprovar').click(function () {
-                        ModificarStatus('Aprovado');
-                        SalvarAgendamento();
-                    });
-
-                    $('.btn-reprovar').click(function () {
-                        ModificarStatus('Reprovado');
-                        SalvarAgendamento();
-                    });
-
-                    InstanciarDateTimePicker();
-
-                    CarregarHistorico(10267).then(function (registros) {
-                        $.fn.dataTable.ext.errMode = 'throw';
-
-                        $('#data-table').DataTable({
-                            data: registros,
-                            columns: [
-                                { data: 'id', title: 'ID' },
-                                { data: 'title', title: 'Ação' },
-                                { data: 'area', title: 'Área' },
-                                { data: 'mensagem', title: 'Mensagem' },
-                                { data: 'author', title: 'Criado por' },
-                                { data: 'created', title: 'Criado' }
-                            ],
-                            language: {
-                                decimal: ',',
-                                thousands: '.',
-                                url: 'https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Portuguese-Brasil.json'
-                            },
-                            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
-                            order: [[0, 'desc']],
-                        });
-                    });
-                }).fail(function () {
-
+                $('#data-table').DataTable({
+                    data: registros,
+                    columns: [
+                        { data: 'id', title: 'ID' },
+                        { data: 'title', title: 'Ação' },
+                        { data: 'area', title: 'Área' },
+                        { data: 'mensagem', title: 'Mensagem' },
+                        { data: 'author', title: 'Criado por' },
+                        { data: 'created', title: 'Criado' }
+                    ],
+                    language: {
+                        decimal: ',',
+                        thousands: '.',
+                        url: 'https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Portuguese-Brasil.json'
+                    },
+                    lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
+                    order: [[0, 'desc']],
                 });
-
-                break;
-            }
-        case 'edit': {
-            if (getUrlParameter('loteid').length > 0) {
-                $.when(
-                    CarregarAgendamento(getUrlParameter('loteid')),
-                    CarregarCategoriaProjeto(),
-                    CarregarLinhasDoProduto(),
-                    CarregarListaGrauComplexidade(),
-                    CarregarListaMotivos(),
-                    CarregarListaStatus(),
-                    CarregarListaTiposLotes(),
-                    dispararCarregarFabricas(),
-                    dispararCarregarLinhasEquipamentos()
-                ).then(function () {
-                    RegistrarBindings();
-                    ResetarAgendamento();
-                    initializeAllPeoplePickers();
-
-                    $("#produtoEnvioAmostras").change(function () {
-                        if (this.checked) {
-                            $("#formResponsavelAmostra").show();
-                        } else {
-                            $("#formResponsavelAmostra").hide();
-                            $("#produtoResponsavelAmostra").text('');
-                            $("#produtoQuantidadeAmostra").text('');
-                        }
-                    });
-
-                    $('#tipoDeLote').change(function () {
-                        switch (this.value) {
-                            case 'Brinde':
-                                $("#pills-responsaveis-tab").removeClass("disabled");
-                                $("#pills-acompanhamento-tab").removeClass("disabled");
-
-                                $("#pills-dlpcl-tab").show();
-                                $("#pills-qualidade-tab").show();
-
-                                $("#pills-eng-envase-tab").hide();
-                                $("#pills-eng-fabricacao-tab").hide();
-                                $("#pills-inov-df-tab").hide();
-                                $("#pills-inov-de-tab").hide();
-                                $("#pills-fabrica-tab").hide();
-
-                                $("#pills-dlpcl-acomp-tab").hide();
-                                $("#pills-qualidade-acomp-tab").hide();
-
-                                $("#pills-eng-envase-acomp-tab").show();
-                                $("#pills-eng-fabricacao-acomp-tab").show();
-                                $("#pills-inov-df-acomp-tab").show();
-                                $("#pills-inov-de-acomp-tab").show();
-                                $("#pills-fabrica-acomp-tab").show();
-
-                                break;
-                            case 'Envase':
-                                $('li a[href="#tab-RespDLPCL"]').parent().show();
-                                $('li a[href="#tab-RespEngEnv"]').parent().show();
-                                $('li a[href="#tab-RespInvDF"]').parent().show();
-                                $('li a[href="#tab-RespQual"]').parent().show();
-                                $('li a[href="#tab-RespFab"]').parent().show();
-
-                                $('li a[href="#tab-AcompInvDE"]').parent().show();
-                                $('li a[href="#tab-AcompEngFab"]').parent().show();
-                                $('li a[href="#tab-AcompMeioAmb"]').parent().show();
-                                break;
-                            case 'Fabricação':
-                                $('li a[href="#tab-RespDLPCL"]').parent().show();
-                                $('li a[href="#tab-RespEngFab"]').parent().show();
-                                $('li a[href="#tab-RespInvDF"]').parent().show();
-                                $('li a[href="#tab-RespQual"]').parent().show();
-                                $('li a[href="#tab-RespFab"]').parent().show();
-
-                                $('li a[href="#tab-AcompEngEnv"]').parent().show();
-                                $('li a[href="#tab-AcompInvDE"]').parent().show();
-                                $('li a[href="#tab-AcompMeioAmb"]').parent().show();
-                                break;
-                            case 'Picking':
-                                $('#tabsResponsaveis').hide();
-                                $('#tabsAcompanhamento').hide();
-                                break;
-                            default:
-                                $("#pills-responsaveis-tab").addClass("disabled");
-                                $("#pills-acompanhamento-tab").addClass("disabled");
-                        }
-                    });
-
-                    $('#tipoDeLote').change();
-
-                    $('.btn-salvar').click(function () {
-                        SalvarAgendamento().then(function () {
-                            alert("Agendamento Salvo");
-                        }).fail(function () {
-                            alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
-                        });
-
-                        return false;
-                    });
-
-                    $('.btn-carregar').click(function () {
-                        EscolherAgendamento();
-                    });
-
-                    $('.btn-concluir').click(function () {
-                        ModificarStatus('Agendado');
-                        SalvarAgendamento();
-                    });
-
-                    $('.btn-executado').click(function () {
-                        ModificarStatus('Registro das Análises');
-                        SalvarAgendamento();
-                    });
-
-                    $('.btn-aprovar').click(function () {
-                        ModificarStatus('Aprovado');
-                        SalvarAgendamento();
-                    });
-
-                    $('.btn-reprovar').click(function () {
-                        ModificarStatus('Reprovado');
-                        SalvarAgendamento();
-                    });
-
-                    InstanciarDateTimePicker();
-
-                    CarregarHistorico(10267).then(function (registros) {
-                        $.fn.dataTable.ext.errMode = 'throw';
-
-                        $('#data-table').DataTable({
-                            data: registros,
-                            columns: [
-                                { data: 'id', title: 'ID' },
-                                { data: 'title', title: 'Ação' },
-                                { data: 'area', title: 'Área' },
-                                { data: 'mensagem', title: 'Mensagem' },
-                                { data: 'author', title: 'Criado por' },
-                                { data: 'created', title: 'Criado' }
-                            ],
-                            language: {
-                                decimal: ',',
-                                thousands: '.',
-                                url: 'https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Portuguese-Brasil.json'
-                            },
-                            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
-                            order: [[0, 'desc']],
-                        });
-                    });
-                }).fail(function () {
-
-                });
-
-                break;
-            }
-            else {
-
-            }
-            break;
+            });
         }
-        default: {
-            break;
-        }
-    }
-
+    });
 });
