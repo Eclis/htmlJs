@@ -216,12 +216,19 @@ function CarregarCategoriaProjeto() {
 
 function CarregarFabricas() {
     var $promise = $.Deferred();
+    var fabricas = $('select#fabrica');
 
     $().SPServices({
         operation: 'GetListItems',
         listName: 'Fábricas Internas e Armazenamento de Fábricas Terceiras',
         CAMLViewFields: '<ViewFields><FieldRef Name="Title" /><FieldRef Name="ID" /><FieldRef Name="Numero" /></ViewFields>',
         completefunc: function (Data, Status) {
+            fabricas.find('option')
+                .remove()
+                .end()
+                .append('<option disabled selected>Selecione uma opção</option>')
+                ;
+
             if (Status != 'success') {
                 $promise.reject({
                     errorCode: '0x99999999',
@@ -339,7 +346,6 @@ function CarregarLinhasEquipamentos(fabrica, tipoLote) {
             $promise.resolve();
         }
     });
-
     return $promise;
 }
 
@@ -492,6 +498,13 @@ function dispararCarregarLinhasEquipamentos() {
     var tipoLoteVal = $("select#tipoDeLote").val();
     if (tipoLoteVal && fabricaVal) {
         CarregarLinhasEquipamentos(fabricaVal, tipoLoteVal);
+    }
+}
+
+function dispararCarregarFabricas() {
+    var tipoLoteVal = $("select#tipoDeLote").val();
+    if (tipoLoteVal) {
+        CarregarFabricas();
     }
 }
 
@@ -709,6 +722,7 @@ function RegistrarBindings() {
     var $fabrica = $("select#fabrica");
     var $linhaEquipamento = $("select#linhaEquipamento");
 
+    $tipoLote.change(dispararCarregarFabricas);
     $tipoLote.change(dispararCarregarLinhasEquipamentos);
     $fabrica.change(dispararCarregarLinhasEquipamentos);
 
@@ -803,12 +817,12 @@ $(document).ready(function () {
             {
                 $.when(
                     CarregarCategoriaProjeto(),
-                    CarregarFabricas(),
                     CarregarLinhasDoProduto(),
                     CarregarListaGrauComplexidade(),
                     CarregarListaMotivos(),
                     CarregarListaStatus(),
                     CarregarListaTiposLotes(),
+                    dispararCarregarFabricas(),
                     dispararCarregarLinhasEquipamentos()
                 ).then(function () {
                     RegistrarBindings();
@@ -935,7 +949,7 @@ $(document).ready(function () {
                                 $("#pills-qualidade-acomp-tab").hide();
                                 $("#pills-fabrica-acomp-tab").hide();
                                 $("#pills-meioambiente-acomp-tab").hide();
-                                
+
                                 break;
                         }
                     });
@@ -1011,12 +1025,12 @@ $(document).ready(function () {
                 $.when(
                     CarregarAgendamento(getUrlParameter('loteid')),
                     CarregarCategoriaProjeto(),
-                    CarregarFabricas(),
                     CarregarLinhasDoProduto(),
                     CarregarListaGrauComplexidade(),
                     CarregarListaMotivos(),
                     CarregarListaStatus(),
                     CarregarListaTiposLotes(),
+                    dispararCarregarFabricas(),
                     dispararCarregarLinhasEquipamentos()
                 ).then(function () {
                     RegistrarBindings();
