@@ -1405,6 +1405,33 @@ function CarregarMotivoCancelamento() {
     return $promise;
 }
 
+function CarregarMotivoNaoExecutado() {
+    var $promise = $.Deferred();
+
+    $().SPServices({
+        operation: "GetList",
+        listName: "Agendamentos",
+        completefunc: function (Data, Status) {
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
+                });
+
+                return;
+            }
+
+            $(Data.responseXML).find('Field[DisplayName="Motivo não execução"] CHOICE').each(function () {
+                $('select#naoExecutadoMotivo').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+            });
+
+            $promise.resolve();
+        }
+    });
+
+    return $promise;
+}
+
 function CarregarFabricas() {
     var $promise = $.Deferred();
 
@@ -1954,37 +1981,28 @@ function ModificarBotoesPorStatus(status) {
     var $btnDerivar = $('.btn-derivar');
     var $btnCancelar = $('.btn-cancelar-agendamento');
     var $btnSalvar = $('.btn-salvar');
+    var $btnNaoExecutado = $('.btn-nao-executado');
+
+    $btnConcluir.hide();
+    $btnExecutado.hide();
+    $btnAprovar.hide();
+    $btnReprovarAprovar.hide();
+    $btnCancelar.hide();
+    $btnSalvar.hide();
+    $btnNaoExecutado.hide();
+    $btnDerivar.hide();
 
     switch (status) {
         case 'Rascunho':
             $btnConcluir.show();
-            $btnExecutado.hide();
-            $btnAprovar.hide();
-            $btnReprovarAprovar.hide();
-            $btnDerivar.show();
-            $btnCancelar.hide();
-            break;
-        case 'Cancelado':
-            $btnConcluir.hide();
-            $btnExecutado.hide();
-            $btnAprovar.hide();
-            $btnReprovarAprovar.hide();
-            $btnCancelar.hide();
-            $btnSalvar.hide();
-            $btnDerivar.hide();
             break;
         case 'Agendado':
-            $btnConcluir.hide();
             $btnExecutado.show();
-            $btnAprovar.hide();
-            $btnReprovarAprovar.hide();
+            if (VerificarPermissoesCancelar()) $btnCancelar.show();
+            if (VerificarPermissoesNaoExecutado()) $btnNaoExecutado.show();
             $btnDerivar.show();
-            $btnCancelar.show();
             break;
         case 'Registro das Análises':
-            $btnConcluir.hide();
-            $btnExecutado.hide();
-            $btnCancelar.hide();
             $btnAprovar.show();
             $btnReprovarAprovar.show();
             $btnDerivar.hide();
@@ -2018,6 +2036,8 @@ function ModificarCamposPorStatus(status) {
     var $Observacoes = $('[name=Observacoes]');
     var $motivoCancelamento = $('[name=CanceladoMotivo]');
     var $motivoComentarios = $('[name=CanceladoComentarios]');
+    var $motivoNaoExecutado = $('[name=NaoExecutadoMotivo]');
+    var $motivoNaoExecutadoComentarios = $('[name=NaoExecutadoComentarios]');
 
     switch (status) {
         case 'Rascunho':
@@ -2067,6 +2087,8 @@ function ModificarCamposPorStatus(status) {
             $Observacoes.attr('disabled', true);
             $motivoCancelamento.attr('disabled', true);
             $motivoComentarios.attr('disabled', true);
+            $motivoNaoExecutado.attr('disabled', true);
+            $motivoNaoExecutadoComentarios.attr('disabled', true);
             break;
     }
 }
@@ -2081,7 +2103,11 @@ function ModificarStatus(status) {
 function ModificarAbasPorStatus(status) {
     switch (status) {
         case 'Cancelado':
-            CarregarMotivoCancelamento();
+            $('#justificativaCancelamento').removeClass('d-md-none');
+            $("#pills-justificativa-tab").removeClass("disabled");
+            break;
+        case 'Lote Não Executado':
+            $('#justificativaNaoExecutado').removeClass('d-md-none');
             $("#pills-justificativa-tab").removeClass("disabled");
             break;
     }
@@ -2470,8 +2496,81 @@ function RegistrarBotoes() {
 
     $('.btn-cancelar-agendamento').click(function () {
         ModificarStatus('Cancelado');
+        $('[name=CanceladoMotivo]').attr('disabled', false);
+        $('[name=CanceladoComentarios]').attr('disabled', false);
+        $('#justificativaCancelamento').removeClass('d-md-none');
         $("#pills-justificativa-tab").tab('show');
     });
+
+    $('.btn-nao-executado').click(function () {
+        ModificarStatus('Lote Não Executado');
+        $('[name=CanceladoMotivo]').attr('disabled', false);
+        $('[name=CanceladoComentarios]').attr('disabled', false);
+        $('#justificativaNaoExecutado').removeClass('d-md-none');
+        $("#pills-justificativa-tab").tab('show');
+    });
+}
+
+var listGruposPermitidosBtnNaoExecutado = [
+    'Administradores Lote Piloto',
+    'Área - Engenharia de Envase',
+    'Área - Engenharia de Fabricação',
+    'Área - Fábrica',
+    'Área - Inovação DE',
+    'Área - Inovação DF',
+    'Área - Meio Ambiente',
+    'Área - Qualidade'
+]
+
+function VerificarPermissoesNaoExecutado() {
+    var result = false;
+    $().SPServices({
+        operation: "GetGroupCollectionFromUser",
+        userLoginName: $().SPServices.SPGetCurrentUser(),
+        async: false,
+        completefunc: function (xData, Status) {
+            $.each(listGruposPermitidosBtnNaoExecutado, function (k, v) {
+                if (($(xData.responseXML).find("Group[Name='" + v + "']").length >= 1)) {
+                    result = true;
+                    return false;
+                } else {
+                    result = false;
+                }
+            });
+
+        }
+    });
+
+    return result;
+}
+
+var listGruposPermitidosBtnCancelar = [
+    'Administradores Lote Piloto',
+    'Agendamento - DLL',
+    'Agendamento - Planta Piloto',
+    'Área - DL PCL'
+]
+
+function VerificarPermissoesCancelar() {
+    var result = false;
+    $().SPServices({
+        operation: "GetGroupCollectionFromUser",
+        userLoginName: $().SPServices.SPGetCurrentUser(),
+        async: false,
+        completefunc: function (xData, Status) {
+            $.each(listGruposPermitidosBtnCancelar, function (k, v) {
+                if (($(xData.responseXML).find("Group[Name='" + v + "']").length >= 1)) {
+                    result = true;
+                    return false;
+                } else {
+                    result = false;
+                }
+            });
+
+        }
+    });
+
+    return result;
 }
 
 $(document).ready(function () {
@@ -2484,6 +2583,8 @@ $(document).ready(function () {
         CarregarListaMotivos(),
         CarregarListaStatus(),
         CarregarListaTiposLotes(),
+        CarregarMotivoCancelamento(),
+        CarregarMotivoNaoExecutado(),
         InitializeAllPeoplePickers()
     ).then(function () {
         InstanciarDateTimePicker();
