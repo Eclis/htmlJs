@@ -678,6 +678,7 @@ function GravarCodigoAgendamento($record) {
     });
 }
 
+
 function InserirAgendamento() {
     var $promise = $.Deferred();
     CalcularCamposCalculaveis();
@@ -856,6 +857,7 @@ function ModificarBotoesPorStatus(status) {
             $btnReprovarAprovar.hide();
             $btnCancelar.hide();
             $btnSalvar.hide();
+            $btnDerivar.hide();
             break;
         case 'Agendado':
             $btnConcluir.hide();
@@ -871,9 +873,10 @@ function ModificarBotoesPorStatus(status) {
             $btnCancelar.hide();
             $btnAprovar.show();
             $btnReprovarAprovar.show();
+            $btnDerivar.hide();
             break;
         case 'Aguardando Reagendamento':
-            $btnDerivar.hide();
+            $btnDerivar.show();
             break;
     }
 }
@@ -1301,8 +1304,14 @@ function DerivarAgendamento() {
     document.getElementById('codigoProduto').value="";
     document.getElementById('produtoDescricao').value="";
     $('select#status').val('Rascunho');
-    window.history.pushState("object or string", "Natura", "deivid.aspx?action=new");
+    window.history.pushState("object", "", "main.aspx?action=new");
 }
+
+function ValidarQtdPecas(){
+    var quantidadePecas = document.getElementById('produtoQuantidade').value;
+
+}
+
 
 function RegistrarBotoes() {
     $('.btn-salvar').click(function () {
