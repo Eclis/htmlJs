@@ -4,6 +4,7 @@
 <link rel="stylesheet" href="/sites/DEV_LotePiloto/SiteAssets/CSS/daterangepicker.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script type="text/javascript" src="/sites/DEV_LotePiloto/SiteAssets/JS/popper.min.js"></script>
 <script type="text/javascript" src="/sites/DEV_LotePiloto/SiteAssets/bootstrap/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="/sites/DEV_LotePiloto/SiteAssets/JS/moment.min.js"></script>
 <script type="text/javascript" src="/sites/DEV_LotePiloto/SiteAssets/JS/daterangepicker.js"></script>
@@ -81,6 +82,10 @@
         <li class="nav-item">
             <a class="nav-link" id="pills-historico-tab" data-toggle="pill" href="#pills-historico" role="tab" aria-controls="pills-historico"
                 aria-selected="false">Histórico</a>
+        </li>
+        <li class="nav-item" title="Esta aba só habilitará para preenchimento nos status &ldquo;Cancelado&rdquo; e &ldquo;Não Executado&rdquo;">
+            <a class="nav-link disabled" id="pills-justificativa-tab" data-toggle="pill" href="#pills-justificativa" role="tab" aria-controls="pills-justificativa"
+                aria-selected="false">Justificativa</a>
         </li>
     </ul>
     <div class="tab-content" id="pills-tabContent">
@@ -585,6 +590,23 @@
             role="tabpanel" aria-labelledby="pills-historico-tab">
             <table id="data-table"></table>
         </div>
+        <div class="tab-pane fade" id="pills-justificativa" style="background-color: rgb(242, 242, 242); padding: 10px; margin-bottom: 10px;"
+            role="tabpanel" aria-labelledby="pills-justificativa-tab">
+                <div class="row" style="margin-top: 10px;">
+                    <div class="col-md-12">
+                        <label for="canceladoMotivo">Motivo</label>
+                        <select class="custom-select salvar-campo select-enum" id="canceladoMotivo" name="CanceladoMotivo">
+                            <option disabled selected>Selecione uma opção</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 10px;">
+                    <div class="col-md-12">
+                        <label for="canceladoComentarios">Comentários</label>
+                        <textarea class="form-control salvar-campo" id="canceladoComentarios" name="CanceladoComentarios" rows="3"></textarea>
+                    </div>
+                </div>
+        </div>
     </div>
     <div class="acoes">
         <a href="#" class="btn btn-primary btn-salvar" role="button">Salvar</a>
@@ -593,5 +615,6 @@
         <a href="#" class="btn btn-primary btn-executado" role="button">Executado</a>
         <a href="#" class="btn btn-primary btn-aprovar" role="button">Aprovar</a>
         <a href="#" class="btn btn-primary btn-reprovar" role="button">Reprovar</a>
+        <a href="#" class="btn btn-primary btn-cancelar-agendamento" role="button">Cancelar Agendamento</a>
     </div>
 </div>

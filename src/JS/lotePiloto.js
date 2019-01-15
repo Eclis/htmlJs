@@ -264,6 +264,33 @@ function CarregarCategoriaProjeto() {
     return $promise;
 }
 
+function CarregarMotivoCancelamento() {
+    var $promise = $.Deferred();
+
+    $().SPServices({
+        operation: "GetList",
+        listName: "Agendamentos",
+        completefunc: function (Data, Status) {
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
+                });
+
+                return;
+            }
+
+            $(Data.responseXML).find('Field[DisplayName="Motivo de cancelamento"] CHOICE').each(function () {
+                $('select#canceladoMotivo').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+            });
+
+            $promise.resolve();
+        }
+    });
+
+    return $promise;
+}
+
 function CarregarFabricas() {
     var $promise = $.Deferred();
     var fabricas = $('select#fabrica');
@@ -822,6 +849,8 @@ function ModificarBotoesPorStatus(status) {
     var $btnExecutado = $('.btn-executado');
     var $btnAprovar = $('.btn-aprovar');
     var $btnReprovarAprovar = $('.btn-reprovar');
+    var $btnCancelar = $('.btn-cancelar-agendamento');
+    var $btnSalvar = $('.btn-salvar');
 
     switch (status) {
         case 'Rascunho':
@@ -829,16 +858,27 @@ function ModificarBotoesPorStatus(status) {
             $btnExecutado.hide();
             $btnAprovar.hide();
             $btnReprovarAprovar.hide();
+            $btnCancelar.hide();
+            break;
+        case 'Cancelado':
+            $btnConcluir.hide();
+            $btnExecutado.hide();
+            $btnAprovar.hide();
+            $btnReprovarAprovar.hide();
+            $btnCancelar.hide();
+            $btnSalvar.hide();
             break;
         case 'Agendado':
             $btnConcluir.hide();
             $btnExecutado.show();
             $btnAprovar.hide();
             $btnReprovarAprovar.hide();
+            $btnCancelar.show();
             break;
         case 'Registro das Análises':
             $btnConcluir.hide();
             $btnExecutado.hide();
+            $btnCancelar.hide();
             $btnAprovar.show();
             $btnReprovarAprovar.show();
             break;
@@ -866,6 +906,8 @@ function ModificarCamposPorStatus(status) {
     var $DuracaoEstimadaHoras = $('[name=DuracaoEstimadaHoras]');
     var $DuracaoEstimadaMinutos = $('[name=DuracaoEstimadaMinutos]');
     var $Observacoes = $('[name=Observacoes]');
+    var $motivoCancelamento = $('[name=CanceladoMotivo]');
+    var $motivoComentarios = $('[name=CanceladoComentarios]');
 
     switch (status) {
         case 'Rascunho':
@@ -913,6 +955,8 @@ function ModificarCamposPorStatus(status) {
             $DuracaoEstimadaHoras.attr('disabled', true);
             $DuracaoEstimadaMinutos.attr('disabled', true);
             $Observacoes.attr('disabled', true);
+            $motivoCancelamento.attr('disabled', true);
+            $motivoComentarios.attr('disabled', true);
             break;
     }
 }
@@ -921,7 +965,16 @@ function ModificarStatus(status) {
     $('select#status').val(status);
     ModificarBotoesPorStatus(status);
     ModificarCamposPorStatus(status);
-    // ModificarAbasPorStatus(status);
+    ModificarAbasPorStatus(status);
+}
+
+function ModificarAbasPorStatus(status) {
+    switch (status) {
+        case 'Cancelado':
+            CarregarMotivoCancelamento();
+            $("#pills-justificativa-tab").removeClass("disabled");
+            break;
+    }
 }
 
 function ModificarAbasPorTipoDeLote(tipoDeLote) {
@@ -1285,9 +1338,15 @@ function RegistrarBotoes() {
         ModificarStatus('Reprovado');
         SalvarAgendamento();
     });
+
+    $('.btn-cancelar-agendamento').click(function () {
+        ModificarStatus('Cancelado');
+        $("#pills-justificativa-tab").tab('show');
+    });
 }
 
 $(document).ready(function () {
+    $('[data-toggle="tooltip"]').tooltip();
     $.when(
         CarregarCategoriaProjeto(),
         CarregarLinhasDoProduto(),
