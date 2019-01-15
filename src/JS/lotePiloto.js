@@ -626,6 +626,7 @@ function ModificarBotoesPorStatus(status) {
     var $btnExecutado = $('.btn-executado');
     var $btnAprovar = $('.btn-aprovar');
     var $btnReprovarAprovar = $('.btn-reprovar');
+    var $btnDerivar = $('.btn-derivar');
 
     switch (status) {
         case 'Rascunho':
@@ -633,18 +634,23 @@ function ModificarBotoesPorStatus(status) {
             $btnExecutado.hide();
             $btnAprovar.hide();
             $btnReprovarAprovar.hide();
+            $btnDerivar.show();
             break;
         case 'Agendado':
             $btnConcluir.hide();
             $btnExecutado.show();
             $btnAprovar.hide();
             $btnReprovarAprovar.hide();
+            $btnDerivar.show();
             break;
         case 'Registro das Análises':
             $btnConcluir.hide();
             $btnExecutado.hide();
             $btnAprovar.show();
             $btnReprovarAprovar.show();
+            break;
+        case 'Aguardando Reagendamento':
+            $btnDerivar.hide();
             break;
     }
 }
@@ -978,6 +984,14 @@ function getUrlParameter(name) {
     return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
 }
 
+function DerivarAgendamento() {
+    document.getElementById('inputId').value = "";
+    document.getElementById('codigoProduto').value="";
+    document.getElementById('produtoDescricao').value="";
+    $('select#status').val('Rascunho');
+    window.history.pushState("object or string", "Natura", "deivid.aspx?action=new");
+}
+
 function RegistrarBotoes() {
     $('.btn-salvar').click(function () {
         SalvarAgendamento().then(function () {
@@ -1011,6 +1025,10 @@ function RegistrarBotoes() {
     $('.btn-reprovar').click(function () {
         ModificarStatus('Reprovado');
         SalvarAgendamento();
+    });
+
+    $('.btn-derivar').click(function () {
+        DerivarAgendamento();
     });
 }
 
