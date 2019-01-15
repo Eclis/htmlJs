@@ -45,6 +45,10 @@ sp.setup({
         folder.files.add('agendamentos.html', contents, true);
     });
 
+    readFile('dist/agendamentos_beta.html', function (err, contents) {
+        folder.files.add('agendamentos_beta.html', contents, true);
+    });
+
     readFile('dist/lotePiloto.js', function (err, contents) {
         jsFolder.files.add('lotePiloto.js', contents, true);
     });

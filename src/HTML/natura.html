@@ -4,9 +4,11 @@
 <link rel="stylesheet" href="/sites/DEV_LotePiloto/SiteAssets/CSS/daterangepicker.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script type="text/javascript" src="/sites/DEV_LotePiloto/SiteAssets/JS/popper.min.js"></script>
 <script type="text/javascript" src="/sites/DEV_LotePiloto/SiteAssets/bootstrap/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="/sites/DEV_LotePiloto/SiteAssets/JS/moment.min.js"></script>
 <script type="text/javascript" src="/sites/DEV_LotePiloto/SiteAssets/JS/daterangepicker.js"></script>
+<script type="text/javascript" src="/sites/DEV_LotePiloto/SiteAssets/JS/toposort.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
 <script type="text/javascript" src="/_layouts/15/MicrosoftAjax.js"></script>
@@ -80,6 +82,10 @@
         <li class="nav-item">
             <a class="nav-link" id="pills-historico-tab" data-toggle="pill" href="#pills-historico" role="tab" aria-controls="pills-historico"
                 aria-selected="false">Histórico</a>
+        </li>
+        <li class="nav-item" title="Esta aba só habilitará para preenchimento nos status &ldquo;Cancelado&rdquo; e &ldquo;Não Executado&rdquo;">
+            <a class="nav-link disabled" id="pills-justificativa-tab" data-toggle="pill" href="#pills-justificativa" role="tab" aria-controls="pills-justificativa"
+                aria-selected="false">Justificativa</a>
         </li>
     </ul>
     <div class="tab-content" id="pills-tabContent">
@@ -230,9 +236,9 @@
                 <div class="tab-pane fade show active" id="pills-dlpcl" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel"
                     aria-labelledby="pills-dlpcl-tab">
                     <div class="row" style="margin-top: 10px;">
-                        <div class="col-md-3">
-                            <label for="peoplePickerRespDLPCL">Responsável</label>
-                            <div id="peoplePickerRespDLPCL"></div>
+                        <div class="col-md-auto">
+                            <label for="peoplePickerAbaRespRespDLPCL">DL/PCL - Responsável</label>
+                            <div id="peoplePickerAbaRespRespDLPCL"></div>
                         </div>
                     </div>
                 </div>
@@ -248,12 +254,12 @@
                     </div>
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-auto">
-                            <label for="peoplePickerRespEngEnvase">Responsável</label>
-                            <div id="peoplePickerRespEngEnvase"></div>
+                            <label for="peoplePickerAbaRespRespEngEnvase">Engenharia Evase - Responsável</label>
+                            <div id="peoplePickerAbaRespRespEngEnvase"></div>
                         </div>
                         <div class="col-md-auto">
-                            <label for="peoplePickerGerenteEngEnvase">Gerente</label>
-                            <div id="peoplePickerGerenteEngEnvase"></div>
+                            <label for="peoplePickerAbaRespGerEngEnvase">Engenharia Evase - Gerente</label>
+                            <div id="peoplePickerAbaRespGerEngEnvase"></div>
                         </div>
                     </div>
                 </div>
@@ -269,12 +275,12 @@
                     </div>
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-auto">
-                            <label for="peoplePickerRespEngFabricacao">Responsável</label>
-                            <div id="peoplePickerRespEngFabricacao"></div>
+                            <label for="peoplePickerAbaRespRespEngFabricacao">Engenharia Fabricação - Responsável</label>
+                            <div id="peoplePickerAbaRespRespEngFabricacao"></div>
                         </div>
                         <div class="col-md-auto">
-                            <label for="peoplePickerGerEngFabricacao">Gerente</label>
-                            <div id="peoplePickerGerenteEngFabricacao"></div>
+                            <label for="peoplePickerAbaRespGerEngFabricacao">Engenharia Fabricação - Gerente</label>
+                            <div id="peoplePickerAbaRespGerEngFabricacao"></div>
                         </div>
                     </div>
                 </div>
@@ -290,12 +296,12 @@
                     </div>
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-auto">
-                            <label for="peoplePickerRespInofDF">Responsável</label>
-                            <div id="peoplePickerRespInofDF"></div>
+                            <label for="peoplePickerAbaRespRespInovDF">Inovação DF - Responsável</label>
+                            <div id="peoplePickerAbaRespRespInovDF"></div>
                         </div>
                         <div class="col-md-auto">
-                            <label for="peoplePickerGerInofDF">Gerente</label>
-                            <div id="peoplePickerGerenteInofDF"></div>
+                            <label for="peoplePickerAbaRespGerInovDF">Inovação DF - Gerente</label>
+                            <div id="peoplePickerAbaRespGerInovDF"></div>
                         </div>
                     </div>
                 </div>
@@ -311,12 +317,12 @@
                     </div>
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-auto">
-                            <label for="peoplePickerRespInofDE">Responsável</label>
-                            <div id="peoplePickerRespInofDE"></div>
+                            <label for="peoplePickerAbaRespRespInovDE">Inovação DE - Responsável</label>
+                            <div id="peoplePickerAbaRespRespInovDE"></div>
                         </div>
                         <div class="col-md-auto">
-                            <label for="peoplePickerGerInofDE">Gerente</label>
-                            <div id="peoplePickerGerenteInofDE"></div>
+                            <label for="peoplePickerAbaRespGerInovDE">Inovação DE - Gerente</label>
+                            <div id="peoplePickerAbaRespGerInovDE"></div>
                         </div>
                     </div>
                 </div>
@@ -332,12 +338,12 @@
                     </div>
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-auto">
-                            <label for="peoplePickerRespQualidade">Responsável</label>
-                            <div id="peoplePickerRespQualidade"></div>
+                            <label for="peoplePickerAbaRespRespQualidade">Qualidade - Responsável</label>
+                            <div id="peoplePickerAbaRespRespQualidade"></div>
                         </div>
                         <div class="col-md-auto">
-                            <label for="peoplePickerGerQualidade">Gerente</label>
-                            <div id="peoplePickerGerenteQualidade"></div>
+                            <label for="peoplePickerAbaRespGerQualidade">Qualidade - Gerente</label>
+                            <div id="peoplePickerAbaRespGerQualidade"></div>
                         </div>
                     </div>
                 </div>
@@ -351,14 +357,18 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row" style="margin-top: 10px;">
+                    <div class="row" style="margin-top: 10px;" id="AbaAcRespsFabrica">
                         <div class="col-md-auto">
-                            <label for="peoplePickerRespFabrica">Responsável</label>
-                            <div id="peoplePickerRespFabrica"></div>
+                            <label for="peoplePickerAbaRespCoordProgFabrica">Fábrica - Coordenador de Programação</label>
+                            <div id="peoplePickerAbaRespCoordProgFabrica"></div>
                         </div>
                         <div class="col-md-auto">
-                            <label for="peoplePickerGerFabrica">Gerente</label>
-                            <div id="peoplePickerGerenteFabrica"></div>
+                            <label for="peoplePickerAbaRespCoordManFabrica">Fábrica - Coordenador de Manufatura</label>
+                            <div id="peoplePickerAbaRespCoordManFabrica"></div>
+                        </div>
+                        <div class="col-md-auto">
+                            <label for="peoplePickerAbaRespGerFabrica">Fábrica - Gerente</label>
+                            <div id="peoplePickerAbaRespGerFabrica"></div>
                         </div>
                     </div>
                 </div>
@@ -422,6 +432,16 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row" style="margin-top: 10px;" id="AbaAcRespsEngEnvase">
+                        <div class="col-md-auto">
+                            <label for="peoplePickerAbaAcRespEngEnvase">Engenharia Evase - Responsável</label>
+                            <div id="peoplePickerAbaAcRespEngEnvase"></div>
+                        </div>
+                        <div class="col-md-auto">
+                            <label for="peoplePickerAbaAcGerEngEnvase">Engenharia Evase - Gerente</label>
+                            <div id="peoplePickerAbaAcGerEngEnvase"></div>
+                        </div>
+                    </div>
                 </div>
                 <div class="tab-pane fade" id="pills-eng-fabricacao-acomp" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel"
                     aria-labelledby="pills-eng-fabricacao-acomp-tab">
@@ -431,6 +451,16 @@
                                 <input type="checkbox" class="custom-control-input" id="acRespEngfabricacaoAcomp">
                                 <label class="custom-control-label" for="acRespEngfabricacaoAcomp">Haverá acompanhamento durante a execução do lote?</label>
                             </div>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 10px;" id="AbaAcRespsEngFabricacao">
+                        <div class="col-md-auto">
+                            <label for="peoplePickerAbaAcRespEngFabricacao">Engenharia Fabricação - Responsável</label>
+                            <div id="peoplePickerAbaAcRespEngFabricacao"></div>
+                        </div>
+                        <div class="col-md-auto">
+                            <label for="peoplePickerAbaAcGerEngFabricacao">Engenharia Fabricação - Gerente</label>
+                            <div id="peoplePickerAbaAcGerEngFabricacao"></div>
                         </div>
                     </div>
                 </div>
@@ -444,15 +474,14 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="tab-pane fade" id="pills-inov-de-acomp" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel"
-                    aria-labelledby="pills-inov-de-acomp-tab">
-                    <div class="row" style="margin-top: 10px;">
+                    <div class="row" style="margin-top: 10px;" id="AbaAcRespsInovDF">
                         <div class="col-md-auto">
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="acRespInofDEAcomp">
-                                <label class="custom-control-label" for="acRespInofDEAcomp">Haverá acompanhamento durante a execução do lote?</label>
-                            </div>
+                            <label for="peoplePickerAbaAcRespInovDF">Inovação DF - Responsável</label>
+                            <div id="peoplePickerAbaAcRespInovDF"></div>
+                        </div>
+                        <div class="col-md-auto">
+                            <label for="peoplePickerAbaAcGerInovDF">Inovação DF - Gerente</label>
+                            <div id="peoplePickerAbaAcGerInovDF"></div>
                         </div>
                     </div>
                 </div>
@@ -461,8 +490,29 @@
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-auto">
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="acRespInofDEAcomp">
-                                <label class="custom-control-label" for="acRespInofDEAcomp">Haverá acompanhamento durante a execução do lote?</label>
+                                <input type="checkbox" class="custom-control-input" id="acRespInovDEAcomp">
+                                <label class="custom-control-label" for="acRespInovDEAcomp">Haverá acompanhamento durante a execução do lote?</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 10px;" id="AbaAcRespsInovDE">
+                        <div class="col-md-auto">
+                            <label for="peoplePickerAbaAcRespInovDE">Inovação DE - Responsável</label>
+                            <div id="peoplePickerAbaAcRespInovDE"></div>
+                        </div>
+                        <div class="col-md-auto">
+                            <label for="peoplePickerAbaAcGerInovDE">Inovação DE - Gerente</label>
+                            <div id="peoplePickerAbaAcGerInovDE"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="pills-inov-de-acomp" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel"
+                    aria-labelledby="pills-inov-de-acomp-tab">
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-auto">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="acRespInovDEAcomp">
+                                <label class="custom-control-label" for="acRespInovDEAcomp">Haverá acompanhamento durante a execução do lote?</label>
                             </div>
                         </div>
                     </div>
@@ -488,6 +538,20 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-auto">
+                            <label for="peoplePickerAbaAcCoordProgFabrica">Fábrica - Coordenador de Programação</label>
+                            <div id="peoplePickerAbaAcCoordProgFabrica"></div>
+                        </div>
+                        <div class="col-md-auto">
+                            <label for="peoplePickerAbaAcCoordManFabrica">Fábrica - Coordenador de Manufatura</label>
+                            <div id="peoplePickerAbaAcCoordManFabrica"></div>
+                        </div>
+                        <div class="col-md-auto">
+                            <label for="peoplePickerAbaAcGerFabrica">Fábrica - Gerente</label>
+                            <div id="peoplePickerAbaAcGerFabrica"></div>
+                        </div>
+                    </div>
                 </div>
                 <div class="tab-pane fade" id="pills-meioambiente-acomp" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel"
                     aria-labelledby="pills-meioambiente-acomp-tab">
@@ -497,6 +561,12 @@
                                 <input type="checkbox" class="custom-control-input" id="acRespMeioAmbienteAcomp">
                                 <label class="custom-control-label" for="acRespMeioAmbienteAcomp">Haverá acompanhamento durante a execução do lote?</label>
                             </div>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 10px;" id="AbaAcRespsMeioAmbiente">
+                        <div class="col-md-auto">
+                            <label for="peoplePickerAbaAcRespMeioAmbiente">Meio Ambiente - Responsável</label>
+                            <div id="peoplePickerAbaAcRespMeioAmbiente"></div>
                         </div>
                     </div>
                 </div>
@@ -520,6 +590,23 @@
             role="tabpanel" aria-labelledby="pills-historico-tab">
             <table id="data-table"></table>
         </div>
+        <div class="tab-pane fade" id="pills-justificativa" style="background-color: rgb(242, 242, 242); padding: 10px; margin-bottom: 10px;"
+            role="tabpanel" aria-labelledby="pills-justificativa-tab">
+                <div class="row" style="margin-top: 10px;">
+                    <div class="col-md-12">
+                        <label for="canceladoMotivo">Motivo</label>
+                        <select class="custom-select salvar-campo select-enum" id="canceladoMotivo" name="CanceladoMotivo">
+                            <option disabled selected>Selecione uma opção</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 10px;">
+                    <div class="col-md-12">
+                        <label for="canceladoComentarios">Comentários</label>
+                        <textarea class="form-control salvar-campo" id="canceladoComentarios" name="CanceladoComentarios" rows="3"></textarea>
+                    </div>
+                </div>
+        </div>
     </div>
     <div class="acoes">
         <a href="#" class="btn btn-primary btn-salvar" role="button">Salvar</a>
@@ -528,5 +615,6 @@
         <a href="#" class="btn btn-primary btn-executado" role="button">Executado</a>
         <a href="#" class="btn btn-primary btn-aprovar" role="button">Aprovar</a>
         <a href="#" class="btn btn-primary btn-reprovar" role="button">Reprovar</a>
+        <a href="#" class="btn btn-primary btn-cancelar-agendamento" role="button">Cancelar Agendamento</a>
     </div>
 </div>

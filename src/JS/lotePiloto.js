@@ -85,6 +85,8 @@ function onFail(sender, args) {
 }
 
 function AtualizarAgendamento(id) {
+    var $promise = $.Deferred();
+    CalcularCamposCalculaveis();
     var campos = [];
 
     $('#main [name].salvar-campo').each(function () {
@@ -98,9 +100,6 @@ function AtualizarAgendamento(id) {
             campos.push([this.name, $this.val()]);
         }
     });
-
-    var $promise = $.Deferred();
-    CalcularCamposCalculados();
 
     $().SPServices({
         operation: "UpdateListItems",
@@ -138,7 +137,7 @@ function AtualizarAgendamento(id) {
     return $promise;
 }
 
-function CalcularCamposCalculados() {
+function CalcularCamposCalculaveis() {
     var $titulo = $('input[name=Title]');
     var $codigoProduto = $('input[name=CodigoProduto]');
     var $projeto = $('input[name=Projeto]');
@@ -148,6 +147,7 @@ function CalcularCamposCalculados() {
 
 function CarregarAgendamento(id) {
     var $promise = $.Deferred();
+
     $().SPServices({
         operation: 'GetListItems',
         listName: 'Agendamentos',
@@ -175,6 +175,7 @@ function CarregarAgendamento(id) {
             }
 
             var atributos = $registro.get(0).attributes;
+            var selectsACarregar = [];
 
             $.each(atributos, function () {
                 if (this.value.startsWith('datetime;#')) {
@@ -185,29 +186,55 @@ function CarregarAgendamento(id) {
 
                 if ($elemento.is('[type=checkbox]')) {
                     $elemento.attr('checked', this.value == "1");
+                    $elemento.change();
                 } else if ($elemento.is('[type=number]')) {
                     $elemento.val(AtributoNumber(this.value));
+                    $elemento.change();
                 } else if ($elemento.is('.date-time-picker')) {
                     $elemento.val(moment(this.value, 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm'));
 
                     if ($elemento.is(':not([readonly])')) {
                         $elemento.data('daterangepicker').elementChanged();
                     }
+
+                    $elemento.change();
                 } else if ($elemento.is('select.select-tabela')) {
-                    $elemento.val(this.value.slice(0, this.value.indexOf(';#')));
+                    selectsACarregar[$elemento.attr('name')] = {
+                        elemento: $elemento,
+                        valor: this.value.slice(0, this.value.indexOf(';#'))
+                    };
+                } else if ($elemento.is('select')) {
+                    selectsACarregar[$elemento.attr('name')] = {
+                        elemento: $elemento,
+                        valor: this.value
+                    };
                 } else {
                     $elemento.val(this.value);
+                    $elemento.change();
                 }
-
-                $elemento.change();
             });
 
+            CarregarSelects(selectsACarregar);
             ModificarStatus($('select#status').val());
             $promise.resolve();
         }
     });
 
     return $promise;
+}
+
+function CarregarSelects(selectsACarregar) {
+    var sorter = new Toposort();
+
+    Object.keys(selectsACarregar).forEach(function (index) {
+        sorter.add(index, ListarDependenciasPorSelect(index));
+    });
+
+    $.each(sorter.sort().reverse(), function (index, value) {
+        var select = selectsACarregar[value];
+        select.elemento.val(select.valor);
+        select.elemento.change();
+    });
 }
 
 function CarregarCategoriaProjeto() {
@@ -228,6 +255,33 @@ function CarregarCategoriaProjeto() {
 
             $(Data.responseXML).find('Field[DisplayName="Categoria do projeto"] CHOICE').each(function () {
                 $('select#categoriaDoProjeto').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+            });
+
+            $promise.resolve();
+        }
+    });
+
+    return $promise;
+}
+
+function CarregarMotivoCancelamento() {
+    var $promise = $.Deferred();
+
+    $().SPServices({
+        operation: "GetList",
+        listName: "Agendamentos",
+        completefunc: function (Data, Status) {
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
+                });
+
+                return;
+            }
+
+            $(Data.responseXML).find('Field[DisplayName="Motivo de cancelamento"] CHOICE').each(function () {
+                $('select#canceladoMotivo').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
             });
 
             $promise.resolve();
@@ -339,12 +393,12 @@ function CarregarLinhasEquipamentos(fabrica, tipoLote) {
         listName: 'Linhas e Equipamentos',
         CAMLQuery: '<Query><Where><And><And><Eq><FieldRef Name="Ativa" /><Value Type="Boolean">1</Value></Eq><Eq><FieldRef Name="Fabrica" /><Value Type="Lookup">' + fabrica + '</Value></Eq></And><Eq><FieldRef Name="TipoLote" /><Value Type="Choice">' + tipoLote + '</Value></Eq></And></Where></Query>',
         CAMLViewFields: '<ViewFields><FieldRef Name="Title" /><FieldRef Name="ID" /></ViewFields>',
+        async: false,
         completefunc: function (Data, Status) {
             linhaEquipamento.find('option')
                 .remove()
                 .end()
-                .append('<option disabled selected>Selecione uma opção</option>')
-                ;
+                .append('<option disabled selected>Selecione uma opção</option>');
 
             if (Status != 'success') {
                 $promise.reject({
@@ -510,9 +564,41 @@ function CarregarListaTiposLotes() {
     return $promise;
 }
 
+function CarregarAgendamentoIdOffset() {
+    var $promise = $.Deferred();
+
+    $().SPServices({
+        operation: 'GetListItems',
+        listName: 'Configuração – Sequência',
+        CAMLQuery: '<Query><Where><Eq><FieldRef Name="Identificador" /><Value Type="Choice">Agendamento</Value></Eq></Where></Query>',
+        CAMLViewFields: '<ViewFields><FieldRef Name="Title" /><FieldRef Name="ID" /></ViewFields>',
+        completefunc: function (Data, Status) {
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
+                });
+
+                return;
+            }
+
+            var $result = $(Data.responseText).find('z\\:row:first');
+
+            if ($result.length > 0) {
+                $promise.resolve(AtributoNumber($result.attr('ows_ultimovalor')));
+            } else {
+                $promise.resolve(0);
+            }
+        }
+    });
+
+    return $promise;
+}
+
 function dispararCarregarLinhasEquipamentos() {
     var fabricaVal = $("select#fabrica :selected").text();
     var tipoLoteVal = $("select#tipoDeLote").val();
+
     if (tipoLoteVal && fabricaVal) {
         CarregarLinhasEquipamentos(fabricaVal, tipoLoteVal);
     }
@@ -530,7 +616,71 @@ function EscolherAgendamento() {
     }
 }
 
+function ExcluirResponsaveisAgendamentosPorCodigoAgendamento(codigoAgendamento) {
+    $().SPServices.SPUpdateMultipleListItems({
+        async: false,
+        batchCmd: "Delete",
+        listName: "AgendamentosResponsaveis",
+        CAMLQuery: "<Query>"
+            + "<Where>" +
+            +"<Eq>" +
+            +"<FieldRef Name='CodigoAgendamento' />" +
+            +"<Value Type='Text'>" + codigoAgendamento + "</Value>" +
+            +"</Eq>" +
+            +"</Where>" +
+            "</Query>",
+        completefunc: function (xData, Status) {
+            alert("Agendamentos Responsáveis Concluídos - Código do Agendamento: " + codigoAgendamento);
+        }
+    });
+
+}
+
+function GravarCodigoAgendamento($record) {
+    return CarregarAgendamentoIdOffset().then(function (offset) {
+        var $promise = $.Deferred();
+
+        $().SPServices({
+            operation: "UpdateListItems",
+            batchCmd: 'Update',
+            listName: 'Agendamentos',
+            ID: $record.attr('ows_id'),
+            valuepairs: [['CodigoAgendamento', offset + AtributoNumber($record.attr('ows_id'))]],
+            completefunc: function (xData, Status) {
+                if (Status != 'success') {
+                    $promise.reject({
+                        errorCode: '0x99999999',
+                        errorText: 'Erro Remoto'
+                    });
+
+                    return;
+                }
+
+                var $response = $(xData.responseText);
+                var errorCode = $response.find('ErrorCode').text();
+
+                if (errorCode == '0x00000000') {
+                    $promise.resolve({
+                        record: $response.find('z\\:row:first')
+                    });
+                } else {
+                    $promise.reject({
+                        errorCode: errorCode,
+                        errorText: $response.find('ErrorText').text()
+                    });
+                }
+
+                $promise.resolve();
+            }
+        });
+
+        return $promise;
+    });
+}
+
 function InserirAgendamento() {
+    var $promise = $.Deferred();
+    CalcularCamposCalculaveis();
     var campos = [];
 
     $('#main [name].salvar-campo').each(function () {
@@ -545,14 +695,66 @@ function InserirAgendamento() {
         }
     });
 
+    $().SPServices({
+        operation: "UpdateListItems",
+        batchCmd: "New",
+        listName: "Agendamentos",
+        valuepairs: campos,
+        completefunc: function (xData, Status) {
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
+                });
+
+                return;
+            }
+
+            var $response = $(xData.responseText);
+            var errorCode = $response.find('ErrorCode').text();
+
+            if (errorCode == '0x00000000') {
+                $promise.resolve({
+                    record: $response.find('z\\:row:first')
+                });
+            } else {
+                $promise.reject({
+                    errorCode: errorCode,
+                    errorText: $response.find('ErrorText').text()
+                });
+            }
+        }
+    });
+
+    return $promise.then(function (response) {
+        return GravarCodigoAgendamento(response.record);
+    });
+}
+
+function InserirResponsavelAgendamento(codigoAgendamento) {
+
+    // var vpTitle = (typeof $('#campo').text === "undefined") ? '' : $('#campo').text;
+
+    // var vpTitle = (typeof $('#campo').text === "undefined") ? ['Title',''] : ['Title',$('#campo').text];
+    // var vpCodigoAgendamento = (typeof $('#campo').text === "undefined") ? ['CodigoAgendamento',''] : ['CodigoAgendamento',$('#campo').text];
+    // var vpTipoResponsavel = (typeof $('#campo').text === "undefined") ? ['TipoResponsavel',''] : ['TipoResponsavel',$('#campo').text];
+    // var vpPessoa = (typeof $('#campo').text === "undefined") ? ['Pessoa',''] : ['Pessoa',$('#campo').text];
+
+
+    var vpCodigoAgendamento = codigoAgendamento;
+    var vpTipoResponsavel = 'DL/PCL - Responsável';
+    var vpTitle = codigoAgendamento + ' - ' + vpTipoResponsavel;
+    var vpPessoa = 21;
+
+    var campos = [['Title', vpTitle], ['CodigoAgendamento', vpCodigoAgendamento], ['TipoResponsavel', vpTipoResponsavel], ['Pessoa', vpPessoa]];
+
     var $promise = $.Deferred();
-    CalcularCamposCalculados();
 
     $().SPServices({
         operation: "UpdateListItems",
         async: false,
         batchCmd: "New",
-        listName: "Agendamentos",
+        listName: "Agendamentos - Responsáveis",
         valuepairs: campos,
         completefunc: function (xData, Status) {
             if (Status != 'success') {
@@ -621,12 +823,22 @@ function InstanciarDateTimePicker() {
     });
 }
 
+function ListarDependenciasPorSelect(campo) {
+    if (campo == 'LinhaEquipamento') {
+        return ['TipoLote', 'Fabrica'];
+    }
+
+    return [];
+}
+
 function ModificarBotoesPorStatus(status) {
     var $btnConcluir = $('.btn-concluir');
     var $btnExecutado = $('.btn-executado');
     var $btnAprovar = $('.btn-aprovar');
     var $btnReprovarAprovar = $('.btn-reprovar');
     var $btnDerivar = $('.btn-derivar');
+    var $btnCancelar = $('.btn-cancelar-agendamento');
+    var $btnSalvar = $('.btn-salvar');
 
     switch (status) {
         case 'Rascunho':
@@ -635,6 +847,15 @@ function ModificarBotoesPorStatus(status) {
             $btnAprovar.hide();
             $btnReprovarAprovar.hide();
             $btnDerivar.show();
+            $btnCancelar.hide();
+            break;
+        case 'Cancelado':
+            $btnConcluir.hide();
+            $btnExecutado.hide();
+            $btnAprovar.hide();
+            $btnReprovarAprovar.hide();
+            $btnCancelar.hide();
+            $btnSalvar.hide();
             break;
         case 'Agendado':
             $btnConcluir.hide();
@@ -642,10 +863,12 @@ function ModificarBotoesPorStatus(status) {
             $btnAprovar.hide();
             $btnReprovarAprovar.hide();
             $btnDerivar.show();
+            $btnCancelar.show();
             break;
         case 'Registro das Análises':
             $btnConcluir.hide();
             $btnExecutado.hide();
+            $btnCancelar.hide();
             $btnAprovar.show();
             $btnReprovarAprovar.show();
             break;
@@ -676,6 +899,8 @@ function ModificarCamposPorStatus(status) {
     var $DuracaoEstimadaHoras = $('[name=DuracaoEstimadaHoras]');
     var $DuracaoEstimadaMinutos = $('[name=DuracaoEstimadaMinutos]');
     var $Observacoes = $('[name=Observacoes]');
+    var $motivoCancelamento = $('[name=CanceladoMotivo]');
+    var $motivoComentarios = $('[name=CanceladoComentarios]');
 
     switch (status) {
         case 'Rascunho':
@@ -723,6 +948,8 @@ function ModificarCamposPorStatus(status) {
             $DuracaoEstimadaHoras.attr('disabled', true);
             $DuracaoEstimadaMinutos.attr('disabled', true);
             $Observacoes.attr('disabled', true);
+            $motivoCancelamento.attr('disabled', true);
+            $motivoComentarios.attr('disabled', true);
             break;
     }
 }
@@ -731,7 +958,16 @@ function ModificarStatus(status) {
     $('select#status').val(status);
     ModificarBotoesPorStatus(status);
     ModificarCamposPorStatus(status);
-    // ModificarAbasPorStatus(status);
+    ModificarAbasPorStatus(status);
+}
+
+function ModificarAbasPorStatus(status) {
+    switch (status) {
+        case 'Cancelado':
+            CarregarMotivoCancelamento();
+            $("#pills-justificativa-tab").removeClass("disabled");
+            break;
+    }
 }
 
 function ModificarAbasPorTipoDeLote(tipoDeLote) {
@@ -876,9 +1112,70 @@ function RegistrarBindings() {
     var $fabrica = $("select#fabrica");
     var $linhaEquipamento = $("select#linhaEquipamento");
 
+    var $acRespEngEnvaseAcomp = $("#acRespEngEnvaseAcomp");
+    var $acRespEngfabricacaoAcomp = $("#acRespEngfabricacaoAcomp");
+    var $acRespInofDFAcomp = $("#acRespInofDFAcomp");
+    var $acRespInofDEAcomp = $("#acRespInofDEAcomp");
+    var $acRespFabricaAcomp = $("#acRespFabricaAcomp");
+    var $acRespMeioAmbienteAcomp = $("#acRespMeioAmbienteAcomp");
+
     $tipoLote.change(function () {
         ModificarAbasPorTipoDeLote(this.value);
         dispararCarregarLinhasEquipamentos();
+    });
+
+    $acRespEngEnvaseAcomp.change(function () {
+        if ($acRespEngEnvaseAcomp.checked) {
+            $("#AbaAcRespsEngEnvase").show();
+        }
+        else {
+            $("#AbaAcRespsEngEnvase").hide();
+        }
+    });
+
+    $acRespEngfabricacaoAcomp.change(function () {
+        if ($acRespEngfabricacaoAcomp.checked) {
+            $("#AbaAcRespsEngFabricacao").show();
+        }
+        else {
+            $("#AbaAcRespsEngFabricacao").hide();
+        }
+    });
+
+    $acRespInofDFAcomp.change(function () {
+        if ($acRespInofDFAcomp.checked) {
+            $("#AbaAcRespsInovDF").show();
+        }
+        else {
+            $("#AbaAcRespsInovDF").hide();
+        }
+    });
+
+    $acRespInofDEAcomp.change(function () {
+        if ($acRespInofDEAcomp.checked) {
+            $("#AbaAcRespsInovDE").show();
+        }
+        else {
+            $("#AbaAcRespsInovDE").hide();
+        }
+    });
+
+    $acRespFabricaAcomp.change(function () {
+        if ($acRespFabricaAcomp.checked) {
+            $("#AbaAcRespsFabrica").show();
+        }
+        else {
+            $("#AbaAcRespsFabrica").hide();
+        }
+    });
+
+    $acRespMeioAmbienteAcomp.change(function () {
+        if ($acRespMeioAmbienteAcomp.checked) {
+            $("#AbaAcRespsMeioAmbiente").show();
+        }
+        else {
+            $("#AbaAcRespsMeioAmbiente").hide();
+        }
     });
 
     $fabrica.change(dispararCarregarLinhasEquipamentos);
@@ -938,25 +1235,40 @@ function SalvarAgendamento() {
 
 function InitializeAllPeoplePickers() {
     return $.when(
-        InitializePeoplePicker('peoplePickerRespDLPCL', 'Área - DL PCL'),
-        InitializePeoplePicker('peoplePickerRespEngEnvase','Área - Engenharia de Envase'),
-        InitializePeoplePicker('peoplePickerGerenteEngEnvase','Área - Engenharia de Envase'),
-        InitializePeoplePicker('peoplePickerRespEngFab','Área - Engenharia de Fabricação'),
-        InitializePeoplePicker('peoplePickerGerenteEngFab','Área - Engenharia de Fabricação'),
-        InitializePeoplePicker('peoplePickerRespInDF','Área - Inovação DF'),
-        InitializePeoplePicker('peoplePickerGerenteInDF','Área - Inovação DF'),
-        InitializePeoplePicker('peoplePickerRespInvDE','Área - Inovação DE'),
-        InitializePeoplePicker('peoplePickerGerenteInvDE','Área - Inovação DE'),
-        InitializePeoplePicker('peoplePickerRespQualidade','Área - Qualidade'),
-        InitializePeoplePicker('peoplePickerGerenteQualidade','Área - Qualidade'),
-        InitializePeoplePicker('peoplePickerRespFabrica','Área - Fábrica'),
-        InitializePeoplePicker('peoplePickerGerenteFabrica','Área - Fábrica')
+        //Aba Responsáveis Peoplepicker
+        InitializePeoplePicker('peoplePickerAbaRespRespDLPCL', 'Área - DL PCL'),
+        InitializePeoplePicker('peoplePickerAbaRespRespEngEnvase', 'Área - Engenharia de Envase'),
+        InitializePeoplePicker('peoplePickerAbaRespGerEngEnvase', 'Área - Engenharia de Envase'),
+        InitializePeoplePicker('peoplePickerAbaRespRespEngFabricacao', 'Área - Engenharia de Fabricação'),
+        InitializePeoplePicker('peoplePickerAbaRespGerEngFabricacao', 'Área - Engenharia de Fabricação'),
+        InitializePeoplePicker('peoplePickerAbaRespRespInovDF', 'Área - Inovação DF'),
+        InitializePeoplePicker('peoplePickerAbaRespGerInovDF', 'Área - Inovação DF'),
+        InitializePeoplePicker('peoplePickerAbaRespRespInovDE', 'Área - Inovação DE'),
+        InitializePeoplePicker('peoplePickerAbaRespGerInovDE', 'Área - Inovação DE'),
+        InitializePeoplePicker('peoplePickerAbaRespRespQualidade', 'Área - Qualidade'),
+        InitializePeoplePicker('peoplePickerAbaRespGerQualidade', 'Área - Qualidade'),
+        InitializePeoplePicker('peoplePickerAbaRespCoordProgFabrica', 'Área - Fábrica'),
+        InitializePeoplePicker('peoplePickerAbaRespCoordManFabrica', 'Área - Fábrica'),
+        InitializePeoplePicker('peoplePickerAbaRespGerFabrica', 'Área - Fábrica'),
+        //Aba Acompanhamentos
+        InitializePeoplePicker('peoplePickerAbaAcRespEngFabricacao', 'Área - Engenharia de Fabricação'),
+        InitializePeoplePicker('peoplePickerAbaAcGerEngFabricacao', 'Área - Engenharia de Fabricação'),
+        InitializePeoplePicker('peoplePickerAbaAcRespInovDF', 'Área - Inovação DF'),
+        InitializePeoplePicker('peoplePickerAbaAcGerInovDF', 'Área - Inovação DF'),
+        InitializePeoplePicker('peoplePickerAbaAcRespEngEnvase', 'Área - Engenharia de Envase'),
+        InitializePeoplePicker('peoplePickerAbaAcGerEngEnvase', 'Área - Engenharia de Envase'),
+        InitializePeoplePicker('peoplePickerAbaAcRespInovDE', 'Área - Inovação DE'),
+        InitializePeoplePicker('peoplePickerAbaAcGerInovDE', 'Área - Inovação DE'),
+        InitializePeoplePicker('peoplePickerAbaAcCoordProgFabrica', 'Área - Fábrica'),
+        InitializePeoplePicker('peoplePickerAbaAcCoordManFabrica', 'Área - Fábrica'),
+        InitializePeoplePicker('peoplePickerAbaAcGerFabrica', 'Fábrica - Gerente'),
+        InitializePeoplePicker('peoplePickerAbaAcRespMeioAmbiente', 'Área - Meio Ambiente')
     );
 }
 
 function InitializePeoplePicker(elementId, groupName) {
     var $promise = $.Deferred();
-    var $GroupIdPromise = QueryGroupIdByName(groupName);
+    var $groupIdPromise = QueryGroupIdByName(groupName);
     var schema = {};
     schema['PrincipalAccountType'] = 'User,DL,SecGroup,SPGroup';
     schema['SearchPrincipalSource'] = 15;
@@ -965,7 +1277,7 @@ function InitializePeoplePicker(elementId, groupName) {
     schema['MaximumEntitySuggestions'] = 50;
     schema['Width'] = '280px';
 
-    $GroupIdPromise.then(function (groupId) {
+    $groupIdPromise.then(function (groupId) {
         schema['SharePointGroupID'] = groupId;
         SPClientPeoplePicker_InitStandaloneControlWrapper(elementId, null, schema);
         $promise.resolve();
@@ -996,7 +1308,7 @@ function RegistrarBotoes() {
     $('.btn-salvar').click(function () {
         SalvarAgendamento().then(function () {
             alert("Agendamento Salvo");
-        }).fail(function () {
+        }).fail(function (response) {
             alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
         });
 
@@ -1030,9 +1342,15 @@ function RegistrarBotoes() {
     $('.btn-derivar').click(function () {
         DerivarAgendamento();
     });
+
+    $('.btn-cancelar-agendamento').click(function () {
+        ModificarStatus('Cancelado');
+        $("#pills-justificativa-tab").tab('show');
+    });
 }
 
 $(document).ready(function () {
+    $('[data-toggle="tooltip"]').tooltip();
     $.when(
         CarregarCategoriaProjeto(),
         CarregarFabricas(),
