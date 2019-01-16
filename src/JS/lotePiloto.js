@@ -97,10 +97,15 @@ function ValidarAgendamentosProduto() {
         LimparValidacao('text', 'input#produtoFormula', '');
     }
 
+
     if ($('input#produtoQuantidade').val() === null || $('input#produtoQuantidade').val() == '') {
         errorAgendamentosProduto++;
         NotificarErroValidacao('text', 'input#produtoQuantidade', '', '');
     }
+    else if (ValidarLinhaEquipamento() === false) {
+        errorAgendamentosProduto++;
+        NotificarErroValidacao('text', 'input#produtoQuantidade', '', '');
+    } 
     else {
         LimparValidacao('text', 'input#produtoQuantidade', '');
     }
@@ -425,12 +430,12 @@ function ValidarAgendamentosResponsaveisFabricacao() {
 
     //DL/PCL - Responsável
     if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespRespDLPCL_TopSpan.HasResolvedUsers()) {
-        errorAgendamentosResponsaveisEnvase++;
+        errorAgendamentosResponsaveisFabricacao++;
         NotificarErroValidacao('people', 'div#peoplePickerAbaRespRespDLPCL', '', '');
     }
     else {
         if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespRespDLPCL_TopSpan.HasInputError) {
-            errorAgendamentosResponsaveisEnvase++;
+            errorAgendamentosResponsaveisFabricacao++;
             NotificarErroValidacao('people', 'div#peoplePickerAbaRespRespDLPCL', '', '');
         }
         else {
@@ -440,12 +445,12 @@ function ValidarAgendamentosResponsaveisFabricacao() {
 
     //Qualidade - Responsável
     if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespRespQualidade_TopSpan.HasResolvedUsers()) {
-        errorAgendamentosResponsaveisEnvase++;
+        errorAgendamentosResponsaveisFabricacao++;
         NotificarErroValidacao('people', 'div#peoplePickerAbaRespRespQualidade', '', '');
     }
     else {
         if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespRespQualidade_TopSpan.HasInputError) {
-            errorAgendamentosResponsaveisEnvase++;
+            errorAgendamentosResponsaveisFabricacao++;
             NotificarErroValidacao('people', 'div#peoplePickerAbaRespRespQualidade', '', '');
         }
         else {
@@ -455,12 +460,12 @@ function ValidarAgendamentosResponsaveisFabricacao() {
 
     //Qualidade - Gerente
     if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespGerQualidade_TopSpan.HasResolvedUsers()) {
-        errorAgendamentosResponsaveisEnvase++;
+        errorAgendamentosResponsaveisFabricacao++;
         NotificarErroValidacao('people', 'div#peoplePickerAbaRespGerQualidade', '', '');
     }
     else {
         if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespGerQualidade_TopSpan.HasInputError) {
-            errorAgendamentosResponsaveisEnvase++;
+            errorAgendamentosResponsaveisFabricacao++;
             NotificarErroValidacao('people', 'div#peoplePickerAbaRespGerQualidade', '', '');
         }
         else {
@@ -470,12 +475,12 @@ function ValidarAgendamentosResponsaveisFabricacao() {
 
     //Eng. Fabricação - Responsável
     if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespRespEngFabricacao_TopSpan.HasResolvedUsers()) {
-        errorAgendamentosResponsaveisEnvase++;
+        errorAgendamentosResponsaveisFabricacao++;
         NotificarErroValidacao('people', 'div#peoplePickerAbaRespRespEngFabricacao', '', '');
     }
     else {
         if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespRespEngFabricacao_TopSpan.HasInputError) {
-            errorAgendamentosResponsaveisEnvase++;
+            errorAgendamentosResponsaveisFabricacao++;
             NotificarErroValidacao('people', 'div#peoplePickerAbaRespRespEngFabricacao', '', '');
         }
         else {
@@ -485,12 +490,12 @@ function ValidarAgendamentosResponsaveisFabricacao() {
 
     //Eng. Fabricação - Gerente
     if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespGerEngFabricacao_TopSpan.HasResolvedUsers()) {
-        errorAgendamentosResponsaveisEnvase++;
+        errorAgendamentosResponsaveisFabricacao++;
         NotificarErroValidacao('people', 'div#peoplePickerAbaRespGerEngFabricacao', '', '');
     }
     else {
         if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespGerEngFabricacao_TopSpan.HasInputError) {
-            errorAgendamentosResponsaveisEnvase++;
+            errorAgendamentosResponsaveisFabricacao++;
             NotificarErroValidacao('people', 'div#peoplePickerAbaRespGerEngFabricacao', '', '');
         }
         else {
@@ -500,12 +505,12 @@ function ValidarAgendamentosResponsaveisFabricacao() {
 
     //Inov DF - Responsável
     if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespRespInovDF_TopSpan.HasResolvedUsers()) {
-        errorAgendamentosResponsaveisEnvase++;
+        errorAgendamentosResponsaveisFabricacao++;
         NotificarErroValidacao('people', 'div#peoplePickerAbaRespRespInovDF', '', '');
     }
     else {
         if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespRespInovDF_TopSpan.HasInputError) {
-            errorAgendamentosResponsaveisEnvase++;
+            errorAgendamentosResponsaveisFabricacao++;
             NotificarErroValidacao('people', 'div#peoplePickerAbaRespRespInovDF', '', '');
         }
         else {
@@ -515,12 +520,12 @@ function ValidarAgendamentosResponsaveisFabricacao() {
 
     //Inov DF - Gerente
     if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespGerInovDF_TopSpan.HasResolvedUsers()) {
-        errorAgendamentosResponsaveisEnvase++;
+        errorAgendamentosResponsaveisFabricacao++;
         NotificarErroValidacao('people', 'div#peoplePickerAbaRespGerInovDF', '', '');
     }
     else {
         if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespGerInovDF_TopSpan.HasInputError) {
-            errorAgendamentosResponsaveisEnvase++;
+            errorAgendamentosResponsaveisFabricacao++;
             NotificarErroValidacao('people', 'div#peoplePickerAbaRespGerInovDF', '', '');
         }
         else {
@@ -530,12 +535,12 @@ function ValidarAgendamentosResponsaveisFabricacao() {
 
     //Fábrica - Coordenador de Programação
     if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespCoordProgFabrica_TopSpan.HasResolvedUsers()) {
-        errorAgendamentosResponsaveisEnvase++;
+        errorAgendamentosResponsaveisFabricacao++;
         NotificarErroValidacao('people', 'div#peoplePickerAbaRespCoordProgFabrica', '', '');
     }
     else {
         if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespCoordProgFabrica_TopSpan.HasInputError) {
-            errorAgendamentosResponsaveisEnvase++;
+            errorAgendamentosResponsaveisFabricacao++;
             NotificarErroValidacao('people', 'div#peoplePickerAbaRespCoordProgFabrica', '', '');
         }
         else {
@@ -545,12 +550,12 @@ function ValidarAgendamentosResponsaveisFabricacao() {
 
     //Fábrica - Coordenador de Manufatura
     if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespCoordManFabrica_TopSpan.HasResolvedUsers()) {
-        errorAgendamentosResponsaveisEnvase++;
+        errorAgendamentosResponsaveisFabricacao++;
         NotificarErroValidacao('people', 'div#peoplePickerAbaRespCoordManFabrica', '', '');
     }
     else {
         if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespCoordManFabrica_TopSpan.HasInputError) {
-            errorAgendamentosResponsaveisEnvase++;
+            errorAgendamentosResponsaveisFabricacao++;
             NotificarErroValidacao('people', 'div#peoplePickerAbaRespCoordManFabrica', '', '');
         }
         else {
@@ -560,12 +565,12 @@ function ValidarAgendamentosResponsaveisFabricacao() {
 
     //Fábrica - Gerente
     if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespGerFabrica_TopSpan.HasResolvedUsers()) {
-        errorAgendamentosResponsaveisEnvase++;
+        errorAgendamentosResponsaveisFabricacao++;
         NotificarErroValidacao('people', 'div#peoplePickerAbaRespGerFabrica', '', '');
     }
     else {
         if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespGerFabrica_TopSpan.HasInputError) {
-            errorAgendamentosResponsaveisEnvase++;
+            errorAgendamentosResponsaveisFabricacao++;
             NotificarErroValidacao('people', 'div#peoplePickerAbaRespGerFabrica', '', '');
         }
         else {
@@ -701,7 +706,7 @@ function ValidarAgendamentosAcompanhamentosBrinde() {
     }
 
     //Inov. DF
-    if ($("input[type=checkbox]#acRespInofDFAcomp").prop('checked')) {
+    if ($("input[type=checkbox]#acRespInovDFAcomp").prop('checked')) {
         //Inovação DF - Responsável
         if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcRespInovDF_TopSpan.HasResolvedUsers()) {
             errorAgendamentosAcompanhamentosBrinde++;
@@ -738,7 +743,7 @@ function ValidarAgendamentosAcompanhamentosBrinde() {
     }
 
     //Inov. DE
-    if ($("input[type=checkbox]#acRespInofDEAcomp").prop('checked')) {
+    if ($("input[type=checkbox]#acRespInovDEAcomp").prop('checked')) {
         //Inovação DE - Responsável
         if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcRespInovDE_TopSpan.HasResolvedUsers()) {
             errorAgendamentosAcompanhamentosBrinde++;
@@ -775,7 +780,7 @@ function ValidarAgendamentosAcompanhamentosBrinde() {
     }
 
     //Fábrica
-    if ($("input[type=checkbox]#acRespInofDFAcomp").prop('checked')) {
+    if ($("input[type=checkbox]#acRespInovDFAcomp").prop('checked')) {
         //Fábrica - Coordenador de Programação
         if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcCoordProgFabrica_TopSpan.HasResolvedUsers()) {
             errorAgendamentosAcompanhamentosBrinde++;
@@ -935,7 +940,7 @@ function ValidarAgendamentosAcompanhamentosFabricacao() {
     }
 
     //Inov. DE
-    if ($("input[type=checkbox]#acRespInofDEAcomp").prop('checked')) {
+    if ($("input[type=checkbox]#acRespInovDEAcomp").prop('checked')) {
         //Inovação DE - Responsável
         if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcRespInovDE_TopSpan.HasResolvedUsers()) {
             errorAgendamentosAcompanhamentosFabricacao++;
@@ -2279,6 +2284,7 @@ function ModificarAbasPorTipoDeLote(tipoDeLote) {
             $("#pills-acompanhamento-tab").removeClass("disabled");
 
             $("#pills-dlpcl-tab").show();
+            $("#pills-dlpcl-tab").focus();
             $("#pills-eng-envase-tab").hide();
             $("#pills-eng-fabricacao-tab").hide();
             $("#pills-inov-df-tab").hide();
@@ -2294,12 +2300,28 @@ function ModificarAbasPorTipoDeLote(tipoDeLote) {
             $("#pills-qualidade-acomp-tab").hide();
             $("#pills-fabrica-acomp-tab").show();
             $("#pills-meioambiente-acomp-tab").hide();
+
+            $('input[type=checkbox]#acRespEngEnvaseAcomp').prop('checked',false);
+            $('input[type=checkbox]#acRespEngfabricacaoAcomp').prop('checked',false);
+            $('input[type=checkbox]#acRespInovDFAcomp').prop('checked',false);
+            $('input[type=checkbox]#acRespInovDEAcomp').prop('checked',false);
+            $('input[type=checkbox]#acRespFabricaAcomp').prop('checked',false);
+            $('input[type=checkbox]#acRespMeioAmbienteAcomp').prop('checked',false);
+
+            $('#AbaAcRespsEngEnvase').hide();
+            $('#AbaAcRespsEngFabricacao').hide();
+            $('#AbaAcRespsInovDF').hide();
+            $('#AbaAcRespsInovDE').hide();
+            $('#AbaAcRespsFabrica').hide();
+            $('#AbaAcRespsMeioAmbiente').hide();
+
             break;
         case 'Envase':
             $("#pills-responsaveis-tab").removeClass("disabled");
             $("#pills-acompanhamento-tab").removeClass("disabled");
 
             $("#pills-dlpcl-tab").show();
+            $("#pills-dlpcl-tab").focus();
             $("#pills-eng-envase-tab").show();
             $("#pills-eng-fabricacao-tab").hide();
             $("#pills-inov-df-tab").hide();
@@ -2316,12 +2338,27 @@ function ModificarAbasPorTipoDeLote(tipoDeLote) {
             $("#pills-fabrica-acomp-tab").hide();
             $("#pills-meioambiente-acomp-tab").show();
 
+            $('input[type=checkbox]#acRespEngEnvaseAcomp').prop('checked',false);
+            $('input[type=checkbox]#acRespEngfabricacaoAcomp').prop('checked',false);
+            $('input[type=checkbox]#acRespInovDFAcomp').prop('checked',false);
+            $('input[type=checkbox]#acRespInovDEAcomp').prop('checked',false);
+            $('input[type=checkbox]#acRespFabricaAcomp').prop('checked',false);
+            $('input[type=checkbox]#acRespMeioAmbienteAcomp').prop('checked',false);
+
+            $('#AbaAcRespsEngEnvase').hide();
+            $('#AbaAcRespsEngFabricacao').hide();
+            $('#AbaAcRespsInovDF').hide();
+            $('#AbaAcRespsInovDE').hide();
+            $('#AbaAcRespsFabrica').hide();
+            $('#AbaAcRespsMeioAmbiente').hide();
+
             break;
         case 'Fabricação':
             $("#pills-responsaveis-tab").removeClass("disabled");
             $("#pills-acompanhamento-tab").removeClass("disabled");
 
             $("#pills-dlpcl-tab").show();
+            $("#pills-dlpcl-tab").focus();
             $("#pills-eng-envase-tab").hide();
             $("#pills-eng-fabricacao-tab").show();
             $("#pills-inov-df-tab").show();
@@ -2337,6 +2374,20 @@ function ModificarAbasPorTipoDeLote(tipoDeLote) {
             $("#pills-qualidade-acomp-tab").hide();
             $("#pills-fabrica-acomp-tab").hide();
             $("#pills-meioambiente-acomp-tab").show();
+
+            $('input[type=checkbox]#acRespEngEnvaseAcomp').prop('checked',false);
+            $('input[type=checkbox]#acRespEngfabricacaoAcomp').prop('checked',false);
+            $('input[type=checkbox]#acRespInovDFAcomp').prop('checked',false);
+            $('input[type=checkbox]#acRespInovDEAcomp').prop('checked',false);
+            $('input[type=checkbox]#acRespFabricaAcomp').prop('checked',false);
+            $('input[type=checkbox]#acRespMeioAmbienteAcomp').prop('checked',false);
+
+            $('#AbaAcRespsEngEnvase').hide();
+            $('#AbaAcRespsEngFabricacao').hide();
+            $('#AbaAcRespsInovDF').hide();
+            $('#AbaAcRespsInovDE').hide();
+            $('#AbaAcRespsFabrica').hide();
+            $('#AbaAcRespsMeioAmbiente').hide();
 
             break;
         case 'Picking':
@@ -2359,6 +2410,21 @@ function ModificarAbasPorTipoDeLote(tipoDeLote) {
             $("#pills-qualidade-acomp-tab").hide();
             $("#pills-fabrica-acomp-tab").hide();
             $("#pills-meioambiente-acomp-tab").hide();
+
+            $('input[type=checkbox]#acRespEngEnvaseAcomp').prop('checked',false);
+            $('input[type=checkbox]#acRespEngfabricacaoAcomp').prop('checked',false);
+            $('input[type=checkbox]#acRespInovDFAcomp').prop('checked',false);
+            $('input[type=checkbox]#acRespInovDEAcomp').prop('checked',false);
+            $('input[type=checkbox]#acRespFabricaAcomp').prop('checked',false);
+            $('input[type=checkbox]#acRespMeioAmbienteAcomp').prop('checked',false);
+
+            $('#AbaAcRespsEngEnvase').hide();
+            $('#AbaAcRespsEngFabricacao').hide();
+            $('#AbaAcRespsInovDF').hide();
+            $('#AbaAcRespsInovDE').hide();
+            $('#AbaAcRespsFabrica').hide();
+            $('#AbaAcRespsMeioAmbiente').hide();
+           
             break;
         default:
             $("#pills-responsaveis-tab").addClass("disabled");
@@ -2380,6 +2446,21 @@ function ModificarAbasPorTipoDeLote(tipoDeLote) {
             $("#pills-qualidade-acomp-tab").hide();
             $("#pills-fabrica-acomp-tab").hide();
             $("#pills-meioambiente-acomp-tab").hide();
+
+            $('input[type=checkbox]#acRespEngEnvaseAcomp').prop('checked',false);
+            $('input[type=checkbox]#acRespEngfabricacaoAcomp').prop('checked',false);
+            $('input[type=checkbox]#acRespInovDFAcomp').prop('checked',false);
+            $('input[type=checkbox]#acRespInovDEAcomp').prop('checked',false);
+            $('input[type=checkbox]#acRespFabricaAcomp').prop('checked',false);
+            $('input[type=checkbox]#acRespMeioAmbienteAcomp').prop('checked',false);
+
+            $('#AbaAcRespsEngEnvase').hide();
+            $('#AbaAcRespsEngFabricacao').hide();
+            $('#AbaAcRespsInovDF').hide();
+            $('#AbaAcRespsInovDE').hide();
+            $('#AbaAcRespsFabrica').hide();
+            $('#AbaAcRespsMeioAmbiente').hide();
+
             break;
     }
 
@@ -2414,12 +2495,12 @@ function RegistrarBindings() {
     var $fabrica = $("select#fabrica");
     var $linhaEquipamento = $("select#linhaEquipamento");
 
-    var $acRespEngEnvaseAcomp = $("#acRespEngEnvaseAcomp");
-    var $acRespEngfabricacaoAcomp = $("#acRespEngfabricacaoAcomp");
-    var $acRespInofDFAcomp = $("#acRespInofDFAcomp");
-    var $acRespInofDEAcomp = $("#acRespInofDEAcomp");
-    var $acRespFabricaAcomp = $("#acRespFabricaAcomp");
-    var $acRespMeioAmbienteAcomp = $("#acRespMeioAmbienteAcomp");
+    var $acRespEngEnvaseAcomp = $("input[type=checkbox]#acRespEngEnvaseAcomp");
+    var $acRespEngfabricacaoAcomp = $("input[type=checkbox]#acRespEngfabricacaoAcomp");
+    var $acRespInovDFAcomp = $("input[type=checkbox]#acRespInovDFAcomp");
+    var $acRespInovDEAcomp = $("input[type=checkbox]#acRespInovDEAcomp");
+    var $acRespFabricaAcomp = $("input[type=checkbox]#acRespFabricaAcomp");
+    var $acRespMeioAmbienteAcomp = $("input[type=checkbox]#acRespMeioAmbienteAcomp");
 
     $tipoLote.change(function () {
         ModificarAbasPorTipoDeLote(this.value);
@@ -2428,7 +2509,7 @@ function RegistrarBindings() {
     });
 
     $acRespEngEnvaseAcomp.change(function () {
-        if ($acRespEngEnvaseAcomp.checked) {
+        if ($acRespEngEnvaseAcomp.prop('checked')) {
             $("#AbaAcRespsEngEnvase").show();
         }
         else {
@@ -2437,7 +2518,7 @@ function RegistrarBindings() {
     });
 
     $acRespEngfabricacaoAcomp.change(function () {
-        if ($acRespEngfabricacaoAcomp.checked) {
+        if ($acRespEngfabricacaoAcomp.prop('checked')) {
             $("#AbaAcRespsEngFabricacao").show();
         }
         else {
@@ -2445,8 +2526,8 @@ function RegistrarBindings() {
         }
     });
 
-    $acRespInofDFAcomp.change(function () {
-        if ($acRespInofDFAcomp.checked) {
+    $acRespInovDFAcomp.change(function () {
+        if ($acRespInovDFAcomp.prop('checked')) {
             $("#AbaAcRespsInovDF").show();
         }
         else {
@@ -2454,8 +2535,8 @@ function RegistrarBindings() {
         }
     });
 
-    $acRespInofDEAcomp.change(function () {
-        if ($acRespInofDEAcomp.checked) {
+    $acRespInovDEAcomp.change(function () {
+        if ($acRespInovDEAcomp.prop('checked')) {
             $("#AbaAcRespsInovDE").show();
         }
         else {
@@ -2464,7 +2545,7 @@ function RegistrarBindings() {
     });
 
     $acRespFabricaAcomp.change(function () {
-        if ($acRespFabricaAcomp.checked) {
+        if ($acRespFabricaAcomp.prop('checked')) {
             $("#AbaAcRespsFabrica").show();
         }
         else {
@@ -2473,7 +2554,7 @@ function RegistrarBindings() {
     });
 
     $acRespMeioAmbienteAcomp.change(function () {
-        if ($acRespMeioAmbienteAcomp.checked) {
+        if ($acRespMeioAmbienteAcomp.prop('checked')) {
             $("#AbaAcRespsMeioAmbiente").show();
         }
         else {
@@ -2491,7 +2572,7 @@ function RegistrarBindings() {
     });
 
     $("#produtoEnvioAmostras").change(function () {
-        if (this.checked) {
+        if (this.prop('checked')) {
             $("#formResponsavelAmostra").show();
         } else {
             $("#formResponsavelAmostra").hide();
@@ -2600,13 +2681,13 @@ function getUrlParameter(name) {
 
 function DerivarAgendamento() {
     document.getElementById('inputId').value = "";
-    document.getElementById('codigoProduto').value="";
-    document.getElementById('produtoDescricao').value="";
-    $('select#status').val('Rascunho');
+    document.getElementById('codigoProduto').value = "";
+    document.getElementById('produtoDescricao').value = "";
+    ModificarStatus('Rascunho');
     window.history.pushState("object", "", "main.aspx?action=new");
 }
 
-function ValidarQtdPecas(){
+function ValidarQtdPecas() {
     var quantidadePecas = document.getElementById('produtoQuantidade').value;
 
 }
@@ -2695,6 +2776,54 @@ function VerificarGrupoDlPclOuPlantaPiloto() {
     });
 
     return result;
+}
+
+function ValidarLinhaEquipamento(){
+    var valSelected = $("select#linhaEquipamento").val();
+    if (valSelected) {
+        return BuscarMinimoEMaximoPecas(valSelected)
+    } else {
+        return false;
+    }
+}
+
+function BuscarMinimoEMaximoPecas(linhaEquipamentoId){
+    var $promise = $.Deferred();
+    var $minimoPecas = "";
+    var $maximoPecas = "";
+    var produtoqtd = $('input#produtoQuantidade').val();
+    $().SPServices({
+        async: false,
+        operation: 'GetListItems',
+        listName: 'Linhas e Equipamentos',
+        CAMLQuery: '<Query><Where><Eq><FieldRef Name="ID" /><Value Type="Number">' + linhaEquipamentoId + '</Value></Eq></Where></Query>',
+        CAMLViewFields: '<ViewFields><FieldRef Name="Title" /><FieldRef Name="ID" /></ViewFields>',
+        completefunc: function (Data, Status) {
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
+                });
+
+                return false;
+            }
+
+            $(Data.responseXML).SPFilterNode("z:row").each(function () {
+                $minimoPecas = AtributoNumber($(this).attr("ows_CapacidadeMin"));
+                $maximoPecas = AtributoNumber($(this).attr("ows_CapacidadeMax"));
+            });
+
+            $promise.resolve();
+        }
+    });
+
+    if (produtoqtd < $minimoPecas ){
+        return false;
+    } else if (produtoqtd > $maximoPecas ) {
+        return false;
+    } else {
+        return true;
+    }
 }
 
 $(document).ready(function () {
