@@ -1,3 +1,1117 @@
+function ValidarAgendamentosGeral() {
+    var errorAgendamentosGeral = 0;
+    LimparValidacoes();
+    if ($('select#tipoDeLote').children('option:selected').val() === 'Selecione uma opção') {
+        errorAgendamentosGeral++;
+        NotificarErroValidacao('select', 'select#tipoDeLote', '', '');
+    }
+    else {
+        LimparValidacao('select', 'select#tipoDeLote', '');
+    }
+
+    if ($('select#fabrica').children('option:selected').val() === 'Selecione uma opção') {
+        errorAgendamentosGeral++;
+        NotificarErroValidacao('select', 'select#fabrica', '', '');
+    }
+    else {
+        LimparValidacao('select', 'select#fabrica', '');
+    }
+
+    if ($('select#linhaEquipamento').children('option:selected').val() === 'Selecione uma opção') {
+        errorAgendamentosGeral++;
+        NotificarErroValidacao('select', 'select#linhaEquipamento', '', '');
+    }
+    else {
+        LimparValidacao('select', 'select#linhaEquipamento', '');
+    }
+
+    return errorAgendamentosGeral;
+}
+
+function ValidarAgendamentosProduto() {
+    var errorAgendamentosProduto = 0;
+    LimparValidacoes();
+    if ($('input#codigoProduto').val() === null || $('input#codigoProduto').val() == '') {
+        errorAgendamentosProduto++;
+        NotificarErroValidacao('text', 'input#codigoProduto', '', '');
+    }
+    else {
+        LimparValidacao('text', 'input#codigoProduto', '');
+    }
+
+    if ($('select#linhaDoProduto').children('option:selected').val() === 'Selecione uma opção') {
+        errorAgendamentosProduto++;
+        NotificarErroValidacao('select', 'select#linhaDoProduto', '', '');
+    }
+    else {
+        LimparValidacao('select', 'select#linhaDoProduto', '');
+    }
+
+    if ($('textarea#produtoDescricao').val() === null || $('textarea#produtoDescricao').val() == '') {
+        errorAgendamentosProduto++;
+        NotificarErroValidacao('text', 'textarea#produtoDescricao', '', '');
+    }
+    else {
+        LimparValidacao('text', 'textarea#produtoDescricao', '');
+    }
+
+    if ($('input#produtoProjeto').val() === null || $('input#produtoProjeto').val() == '') {
+        errorAgendamentosProduto++;
+        NotificarErroValidacao('text', 'input#produtoProjeto', '', '');
+    }
+    else {
+        LimparValidacao('text', 'input#produtoProjeto', '');
+    }
+
+    if ($('select#categoriaDoProjeto').children('option:selected').val() === 'Selecione uma opção') {
+        errorAgendamentosProduto++;
+        NotificarErroValidacao('select', 'select#categoriaDoProjeto', '', '');
+    }
+    else {
+        LimparValidacao('select', 'select#categoriaDoProjeto', '');
+    }
+
+    if ($('input#produtoFormula').val() === null || $('input#produtoFormula').val() == '') {
+        errorAgendamentosProduto++;
+        NotificarErroValidacao('text', 'input#produtoFormula', '', '');
+    }
+    else {
+        LimparValidacao('text', 'input#produtoFormula', '');
+    }
+
+    if ($('input#produtoQuantidade').val() === null || $('input#produtoQuantidade').val() == '') {
+        errorAgendamentosProduto++;
+        NotificarErroValidacao('text', 'input#produtoQuantidade', '', '');
+    }
+    else {
+        LimparValidacao('text', 'input#produtoQuantidade', '');
+    }
+
+    if ($('select#motivo').children('option:selected').val() === 'Selecione uma opção') {
+        errorAgendamentosProduto++;
+        NotificarErroValidacao('select', 'select#motivo', '', '');
+    }
+    else {
+        LimparValidacao('select', 'select#motivo', '');
+    }
+    // if ($("input[type=checkbox]#produtoEnvioAmostras").prop('checked')) {
+    //     if ($('input#produtoResponsavelAmostra').val() === null || $('input#produtoResponsavelAmostra').val()=='') {
+    //         errorAgendamentosProduto++;
+    //         NotificarErroValidacao('text', 'input#produtoResponsavelAmostra', '', '');
+    //     }
+    //     else {
+    //         LimparValidacao('text', 'input#produtoResponsavelAmostra', '');
+    //     }
+
+    //     if ($('input#produtoQuantidadeAmostra').val() === null || $('input#produtoQuantidadeAmostra').val()=='') {
+    //         errorAgendamentosProduto++;
+    //         NotificarErroValidacao('text', 'input#produtoQuantidadeAmostra', '', '');
+    //     }
+    //     else {
+    //         LimparValidacao('text', 'input#produtoQuantidadeAmostra', '');
+    //     }
+    // }
+    // else {
+    //     LimparValidacao('text', 'input#produtoResponsavelAmostra', '');
+    //     LimparValidacao('text', 'input#produtoResponsavelAmostra', '');
+    // }
+
+    return errorAgendamentosProduto;
+}
+
+function ValidarAgendamentosAgendamento() {
+    var errorAgendamentosAgendamento = 0;
+    LimparValidacoes();
+    if ($('input#agendamentoCentroCusto').val() === null || $('input#agendamentoCentroCusto').val() == '') {
+        errorAgendamentosAgendamento++;
+        NotificarErroValidacao('text', 'input#agendamentoCentroCusto', '', '');
+    }
+    else {
+        LimparValidacao('text', 'input#agendamentoCentroCusto', '');
+    }
+
+    if ($('select#grauComplexidade').children('option:selected').val() === 'Selecione uma opção') {
+        errorAgendamentosAgendamento++;
+        NotificarErroValidacao('select', 'select#grauComplexidade', '', '');
+    }
+    else {
+        LimparValidacao('select', 'select#grauComplexidade', '');
+    }
+
+    if ($('input#agendamentoDataInicioProgramado').val() === null || $('input#agendamentoDataInicioProgramado').val() == '') {
+        errorAgendamentosAgendamento++;
+        NotificarErroValidacao('text', 'input#agendamentoDataInicioProgramado', '', '');
+    }
+    else {
+        var SelectedDate = new Date($('input#agendamentoDataInicioProgramado').val().substring(6, 10), $('input#agendamentoDataInicioProgramado').val().substring(3, 5) - 1, $('input#agendamentoDataInicioProgramado').val().substring(0, 2));
+        var CurrentDateTime = new Date();
+        var CurrentDate = new Date(CurrentDateTime.getFullYear(), CurrentDateTime.getMonth(), CurrentDateTime.getDate());
+
+        if (CurrentDate > SelectedDate) {
+            errorAgendamentosAgendamento++;
+            NotificarErroValidacao('text', 'input#agendamentoDataInicioProgramado', '', '');
+        }
+        else {
+            LimparValidacao('text', 'input#agendamentoDataInicioProgramado', '');
+        }
+    }
+
+    if ($('input#agendamentoDuracaoHoras').val() === null || $('input#agendamentoDuracaoHoras').val() == '') {
+        errorAgendamentosAgendamento++;
+        NotificarErroValidacao('text', 'input#agendamentoDuracaoHoras', '', '');
+    }
+    else {
+        if ($('input#agendamentoDuracaoHoras').val() < 0 || $('input#agendamentoDuracaoHoras').val() > 24) {
+            errorAgendamentosAgendamento++;
+            NotificarErroValidacao('text', 'input#agendamentoDuracaoHoras', '', '');
+        }
+        else {
+            LimparValidacao('text', 'input#agendamentoDuracaoHoras', '');
+        }
+    }
+
+    if ($('input#agendamentoDuracaoMinutos').val() === null || $('input#agendamentoDuracaoMinutos').val() == '') {
+        errorAgendamentosAgendamento++;
+        NotificarErroValidacao('text', 'input#agendamentoDuracaoMinutos', '', '');
+    }
+    else {
+        if ($('input#agendamentoDuracaoMinutos').val() < 0 || $('input#agendamentoDuracaoMinutos').val() > 59) {
+            errorAgendamentosAgendamento++;
+            NotificarErroValidacao('text', 'input#agendamentoDuracaoMinutos', '', '');
+        }
+        else {
+            LimparValidacao('text', 'input#agendamentoDuracaoMinutos', '');
+        }
+    }
+
+    // if ($('textarea#agendamentoObservacoes').val() === null || $('textarea#agendamentoObservacoes').val() == '') {
+    //     errorAgendamentosAgendamento++;
+    //     NotificarErroValidacao('text', 'textarea#agendamentoObservacoes', '', '');
+    // }
+    // else {
+    //     LimparValidacao('text', 'textarea#agendamentoObservacoes', '');
+    // }
+
+    return errorAgendamentosAgendamento;
+}
+
+function ValidarAgendamentosResponsaveisBrinde() {
+    var errorAgendamentosResponsaveisBrinde = 0;
+
+    //DL/PCL - Responsável
+    if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespRespDLPCL_TopSpan.HasResolvedUsers()) {
+        errorAgendamentosResponsaveisBrinde++;
+        NotificarErroValidacao('people', 'div#peoplePickerAbaRespRespDLPCL', '', '');
+    }
+    else {
+        if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespRespDLPCL_TopSpan.HasInputError) {
+            errorAgendamentosResponsaveisBrinde++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaRespRespDLPCL', '', '');
+        }
+        else {
+            LimparValidacao('people', 'div#peoplePickerAbaRespRespDLPCL', '');
+        }
+    }
+
+    //Qualidade - Responsável
+    if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespRespQualidade_TopSpan.HasResolvedUsers()) {
+        errorAgendamentosResponsaveisBrinde++;
+        NotificarErroValidacao('people', 'div#peoplePickerAbaRespRespQualidade', '', '');
+    }
+    else {
+        if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespRespQualidade_TopSpan.HasInputError) {
+            errorAgendamentosResponsaveisBrinde++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaRespRespQualidade', '', '');
+        }
+        else {
+            LimparValidacao('people', 'div#peoplePickerAbaRespRespQualidade', '');
+        }
+    }
+
+    //Qualidade - Gerente
+    if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespGerQualidade_TopSpan.HasResolvedUsers()) {
+        errorAgendamentosResponsaveisBrinde++;
+        NotificarErroValidacao('people', 'div#peoplePickerAbaRespGerQualidade', '', '');
+    }
+    else {
+        if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespGerQualidade_TopSpan.HasInputError) {
+            errorAgendamentosResponsaveisBrinde++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaRespGerQualidade', '', '');
+        }
+        else {
+            LimparValidacao('people', 'div#peoplePickerAbaRespGerQualidade', '');
+        }
+    }
+
+    return errorAgendamentosResponsaveisBrinde;
+}
+
+function ValidarAgendamentosResponsaveisEnvase() {
+    var errorAgendamentosResponsaveisEnvase = 0;
+
+    //DL/PCL - Responsável
+    if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespRespDLPCL_TopSpan.HasResolvedUsers()) {
+        errorAgendamentosResponsaveisEnvase++;
+        NotificarErroValidacao('people', 'div#peoplePickerAbaRespRespDLPCL', '', '');
+    }
+    else {
+        if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespRespDLPCL_TopSpan.HasInputError) {
+            errorAgendamentosResponsaveisEnvase++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaRespRespDLPCL', '', '');
+        }
+        else {
+            LimparValidacao('people', 'div#peoplePickerAbaRespRespDLPCL', '');
+        }
+    }
+
+    //Eng. Envase - Responsável
+    if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespRespEngEnvase_TopSpan.HasResolvedUsers()) {
+        errorAgendamentosResponsaveisEnvase++;
+        NotificarErroValidacao('people', 'div#peoplePickerAbaRespRespEngEnvase', '', '');
+    }
+    else {
+        if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespRespEngEnvase_TopSpan.HasInputError) {
+            errorAgendamentosResponsaveisEnvase++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaRespRespEngEnvase', '', '');
+        }
+        else {
+            LimparValidacao('people', 'div#peoplePickerAbaRespRespEngEnvase', '');
+        }
+    }
+
+    //Eng. Envase - Gerente
+    if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespGerEngEnvase_TopSpan.HasResolvedUsers()) {
+        errorAgendamentosResponsaveisEnvase++;
+        NotificarErroValidacao('people', 'div#peoplePickerAbaRespGerEngEnvase', '', '');
+    }
+    else {
+        if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespGerEngEnvase_TopSpan.HasInputError) {
+            errorAgendamentosResponsaveisEnvase++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaRespGerEngEnvase', '', '');
+        }
+        else {
+            LimparValidacao('people', 'div#peoplePickerAbaRespGerEngEnvase', '');
+        }
+    }
+
+    //Qualidade - Responsável
+    if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespRespQualidade_TopSpan.HasResolvedUsers()) {
+        errorAgendamentosResponsaveisEnvase++;
+        NotificarErroValidacao('people', 'div#peoplePickerAbaRespRespQualidade', '', '');
+    }
+    else {
+        if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespRespQualidade_TopSpan.HasInputError) {
+            errorAgendamentosResponsaveisEnvase++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaRespRespQualidade', '', '');
+        }
+        else {
+            LimparValidacao('people', 'div#peoplePickerAbaRespRespQualidade', '');
+        }
+    }
+
+    //Qualidade - Gerente
+    if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespGerQualidade_TopSpan.HasResolvedUsers()) {
+        errorAgendamentosResponsaveisEnvase++;
+        NotificarErroValidacao('people', 'div#peoplePickerAbaRespGerQualidade', '', '');
+    }
+    else {
+        if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespGerQualidade_TopSpan.HasInputError) {
+            errorAgendamentosResponsaveisEnvase++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaRespGerQualidade', '', '');
+        }
+        else {
+            LimparValidacao('people', 'div#peoplePickerAbaRespGerQualidade', '');
+        }
+    }
+
+    //InovDE - Responsável
+    if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespRespInovDE_TopSpan.HasResolvedUsers()) {
+        errorAgendamentosResponsaveisEnvase++;
+        NotificarErroValidacao('people', 'div#peoplePickerAbaRespRespInovDE', '', '');
+    }
+    else {
+        if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespRespInovDE_TopSpan.HasInputError) {
+            errorAgendamentosResponsaveisEnvase++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaRespRespInovDE', '', '');
+        }
+        else {
+            LimparValidacao('people', 'div#peoplePickerAbaRespRespInovDE', '');
+        }
+    }
+
+    //InovDE - Gerente
+    if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespGerInovDE_TopSpan.HasResolvedUsers()) {
+        errorAgendamentosResponsaveisEnvase++;
+        NotificarErroValidacao('people', 'div#peoplePickerAbaRespGerInovDE', '', '');
+    }
+    else {
+        if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespGerInovDE_TopSpan.HasInputError) {
+            errorAgendamentosResponsaveisEnvase++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaRespGerInovDE', '', '');
+        }
+        else {
+            LimparValidacao('people', 'div#peoplePickerAbaRespGerInovDE', '');
+        }
+    }
+
+    //Fábrica - Coordenador de Programação
+    if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespCoordProgFabrica_TopSpan.HasResolvedUsers()) {
+        errorAgendamentosResponsaveisEnvase++;
+        NotificarErroValidacao('people', 'div#peoplePickerAbaRespCoordProgFabrica', '', '');
+    }
+    else {
+        if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespCoordProgFabrica_TopSpan.HasInputError) {
+            errorAgendamentosResponsaveisEnvase++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaRespCoordProgFabrica', '', '');
+        }
+        else {
+            LimparValidacao('people', 'div#peoplePickerAbaRespCoordProgFabrica', '');
+        }
+    }
+
+    //Fábrica - Coordenador de Manufatura
+    if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespCoordManFabrica_TopSpan.HasResolvedUsers()) {
+        errorAgendamentosResponsaveisEnvase++;
+        NotificarErroValidacao('people', 'div#peoplePickerAbaRespCoordManFabrica', '', '');
+    }
+    else {
+        if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespCoordManFabrica_TopSpan.HasInputError) {
+            errorAgendamentosResponsaveisEnvase++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaRespCoordManFabrica', '', '');
+        }
+        else {
+            LimparValidacao('people', 'div#peoplePickerAbaRespCoordManFabrica', '');
+        }
+    }
+
+    //Fábrica - Gerente
+    if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespGerFabrica_TopSpan.HasResolvedUsers()) {
+        errorAgendamentosResponsaveisEnvase++;
+        NotificarErroValidacao('people', 'div#peoplePickerAbaRespGerFabrica', '', '');
+    }
+    else {
+        if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespGerFabrica_TopSpan.HasInputError) {
+            errorAgendamentosResponsaveisEnvase++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaRespGerFabrica', '', '');
+        }
+        else {
+            LimparValidacao('people', 'div#peoplePickerAbaRespGerFabrica', '');
+        }
+    }
+
+    return errorAgendamentosResponsaveisEnvase;
+}
+
+function ValidarAgendamentosResponsaveisFabricacao() {
+    var errorAgendamentosResponsaveisFabricacao = 0;
+
+    //DL/PCL - Responsável
+    if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespRespDLPCL_TopSpan.HasResolvedUsers()) {
+        errorAgendamentosResponsaveisEnvase++;
+        NotificarErroValidacao('people', 'div#peoplePickerAbaRespRespDLPCL', '', '');
+    }
+    else {
+        if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespRespDLPCL_TopSpan.HasInputError) {
+            errorAgendamentosResponsaveisEnvase++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaRespRespDLPCL', '', '');
+        }
+        else {
+            LimparValidacao('people', 'div#peoplePickerAbaRespRespDLPCL', '');
+        }
+    }
+
+    //Qualidade - Responsável
+    if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespRespQualidade_TopSpan.HasResolvedUsers()) {
+        errorAgendamentosResponsaveisEnvase++;
+        NotificarErroValidacao('people', 'div#peoplePickerAbaRespRespQualidade', '', '');
+    }
+    else {
+        if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespRespQualidade_TopSpan.HasInputError) {
+            errorAgendamentosResponsaveisEnvase++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaRespRespQualidade', '', '');
+        }
+        else {
+            LimparValidacao('people', 'div#peoplePickerAbaRespRespQualidade', '');
+        }
+    }
+
+    //Qualidade - Gerente
+    if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespGerQualidade_TopSpan.HasResolvedUsers()) {
+        errorAgendamentosResponsaveisEnvase++;
+        NotificarErroValidacao('people', 'div#peoplePickerAbaRespGerQualidade', '', '');
+    }
+    else {
+        if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespGerQualidade_TopSpan.HasInputError) {
+            errorAgendamentosResponsaveisEnvase++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaRespGerQualidade', '', '');
+        }
+        else {
+            LimparValidacao('people', 'div#peoplePickerAbaRespGerQualidade', '');
+        }
+    }
+
+    //Eng. Fabricação - Responsável
+    if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespRespEngFabricacao_TopSpan.HasResolvedUsers()) {
+        errorAgendamentosResponsaveisEnvase++;
+        NotificarErroValidacao('people', 'div#peoplePickerAbaRespRespEngFabricacao', '', '');
+    }
+    else {
+        if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespRespEngFabricacao_TopSpan.HasInputError) {
+            errorAgendamentosResponsaveisEnvase++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaRespRespEngFabricacao', '', '');
+        }
+        else {
+            LimparValidacao('people', 'div#peoplePickerAbaRespRespEngFabricacao', '');
+        }
+    }
+
+    //Eng. Fabricação - Gerente
+    if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespGerEngFabricacao_TopSpan.HasResolvedUsers()) {
+        errorAgendamentosResponsaveisEnvase++;
+        NotificarErroValidacao('people', 'div#peoplePickerAbaRespGerEngFabricacao', '', '');
+    }
+    else {
+        if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespGerEngFabricacao_TopSpan.HasInputError) {
+            errorAgendamentosResponsaveisEnvase++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaRespGerEngFabricacao', '', '');
+        }
+        else {
+            LimparValidacao('people', 'div#peoplePickerAbaRespGerEngFabricacao', '');
+        }
+    }
+
+    //Inov DF - Responsável
+    if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespRespInovDF_TopSpan.HasResolvedUsers()) {
+        errorAgendamentosResponsaveisEnvase++;
+        NotificarErroValidacao('people', 'div#peoplePickerAbaRespRespInovDF', '', '');
+    }
+    else {
+        if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespRespInovDF_TopSpan.HasInputError) {
+            errorAgendamentosResponsaveisEnvase++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaRespRespInovDF', '', '');
+        }
+        else {
+            LimparValidacao('people', 'div#peoplePickerAbaRespRespInovDF', '');
+        }
+    }
+
+    //Inov DF - Gerente
+    if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespGerInovDF_TopSpan.HasResolvedUsers()) {
+        errorAgendamentosResponsaveisEnvase++;
+        NotificarErroValidacao('people', 'div#peoplePickerAbaRespGerInovDF', '', '');
+    }
+    else {
+        if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespGerInovDF_TopSpan.HasInputError) {
+            errorAgendamentosResponsaveisEnvase++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaRespGerInovDF', '', '');
+        }
+        else {
+            LimparValidacao('people', 'div#peoplePickerAbaRespGerInovDF', '');
+        }
+    }
+
+    //Fábrica - Coordenador de Programação
+    if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespCoordProgFabrica_TopSpan.HasResolvedUsers()) {
+        errorAgendamentosResponsaveisEnvase++;
+        NotificarErroValidacao('people', 'div#peoplePickerAbaRespCoordProgFabrica', '', '');
+    }
+    else {
+        if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespCoordProgFabrica_TopSpan.HasInputError) {
+            errorAgendamentosResponsaveisEnvase++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaRespCoordProgFabrica', '', '');
+        }
+        else {
+            LimparValidacao('people', 'div#peoplePickerAbaRespCoordProgFabrica', '');
+        }
+    }
+
+    //Fábrica - Coordenador de Manufatura
+    if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespCoordManFabrica_TopSpan.HasResolvedUsers()) {
+        errorAgendamentosResponsaveisEnvase++;
+        NotificarErroValidacao('people', 'div#peoplePickerAbaRespCoordManFabrica', '', '');
+    }
+    else {
+        if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespCoordManFabrica_TopSpan.HasInputError) {
+            errorAgendamentosResponsaveisEnvase++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaRespCoordManFabrica', '', '');
+        }
+        else {
+            LimparValidacao('people', 'div#peoplePickerAbaRespCoordManFabrica', '');
+        }
+    }
+
+    //Fábrica - Gerente
+    if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespGerFabrica_TopSpan.HasResolvedUsers()) {
+        errorAgendamentosResponsaveisEnvase++;
+        NotificarErroValidacao('people', 'div#peoplePickerAbaRespGerFabrica', '', '');
+    }
+    else {
+        if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespGerFabrica_TopSpan.HasInputError) {
+            errorAgendamentosResponsaveisEnvase++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaRespGerFabrica', '', '');
+        }
+        else {
+            LimparValidacao('people', 'div#peoplePickerAbaRespGerFabrica', '');
+        }
+    }
+
+    return errorAgendamentosResponsaveisFabricacao;
+}
+
+function ValidarAgendamentosResponsaveisPicking() {
+    var errorAgendamentosResponsaveisPicking = 0;
+    LimparValidacao('people', 'div#peoplePickerAbaRespRespDLPCL', '');
+    LimparValidacao('people', 'div#peoplePickerAbaRespRespEngEnvase', '');
+    LimparValidacao('people', 'div#peoplePickerAbaRespGerEngEnvase', '');
+    LimparValidacao('people', 'div#peoplePickerAbaRespRespEngFabricacao', '');
+    LimparValidacao('people', 'div#peoplePickerAbaRespGerEngFabricacao', '');
+    LimparValidacao('people', 'div#peoplePickerAbaRespRespInovDF', '');
+    LimparValidacao('people', 'div#peoplePickerAbaRespGerInovDF', '');
+    LimparValidacao('people', 'div#peoplePickerAbaRespRespInovDE', '');
+    LimparValidacao('people', 'div#peoplePickerAbaRespGerInovDE', '');
+    LimparValidacao('people', 'div#peoplePickerAbaRespRespQualidade', '');
+    LimparValidacao('people', 'div#peoplePickerAbaRespGerQualidade', '');
+    LimparValidacao('people', 'div#peoplePickerAbaRespCoordProgFabrica', '');
+    LimparValidacao('people', 'div#peoplePickerAbaRespCoordManFabrica', '');
+    LimparValidacao('people', 'div#peoplePickerAbaRespGerFabrica', '');
+    return errorAgendamentosResponsaveisPicking;
+}
+
+function ValidarAgendamentosResponsaveis(tipoDeLote) {
+    var errorAgendamentosResponsaveis = 0;
+    switch (tipoDeLote) {
+        case 'Brinde': {
+            errorAgendamentosResponsaveis = ValidarAgendamentosResponsaveisBrinde();
+            break;
+        }
+        case 'Envase': {
+            errorAgendamentosResponsaveis = ValidarAgendamentosResponsaveisEnvase();
+            break;
+        }
+        case 'Fabricação': {
+            errorAgendamentosResponsaveis = ValidarAgendamentosResponsaveisFabricacao();
+            break;
+        }
+        case 'Picking': {
+            errorAgendamentosResponsaveis = ValidarAgendamentosResponsaveisPicking();
+            return errorAgendamentosResponsaveis;
+        }
+        default: {
+            return errorAgendamentosResponsaveis;
+        }
+    }
+
+    return errorAgendamentosAgendamento;
+}
+
+function ValidarAgendamentosAcompanhamentosBrinde() {
+    var errorAgendamentosAcompanhamentosBrinde = 0;
+
+    //Eng. Envase
+    if ($("input[type=checkbox]#produtoEnvioAmostras").prop('checked')) {
+        //Engenharia Evase - Responsável
+        if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcRespEngEnvase_TopSpan.HasResolvedUsers()) {
+            errorAgendamentosAcompanhamentosBrinde++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaAcRespEngEnvase', '', '');
+        }
+        else {
+            if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcRespEngEnvase_TopSpan.HasInputError) {
+                errorAgendamentosAcompanhamentosBrinde++;
+                NotificarErroValidacao('people', 'div#peoplePickerAbaAcRespEngEnvase', '', '');
+            }
+            else {
+                LimparValidacao('people', 'div#peoplePickerAbaAcRespEngEnvase', '');
+            }
+        }
+
+        //Engenharia Evase - Gerente
+        if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcGerEngEnvase_TopSpan.HasResolvedUsers()) {
+            errorAgendamentosAcompanhamentosBrinde++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaAcGerEngEnvase', '', '');
+        }
+        else {
+            if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcGerEngEnvase_TopSpan.HasInputError) {
+                errorAgendamentosAcompanhamentosBrinde++;
+                NotificarErroValidacao('people', 'div#peoplePickerAbaAcGerEngEnvase', '', '');
+            }
+            else {
+                LimparValidacao('people', 'div#peoplePickerAbaAcGerEngEnvase', '');
+            }
+        }
+    }
+    else {
+        LimparValidacao('people', 'div#peoplePickerAbaAcRespEngEnvase', '');
+        LimparValidacao('people', 'div#peoplePickerAbaAcGerEngEnvase', '');
+    }
+
+
+    //Eng. Fabricação
+    if ($("input[type=checkbox]#acRespEngfabricacaoAcomp").prop('checked')) {
+        //Engenharia Fabricação - Responsável
+        if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcRespEngFabricacao_TopSpan.HasResolvedUsers()) {
+            errorAgendamentosAcompanhamentosBrinde++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaAcRespEngFabricacao', '', '');
+        }
+        else {
+            if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcRespEngFabricacao_TopSpan.HasInputError) {
+                errorAgendamentosAcompanhamentosBrinde++;
+                NotificarErroValidacao('people', 'div#peoplePickerAbaAcRespEngFabricacao', '', '');
+            }
+            else {
+                LimparValidacao('people', 'div#peoplePickerAbaAcRespEngFabricacao', '');
+            }
+        }
+
+        //Engenharia Fabricação - Gerente
+        if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcGerEngFabricacao_TopSpan.HasResolvedUsers()) {
+            errorAgendamentosAcompanhamentosBrinde++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaAcGerEngFabricacao', '', '');
+        }
+        else {
+            if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcGerEngFabricacao_TopSpan.HasInputError) {
+                errorAgendamentosAcompanhamentosBrinde++;
+                NotificarErroValidacao('people', 'div#peoplePickerAbaAcGerEngFabricacao', '', '');
+            }
+            else {
+                LimparValidacao('people', 'div#peoplePickerAbaAcGerEngFabricacao', '');
+            }
+        }
+    }
+    else {
+        LimparValidacao('people', 'div#peoplePickerAbaAcRespEngFabricacao', '');
+        LimparValidacao('people', 'div#peoplePickerAbaAcGerEngFabricacao', '');
+    }
+
+    //Inov. DF
+    if ($("input[type=checkbox]#acRespInofDFAcomp").prop('checked')) {
+        //Inovação DF - Responsável
+        if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcRespInovDF_TopSpan.HasResolvedUsers()) {
+            errorAgendamentosAcompanhamentosBrinde++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaAcRespInovDF', '', '');
+        }
+        else {
+            if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcRespInovDF_TopSpan.HasInputError) {
+                errorAgendamentosAcompanhamentosBrinde++;
+                NotificarErroValidacao('people', 'div#peoplePickerAbaAcRespInovDF', '', '');
+            }
+            else {
+                LimparValidacao('people', 'div#peoplePickerAbaAcRespInovDF', '');
+            }
+        }
+
+        //Inovação DF - Gerente
+        if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcGerInovDF_TopSpan.HasResolvedUsers()) {
+            errorAgendamentosAcompanhamentosBrinde++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaAcGerInovDF', '', '');
+        }
+        else {
+            if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcGerInovDF_TopSpan.HasInputError) {
+                errorAgendamentosAcompanhamentosBrinde++;
+                NotificarErroValidacao('people', 'div#peoplePickerAbaAcGerInovDF', '', '');
+            }
+            else {
+                LimparValidacao('people', 'div#peoplePickerAbaAcGerInovDF', '');
+            }
+        }
+    }
+    else {
+        LimparValidacao('people', 'div#peoplePickerAbaAcRespInovDF', '');
+        LimparValidacao('people', 'div#peoplePickerAbaAcGerInovDF', '');
+    }
+
+    //Inov. DE
+    if ($("input[type=checkbox]#acRespInofDEAcomp").prop('checked')) {
+        //Inovação DE - Responsável
+        if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcRespInovDE_TopSpan.HasResolvedUsers()) {
+            errorAgendamentosAcompanhamentosBrinde++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaAcRespInovDE', '', '');
+        }
+        else {
+            if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcRespInovDE_TopSpan.HasInputError) {
+                errorAgendamentosAcompanhamentosBrinde++;
+                NotificarErroValidacao('people', 'div#peoplePickerAbaAcRespInovDE', '', '');
+            }
+            else {
+                LimparValidacao('people', 'div#peoplePickerAbaAcRespInovDE', '');
+            }
+        }
+
+        //Inovação DE - Gerente
+        if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcGerInovDE_TopSpan.HasResolvedUsers()) {
+            errorAgendamentosAcompanhamentosBrinde++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaAcGerInovDE', '', '');
+        }
+        else {
+            if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcGerInovDE_TopSpan.HasInputError) {
+                errorAgendamentosAcompanhamentosBrinde++;
+                NotificarErroValidacao('people', 'div#peoplePickerAbaAcGerInovDE', '', '');
+            }
+            else {
+                LimparValidacao('people', 'div#peoplePickerAbaAcGerInovDE', '');
+            }
+        }
+    }
+    else {
+        LimparValidacao('people', 'div#peoplePickerAbaAcRespInovDE', '');
+        LimparValidacao('people', 'div#peoplePickerAbaAcGerInovDE', '');
+    }
+
+    //Fábrica
+    if ($("input[type=checkbox]#acRespInofDFAcomp").prop('checked')) {
+        //Fábrica - Coordenador de Programação
+        if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcCoordProgFabrica_TopSpan.HasResolvedUsers()) {
+            errorAgendamentosAcompanhamentosBrinde++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaAcCoordProgFabrica', '', '');
+        }
+        else {
+            if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcCoordProgFabrica_TopSpan.HasInputError) {
+                errorAgendamentosAcompanhamentosBrinde++;
+                NotificarErroValidacao('people', 'div#peoplePickerAbaAcCoordProgFabrica', '', '');
+            }
+            else {
+                LimparValidacao('people', 'div#peoplePickerAbaAcCoordProgFabrica', '');
+            }
+        }
+
+        //Fábrica - Coordenador de Manufatura
+        if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcCoordManFabrica_TopSpan.HasResolvedUsers()) {
+            errorAgendamentosAcompanhamentosBrinde++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaAcCoordManFabrica', '', '');
+        }
+        else {
+            if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcCoordManFabrica_TopSpan.HasInputError) {
+                errorAgendamentosAcompanhamentosBrinde++;
+                NotificarErroValidacao('people', 'div#peoplePickerAbaAcCoordManFabrica', '', '');
+            }
+            else {
+                LimparValidacao('people', 'div#peoplePickerAbaAcCoordManFabrica', '');
+            }
+        }
+
+        //Fábrica - Gerente
+        if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcGerFabrica_TopSpan.HasResolvedUsers()) {
+            errorAgendamentosAcompanhamentosBrinde++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaAcGerFabrica', '', '');
+        }
+        else {
+            if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcGerFabrica_TopSpan.HasInputError) {
+                errorAgendamentosAcompanhamentosBrinde++;
+                NotificarErroValidacao('people', 'div#peoplePickerAbaAcGerFabrica', '', '');
+            }
+            else {
+                LimparValidacao('people', 'div#peoplePickerAbaAcGerFabrica', '');
+            }
+        }
+    }
+    else {
+        LimparValidacao('people', 'div#peoplePickerAbaAcCoordProgFabrica', '');
+        LimparValidacao('people', 'div#peoplePickerAbaAcCoordManFabrica', '');
+        LimparValidacao('people', 'div#peoplePickerAbaAcGerFabrica', '');
+    }
+
+    return errorAgendamentosAcompanhamentosBrinde;
+}
+
+function ValidarAgendamentosAcompanhamentosEnvase() {
+    var errorAgendamentosAcompanhamentosEnvase = 0;
+
+    //Eng. Fabricação
+    if ($("input[type=checkbox]#acRespEngfabricacaoAcomp").prop('checked')) {
+        //Engenharia Fabricação - Responsável
+        if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcRespEngFabricacao_TopSpan.HasResolvedUsers()) {
+            errorAgendamentosAcompanhamentosEnvase++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaAcRespEngFabricacao', '', '');
+        }
+        else {
+            if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcRespEngFabricacao_TopSpan.HasInputError) {
+                errorAgendamentosAcompanhamentosEnvase++;
+                NotificarErroValidacao('people', 'div#peoplePickerAbaAcRespEngFabricacao', '', '');
+            }
+            else {
+                LimparValidacao('people', 'div#peoplePickerAbaAcRespEngFabricacao', '');
+            }
+        }
+
+        //Engenharia Fabricação - Gerente
+        if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcGerEngFabricacao_TopSpan.HasResolvedUsers()) {
+            errorAgendamentosAcompanhamentosEnvase++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaAcGerEngFabricacao', '', '');
+        }
+        else {
+            if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcGerEngFabricacao_TopSpan.HasInputError) {
+                errorAgendamentosAcompanhamentosEnvase++;
+                NotificarErroValidacao('people', 'div#peoplePickerAbaAcGerEngFabricacao', '', '');
+            }
+            else {
+                LimparValidacao('people', 'div#peoplePickerAbaAcGerEngFabricacao', '');
+            }
+        }
+    }
+    else {
+        LimparValidacao('people', 'div#peoplePickerAbaAcRespEngFabricacao', '');
+        LimparValidacao('people', 'div#peoplePickerAbaAcGerEngFabricacao', '');
+    }
+
+    //Meio Ambiente
+    if ($("input[type=checkbox]#acRespMeioAmbienteAcomp").prop('checked')) {
+        //Meio Ambiente - Responsável
+        if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcRespMeioAmbiente_TopSpan.HasResolvedUsers()) {
+            errorAgendamentosAcompanhamentosEnvase++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaAcRespMeioAmbiente', '', '');
+        }
+        else {
+            if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcRespMeioAmbiente_TopSpan.HasInputError) {
+                errorAgendamentosAcompanhamentosEnvase++;
+                NotificarErroValidacao('people', 'div#peoplePickerAbaAcRespMeioAmbiente', '', '');
+            }
+            else {
+                LimparValidacao('people', 'div#peoplePickerAbaAcRespMeioAmbiente', '');
+            }
+        }
+    }
+    else {
+        LimparValidacao('people', 'div#peoplePickerAbaAcRespMeioAmbiente', '');
+    }
+
+    return errorAgendamentosAcompanhamentosEnvase;
+}
+
+function ValidarAgendamentosAcompanhamentosFabricacao() {
+    var errorAgendamentosAcompanhamentosFabricacao = 0;
+
+    //Eng. Envase
+    if ($("input[type=checkbox]#acRespEngEnvaseAcomp").prop('checked')) {
+        //Engenharia Evase - Responsável
+        if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcRespEngEnvase_TopSpan.HasResolvedUsers()) {
+            errorAgendamentosAcompanhamentosFabricacao++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaAcRespEngEnvase', '', '');
+        }
+        else {
+            if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcRespEngEnvase_TopSpan.HasInputError) {
+                errorAgendamentosAcompanhamentosFabricacao++;
+                NotificarErroValidacao('people', 'div#peoplePickerAbaAcRespEngEnvase', '', '');
+            }
+            else {
+                LimparValidacao('people', 'div#peoplePickerAbaAcRespEngEnvase', '');
+            }
+        }
+
+        //Engenharia Evase - Gerente
+        if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcGerEngEnvase_TopSpan.HasResolvedUsers()) {
+            errorAgendamentosAcompanhamentosFabricacao++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaAcGerEngEnvase', '', '');
+        }
+        else {
+            if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcGerEngEnvase_TopSpan.HasInputError) {
+                errorAgendamentosAcompanhamentosFabricacao++;
+                NotificarErroValidacao('people', 'div#peoplePickerAbaAcGerEngEnvase', '', '');
+            }
+            else {
+                LimparValidacao('people', 'div#peoplePickerAbaAcGerEngEnvase', '');
+            }
+        }
+    }
+    else {
+        LimparValidacao('people', 'div#peoplePickerAbaAcRespEngEnvase', '');
+        LimparValidacao('people', 'div#peoplePickerAbaAcGerEngEnvase', '');
+    }
+
+    //Inov. DE
+    if ($("input[type=checkbox]#acRespInofDEAcomp").prop('checked')) {
+        //Inovação DE - Responsável
+        if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcRespInovDE_TopSpan.HasResolvedUsers()) {
+            errorAgendamentosAcompanhamentosFabricacao++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaAcRespInovDE', '', '');
+        }
+        else {
+            if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcRespInovDE_TopSpan.HasInputError) {
+                errorAgendamentosAcompanhamentosFabricacao++;
+                NotificarErroValidacao('people', 'div#peoplePickerAbaAcRespInovDE', '', '');
+            }
+            else {
+                LimparValidacao('people', 'div#peoplePickerAbaAcRespInovDE', '');
+            }
+        }
+
+        //Inovação DE - Gerente
+        if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcGerInovDE_TopSpan.HasResolvedUsers()) {
+            errorAgendamentosAcompanhamentosFabricacao++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaAcGerInovDE', '', '');
+        }
+        else {
+            if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcGerInovDE_TopSpan.HasInputError) {
+                errorAgendamentosAcompanhamentosFabricacao++;
+                NotificarErroValidacao('people', 'div#peoplePickerAbaAcGerInovDE', '', '');
+            }
+            else {
+                LimparValidacao('people', 'div#peoplePickerAbaAcGerInovDE', '');
+            }
+        }
+    }
+    else {
+        LimparValidacao('people', 'div#peoplePickerAbaAcRespInovDE', '');
+        LimparValidacao('people', 'div#peoplePickerAbaAcGerInovDE', '');
+    }
+
+    //Meio Ambiente
+    if ($("input[type=checkbox]#acRespMeioAmbienteAcomp").prop('checked')) {
+        //Meio Ambiente - Responsável
+        if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcRespMeioAmbiente_TopSpan.HasResolvedUsers()) {
+            errorAgendamentosAcompanhamentosFabricacao++;
+            NotificarErroValidacao('people', 'div#peoplePickerAbaAcRespMeioAmbiente', '', '');
+        }
+        else {
+            if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcRespMeioAmbiente_TopSpan.HasInputError) {
+                errorAgendamentosAcompanhamentosFabricacao++;
+                NotificarErroValidacao('people', 'div#peoplePickerAbaAcRespMeioAmbiente', '', '');
+            }
+            else {
+                LimparValidacao('people', 'div#peoplePickerAbaAcRespMeioAmbiente', '');
+            }
+        }
+    }
+    else {
+        LimparValidacao('people', 'div#peoplePickerAbaAcRespMeioAmbiente', '');
+    }
+
+    return errorAgendamentosAcompanhamentosFabricacao;
+}
+
+function ValidarAgendamentosAcompanhamentosPicking() {
+    var errorAgendamentosAcompanhamentosPicking = 0;
+
+    LimparValidacao('people', 'div#peoplePickerAbaAcRespEngFabricacao', '');
+    LimparValidacao('people', 'div#peoplePickerAbaAcGerEngFabricacao', '');
+    LimparValidacao('people', 'div#peoplePickerAbaAcRespInovDF', '');
+    LimparValidacao('people', 'div#peoplePickerAbaAcGerInovDF', '');
+    LimparValidacao('people', 'div#peoplePickerAbaAcRespEngEnvase', '');
+    LimparValidacao('people', 'div#peoplePickerAbaAcGerEngEnvase', '');
+    LimparValidacao('people', 'div#peoplePickerAbaAcRespInovDE', '');
+    LimparValidacao('people', 'div#peoplePickerAbaAcGerInovDE', '');
+    LimparValidacao('people', 'div#peoplePickerAbaAcCoordProgFabrica', '');
+    LimparValidacao('people', 'div#peoplePickerAbaAcCoordManFabrica', '');
+    LimparValidacao('people', 'div#peoplePickerAbaAcGerFabrica', '');
+    LimparValidacao('people', 'div#peoplePickerAbaAcRespMeioAmbiente', '');
+
+    return errorAgendamentosAcompanhamentosPicking;
+}
+
+function ValidarAgendamentosAcompanhamentos(tipoDeLote) {
+    var errorAgendamentosAcompanhamentos = 0;
+    switch (tipoDeLote) {
+        case 'Brinde': {
+            errorAgendamentosAcompanhamentos = ValidarAgendamentosAcompanhamentosBrinde();
+            break;
+        }
+        case 'Envase': {
+            errorAgendamentosAcompanhamentos = ValidarAgendamentosAcompanhamentosEnvase();
+            break;
+        }
+        case 'Fabricação': {
+            errorAgendamentosAcompanhamentos = ValidarAgendamentosAcompanhamentosFabricacao();
+            break;
+        }
+        case 'Picking': {
+            errorAgendamentosAcompanhamentos = ValidarAgendamentosAcompanhamentosPicking();
+            return errorAgendamentosAcompanhamentos;
+        }
+        default: {
+            return errorAgendamentosAcompanhamentos;
+        }
+    }
+
+    return errorAgendamentosAcompanhamentos;
+}
+
+function ValidarAgendamento() {
+    var erroTotal = 0;
+    var errosPnlGeral = ValidarAgendamentosGeral();
+    var errosAbaProduto = ValidarAgendamentosProduto();
+    var errorAbaAgendamento = ValidarAgendamentosAgendamento();
+
+    var errorAgendamentosResponsaveis = ValidarAgendamentosResponsaveis($("select#tipoDeLote").val());
+    var errorAgendamentosAcompanhamentos = ValidarAgendamentosAcompanhamentos($("select#tipoDeLote").val());
+
+    erroTotal = errosPnlGeral + errosAbaProduto + errorAbaAgendamento + errorAgendamentosResponsaveis + errorAgendamentosAcompanhamentos;
+
+    if (erroTotal > 0) {
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
+function LimparValidacao(controlType, control, controlValidator) {
+    switch (controlType) {
+        case 'select':
+            {
+                $(control).css({
+                    "border-color": "",
+                    "-webkit-box-shadow": "",
+                    "box-shadow": ""
+                });
+                $(controlValidator).hide();
+                break;
+            }
+        case 'text':
+            {
+                $(control).css({
+                    "border-color": "",
+                    "-webkit-box-shadow": "",
+                    "box-shadow": ""
+                });
+                $(controlValidator).hide();
+                break;
+            }
+        case 'people':
+            {
+                $(control).css({
+                    "border": "",
+                    "-webkit-box-shadow": "",
+                    "box-shadow": ""
+                });
+                $(controlValidator).hide();
+                break;
+            }
+    }
+}
+
+function NotificarErroValidacao(controlType, control, controlValidator, message) {
+    switch (controlType) {
+        case 'select':
+            {
+                $(control).css({
+                    "border-color": "#a94442",
+                    "-webkit-box-shadow": "inset 0 1px 1px rgba(0,0,0,.075)",
+                    "box-shadow": "inset 0 1px 1px rgba(0,0,0,.075)"
+                });
+                break;
+            }
+        case 'text':
+            {
+                $(control).css({
+                    "border-color": "#a94442",
+                    "-webkit-box-shadow": "inset 0 1px 1px rgba(0,0,0,.075)",
+                    "box-shadow": "inset 0 1px 1px rgba(0,0,0,.075)"
+                });
+                break;
+            }
+        case 'people':
+            {
+                $(control).css({
+                    "border": "1px solid #a94442",
+                    "-webkit-box-shadow": "inset 0 1px 1px rgba(0,0,0,.075)",
+                    "box-shadow": "inset 0 1px 1px rgba(0,0,0,.075)"
+                });
+                break;
+            }
+    }
+}
+
+function LimparValidacoes() {
+}
+
 //Função para adicionar anexos (Utilizado na aba de Análises)
 function AddAttachments(listName, itemId, controlName) {
     var digest = "";
@@ -282,6 +1396,33 @@ function CarregarMotivoCancelamento() {
 
             $(Data.responseXML).find('Field[DisplayName="Motivo de cancelamento"] CHOICE').each(function () {
                 $('select#canceladoMotivo').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+            });
+
+            $promise.resolve();
+        }
+    });
+
+    return $promise;
+}
+
+function CarregarMotivoNaoExecutado() {
+    var $promise = $.Deferred();
+
+    $().SPServices({
+        operation: "GetList",
+        listName: "Agendamentos",
+        completefunc: function (Data, Status) {
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
+                });
+
+                return;
+            }
+
+            $(Data.responseXML).find('Field[DisplayName="Motivo não execução"] CHOICE').each(function () {
+                $('select#naoExecutadoMotivo').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
             });
 
             $promise.resolve();
@@ -691,6 +1832,7 @@ function GravarCodigoAgendamento($record) {
     });
 }
 
+
 function InserirAgendamento() {
     var $promise = $.Deferred();
     CalcularCamposCalculaveis();
@@ -849,38 +1991,38 @@ function ModificarBotoesPorStatus(status) {
     var $btnExecutado = $('.btn-executado');
     var $btnAprovar = $('.btn-aprovar');
     var $btnReprovarAprovar = $('.btn-reprovar');
+    var $btnDerivar = $('.btn-derivar');
     var $btnCancelar = $('.btn-cancelar-agendamento');
     var $btnSalvar = $('.btn-salvar');
+    var $btnNaoExecutado = $('.btn-nao-executado');
+
+    $btnConcluir.hide();
+    $btnExecutado.hide();
+    $btnAprovar.hide();
+    $btnReprovarAprovar.hide();
+    $btnCancelar.hide();
+    $btnSalvar.hide();
+    $btnNaoExecutado.hide();
+    $btnDerivar.hide();
 
     switch (status) {
         case 'Rascunho':
             $btnConcluir.show();
-            $btnExecutado.hide();
-            $btnAprovar.hide();
-            $btnReprovarAprovar.hide();
-            $btnCancelar.hide();
-            break;
-        case 'Cancelado':
-            $btnConcluir.hide();
-            $btnExecutado.hide();
-            $btnAprovar.hide();
-            $btnReprovarAprovar.hide();
-            $btnCancelar.hide();
-            $btnSalvar.hide();
+            if (VerificarPermissoesDerivar()) $btnDerivar.show();
             break;
         case 'Agendado':
-            $btnConcluir.hide();
             $btnExecutado.show();
-            $btnAprovar.hide();
-            $btnReprovarAprovar.hide();
-            $btnCancelar.show();
+            if (VerificarPermissoesCancelar()) $btnCancelar.show();
+            if (VerificarPermissoesNaoExecutado()) $btnNaoExecutado.show();
+            if (VerificarPermissoesDerivar()) $btnDerivar.show();
             break;
         case 'Registro das Análises':
-            $btnConcluir.hide();
-            $btnExecutado.hide();
-            $btnCancelar.hide();
             $btnAprovar.show();
             $btnReprovarAprovar.show();
+            $btnDerivar.hide();
+            break;
+        case 'Aguardando Reagendamento':
+            if (VerificarPermissoesDerivar()) $btnDerivar.show();
             break;
     }
 }
@@ -908,6 +2050,8 @@ function ModificarCamposPorStatus(status) {
     var $Observacoes = $('[name=Observacoes]');
     var $motivoCancelamento = $('[name=CanceladoMotivo]');
     var $motivoComentarios = $('[name=CanceladoComentarios]');
+    var $motivoNaoExecutado = $('[name=NaoExecutadoMotivo]');
+    var $motivoNaoExecutadoComentarios = $('[name=NaoExecutadoComentarios]');
 
     switch (status) {
         case 'Rascunho':
@@ -957,6 +2101,8 @@ function ModificarCamposPorStatus(status) {
             $Observacoes.attr('disabled', true);
             $motivoCancelamento.attr('disabled', true);
             $motivoComentarios.attr('disabled', true);
+            $motivoNaoExecutado.attr('disabled', true);
+            $motivoNaoExecutadoComentarios.attr('disabled', true);
             break;
     }
 }
@@ -971,7 +2117,11 @@ function ModificarStatus(status) {
 function ModificarAbasPorStatus(status) {
     switch (status) {
         case 'Cancelado':
-            CarregarMotivoCancelamento();
+            $('#justificativaCancelamento').removeClass('d-md-none');
+            $("#pills-justificativa-tab").removeClass("disabled");
+            break;
+        case 'Lote Não Executado':
+            $('#justificativaNaoExecutado').removeClass('d-md-none');
             $("#pills-justificativa-tab").removeClass("disabled");
             break;
     }
@@ -1304,6 +2454,20 @@ function getUrlParameter(name) {
     return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
 }
 
+function DerivarAgendamento() {
+    document.getElementById('inputId').value = "";
+    document.getElementById('codigoProduto').value="";
+    document.getElementById('produtoDescricao').value="";
+    $('select#status').val('Rascunho');
+    window.history.pushState("object", "", "main.aspx?action=new");
+}
+
+function ValidarQtdPecas(){
+    var quantidadePecas = document.getElementById('produtoQuantidade').value;
+
+}
+
+
 function RegistrarBotoes() {
     $('.btn-salvar').click(function () {
         SalvarAgendamento().then(function () {
@@ -1320,8 +2484,10 @@ function RegistrarBotoes() {
     });
 
     $('.btn-concluir').click(function () {
-        ModificarStatus('Agendado');
-        SalvarAgendamento();
+        if (ValidarAgendamento()) {
+            ModificarStatus('Agendado');
+            SalvarAgendamento();
+        }
     });
 
     $('.btn-executado').click(function () {
@@ -1339,10 +2505,116 @@ function RegistrarBotoes() {
         SalvarAgendamento();
     });
 
+    $('.btn-derivar').click(function () {
+        DerivarAgendamento();
+    });
+
     $('.btn-cancelar-agendamento').click(function () {
         ModificarStatus('Cancelado');
+        $('[name=CanceladoMotivo]').attr('disabled', false);
+        $('[name=CanceladoComentarios]').attr('disabled', false);
+        $('#justificativaCancelamento').removeClass('d-md-none');
         $("#pills-justificativa-tab").tab('show');
     });
+
+    $('.btn-nao-executado').click(function () {
+        ModificarStatus('Lote Não Executado');
+        $('[name=CanceladoMotivo]').attr('disabled', false);
+        $('[name=CanceladoComentarios]').attr('disabled', false);
+        $('#justificativaNaoExecutado').removeClass('d-md-none');
+        $("#pills-justificativa-tab").tab('show');
+    });
+}
+
+var listGruposPermitidosBtnNaoExecutado = [
+    'Administradores Lote Piloto',
+    'Área - Engenharia de Envase',
+    'Área - Engenharia de Fabricação',
+    'Área - Fábrica',
+    'Área - Inovação DE',
+    'Área - Inovação DF',
+    'Área - Meio Ambiente',
+    'Área - Qualidade'
+]
+
+function VerificarPermissoesNaoExecutado() {
+    var result = false;
+    $().SPServices({
+        operation: "GetGroupCollectionFromUser",
+        userLoginName: $().SPServices.SPGetCurrentUser(),
+        async: false,
+        completefunc: function (xData, Status) {
+            $.each(listGruposPermitidosBtnNaoExecutado, function (k, v) {
+                if (($(xData.responseXML).find("Group[Name='" + v + "']").length >= 1)) {
+                    result = true;
+                    return false;
+                } else {
+                    result = false;
+                }
+            });
+
+        }
+    });
+
+    return result;
+}
+
+var listGruposPermitidosBtnCancelar = [
+    'Administradores Lote Piloto',
+    'Agendamento - DLL',
+    'Agendamento - Planta Piloto',
+    'Área - DL PCL'
+]
+
+function VerificarPermissoesCancelar() {
+    var result = false;
+    $().SPServices({
+        operation: "GetGroupCollectionFromUser",
+        userLoginName: $().SPServices.SPGetCurrentUser(),
+        async: false,
+        completefunc: function (xData, Status) {
+            $.each(listGruposPermitidosBtnCancelar, function (k, v) {
+                if (($(xData.responseXML).find("Group[Name='" + v + "']").length >= 1)) {
+                    result = true;
+                    return false;
+                } else {
+                    result = false;
+                }
+            });
+
+        }
+    });
+
+    return result;
+}
+
+var listGruposPermitidosBtnDerivar = [
+    'Administradores Lote Piloto',
+    'Agendamento - DLL',
+    'Agendamento - Planta Piloto',
+    'Área - DL PCL'
+]
+
+function VerificarPermissoesDerivar() {
+    var result = false;
+    $().SPServices({
+        operation: "GetGroupCollectionFromUser",
+        userLoginName: $().SPServices.SPGetCurrentUser(),
+        async: false,
+        completefunc: function (xData, Status) {
+            $.each(listGruposPermitidosBtnDerivar, function (k, v) {
+                if (($(xData.responseXML).find("Group[Name='" + v + "']").length >= 1)) {
+                    result = true;
+                    return false;
+                } else {
+                    result = false;
+                }
+            });
+
+        }
+    });
+
+    return result;
 }
 
 $(document).ready(function () {
@@ -1355,6 +2627,8 @@ $(document).ready(function () {
         CarregarListaStatus(),
         CarregarListaTiposLotes(),
         dispararCarregarFabricas(),
+        CarregarMotivoCancelamento(),
+        CarregarMotivoNaoExecutado(),
         InitializeAllPeoplePickers()
     ).then(function () {
         InstanciarDateTimePicker();

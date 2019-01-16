@@ -33,15 +33,15 @@ function criarNovo() {
 
 function threadNovo( maxValue){
     var me = this;
-    var valor = document.getElementById('meuFrame').contentWindow.document.getElementsByName('Novo').length;
+    var novoLength = document.getElementById('meuFrame').contentWindow.document.getElementsByName('Novo').length;
 
-    if (valor != 0 ){
-        if ( valor != 1){
-            valor = 0;
+    if (novoLength != 0 ){
+        if ( novoLength != 1){
+            novoLength = 0;
         }
     }
 
-    if (valor == 0){
+    if (novoLength == 0){
         setTimeout(function () { me.threadNovo( maxValue); }, 500);
     } else {
         criarNovo();
@@ -51,15 +51,15 @@ function threadNovo( maxValue){
 
 function threadEditar( maxValue){
     var me = this;
-    var valor = document.getElementById('meuFrame').contentWindow.document.getElementsByName('Editar').length;
+    var editarLength = document.getElementById('meuFrame').contentWindow.document.getElementsByName('Editar').length;
 
-    if (valor != 0 ){
-        if ( valor != 1){
-            valor = 0;
+    if (editarLength != 0 ){
+        if ( editarLength != 1){
+            editarLength = 0;
         }
     }
 
-     if (valor == 0){
+     if (editarLength == 0){
         setTimeout(function () { me.threadEditar( maxValue); }, 400);
     } else {
         editarLista();

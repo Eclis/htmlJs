@@ -3,6 +3,7 @@
 <link rel="stylesheet" href="/sites/DEV_LotePiloto/SiteAssets/CSS/bootstrap-custom-reboot.css">
 <link rel="stylesheet" href="/sites/DEV_LotePiloto/SiteAssets/CSS/daterangepicker.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="/sites/DEV_LotePiloto/SiteAssets/CSS/lotepiloto.css">
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
 <script type="text/javascript" src="/sites/DEV_LotePiloto/SiteAssets/JS/popper.min.js"></script>
 <script type="text/javascript" src="/sites/DEV_LotePiloto/SiteAssets/bootstrap/js/bootstrap.min.js"></script>
@@ -180,7 +181,7 @@
                 </div>
                 <div class="col-md-2">
                     <label for="agendamentoDuracaoHoras">Duração (HH)</label>
-                    <input type="number" min="0" max="23" class="form-control salvar-campo" id="agendamentoDuracaoHoras" name="DuracaoEstimadaHoras"
+                    <input type="number" min="0" max="24" class="form-control salvar-campo" id="agendamentoDuracaoHoras" name="DuracaoEstimadaHoras"
                     />
                 </div>
                 <div class="col-md-2">
@@ -592,18 +593,36 @@
         </div>
         <div class="tab-pane fade" id="pills-justificativa" style="background-color: rgb(242, 242, 242); padding: 10px; margin-bottom: 10px;"
             role="tabpanel" aria-labelledby="pills-justificativa-tab">
-                <div class="row" style="margin-top: 10px;">
-                    <div class="col-md-12">
-                        <label for="canceladoMotivo">Motivo</label>
-                        <select class="custom-select salvar-campo select-enum" id="canceladoMotivo" name="CanceladoMotivo">
-                            <option disabled selected>Selecione uma opção</option>
-                        </select>
+                <div class="d-md-none" id="justificativaCancelamento">
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-12">
+                            <label for="canceladoMotivo">Motivo</label>
+                            <select class="custom-select salvar-campo select-enum" id="canceladoMotivo" name="CanceladoMotivo">
+                                <option disabled selected>Selecione uma opção</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-12">
+                            <label for="canceladoComentarios">Comentários</label>
+                            <textarea class="form-control salvar-campo" id="canceladoComentarios" name="CanceladoComentarios" rows="3"></textarea>
+                        </div>
                     </div>
                 </div>
-                <div class="row" style="margin-top: 10px;">
-                    <div class="col-md-12">
-                        <label for="canceladoComentarios">Comentários</label>
-                        <textarea class="form-control salvar-campo" id="canceladoComentarios" name="CanceladoComentarios" rows="3"></textarea>
+                <div class="d-md-none" id="justificativaNaoExecutado">
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-12">
+                            <label for="naoExecutadoMotivo">Motivo</label>
+                            <select class="custom-select salvar-campo select-enum" id="naoExecutadoMotivo" name="NaoExecutadoMotivo">
+                                <option disabled selected>Selecione uma opção</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-12">
+                            <label for="naoExecutadoComentarios">Comentários</label>
+                            <textarea class="form-control salvar-campo" id="naoExecutadoComentarios" name="NaoExecutadoComentarios" rows="3"></textarea>
+                        </div>
                     </div>
                 </div>
         </div>
@@ -611,10 +630,12 @@
     <div class="acoes">
         <a href="#" class="btn btn-primary btn-salvar" role="button">Salvar</a>
         <a href="#" class="btn btn-primary btn-carregar" role="button">Carregar</a>
-        <a href="#" class="btn btn-primary btn-concluir" role="button">Concluir Agendamento</a>
+        <a href="#" class="btn btn-primary btn-concluir" role="button">Agendar</a>
         <a href="#" class="btn btn-primary btn-executado" role="button">Executado</a>
         <a href="#" class="btn btn-primary btn-aprovar" role="button">Aprovar</a>
         <a href="#" class="btn btn-primary btn-reprovar" role="button">Reprovar</a>
         <a href="#" class="btn btn-primary btn-cancelar-agendamento" role="button">Cancelar Agendamento</a>
+        <a href="#" class="btn btn-primary btn-nao-executado" role="button">Não Executado</a>
+        <a href="#" class="btn btn-primary btn-derivar" role="button">Derivar</a>
     </div>
 </div>
