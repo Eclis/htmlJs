@@ -1995,34 +1995,50 @@ function ModificarBotoesPorStatus(status) {
     var $btnCancelar = $('.btn-cancelar-agendamento');
     var $btnSalvar = $('.btn-salvar');
     var $btnNaoExecutado = $('.btn-nao-executado');
+    var $btnEditar = $('.btn-editar');
 
     $btnConcluir.hide();
     $btnExecutado.hide();
     $btnAprovar.hide();
     $btnReprovarAprovar.hide();
+    $btnDerivar.hide();
     $btnCancelar.hide();
     $btnSalvar.hide();
     $btnNaoExecutado.hide();
-    $btnDerivar.hide();
+    $btnEditar.hide();
 
     switch (status) {
         case 'Rascunho':
             $btnConcluir.show();
-            if (VerificarPermissoesDerivar()) $btnDerivar.show();
+            if (VerificarPermissoesDerivar()) {
+                $btnDerivar.show();
+                $btnSalvar.show();
+            }
             break;
         case 'Agendado':
             $btnExecutado.show();
-            if (VerificarPermissoesCancelar()) $btnCancelar.show();
-            if (VerificarPermissoesNaoExecutado()) $btnNaoExecutado.show();
-            if (VerificarPermissoesDerivar()) $btnDerivar.show();
+            if (VerificarPermissoesCancelar()) {
+                $btnCancelar.show();
+                $btnSalvar.show();
+            }
+            if (VerificarPermissoesNaoExecutado()){
+                $btnNaoExecutado.show();
+                $btnSalvar.show();
+            }
+            if (VerificarPermissoesDerivar()) {
+                $btnDerivar.show();
+                $btnSalvar.show();
+            }
             break;
         case 'Registro das Análises':
             $btnAprovar.show();
             $btnReprovarAprovar.show();
-            $btnDerivar.hide();
             break;
         case 'Aguardando Reagendamento':
-            if (VerificarPermissoesDerivar()) $btnDerivar.show();
+            if (VerificarPermissoesDerivar()) {
+                $btnDerivar.show();
+                $btnSalvar.show();
+            }
             break;
     }
 }
@@ -2389,6 +2405,7 @@ function SalvarAgendamento() {
     return InserirAgendamento().then(function (response) {
         return CarregarAgendamento(response.record.attr('ows_ID'));
     });
+
 }
 
 function InitializeAllPeoplePickers() {
@@ -2471,6 +2488,9 @@ function ValidarQtdPecas(){
 function RegistrarBotoes() {
     $('.btn-salvar').click(function () {
         SalvarAgendamento().then(function () {
+            var id = $('input[name="ID"]').val();
+            window.history.pushState('Object', '', '/sites/DEV_LotePiloto/SiteAssets/main.aspx?action=edit&loteid=' + id);
+            ModificarStatus("");
             alert("Agendamento Salvo");
         }).fail(function (response) {
             alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
@@ -2524,6 +2544,20 @@ function RegistrarBotoes() {
         $('#justificativaNaoExecutado').removeClass('d-md-none');
         $("#pills-justificativa-tab").tab('show');
     });
+
+    $('.btn-editar').click(function () {
+        var id = $('input[name="ID"]').val()
+
+        if (id) {
+            window.history.pushState('Object', 'Editar', '/sites/DEV_LotePiloto/SiteAssets/main.aspx?action=edit&loteid=' +id);
+            ResetarAgendamento();
+            CarregarAgendamento(id).fail(function (response) {
+                alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
+            });
+        } else {
+            alert('Agendamento não foi criado.');
+        }
+     });
 }
 
 var listGruposPermitidosBtnNaoExecutado = [
