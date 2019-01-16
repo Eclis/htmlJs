@@ -79,10 +79,15 @@ function ValidarAgendamentosProduto() {
         LimparValidacao('text', 'input#produtoFormula', '');
     }
 
+
     if ($('input#produtoQuantidade').val() === null || $('input#produtoQuantidade').val() == '') {
         errorAgendamentosProduto++;
         NotificarErroValidacao('text', 'input#produtoQuantidade', '', '');
     }
+    else if (ValidarLinhaEquipamento() === false) {
+        errorAgendamentosProduto++;
+        NotificarErroValidacao('text', 'input#produtoQuantidade', '', '');
+    } 
     else {
         LimparValidacao('text', 'input#produtoQuantidade', '');
     }
@@ -2534,7 +2539,7 @@ function DerivarAgendamento() {
     document.getElementById('inputId').value = "";
     document.getElementById('codigoProduto').value = "";
     document.getElementById('produtoDescricao').value = "";
-    $('select#status').val('Rascunho');
+    ModificarStatus('Rascunho');
     window.history.pushState("object", "", "main.aspx?action=new");
 }
 
@@ -2670,6 +2675,54 @@ var listGruposPermitidosBtnDerivar = [
     'Agendamento - Planta Piloto',
     'Área - DL PCL'
 ]
+
+function ValidarLinhaEquipamento(){
+    var valSelected = $("select#linhaEquipamento").val();
+    if (valSelected) {
+        return BuscarMinimoEMaximoPecas(valSelected)
+    } else {
+        return false;
+    }
+}
+
+function BuscarMinimoEMaximoPecas(linhaEquipamentoId){
+    var $promise = $.Deferred();
+    var $minimoPecas = "";
+    var $maximoPecas = "";
+    var produtoqtd = $('input#produtoQuantidade').val();
+    $().SPServices({
+        async: false,
+        operation: 'GetListItems',
+        listName: 'Linhas e Equipamentos',
+        CAMLQuery: '<Query><Where><Eq><FieldRef Name="ID" /><Value Type="Number">' + linhaEquipamentoId + '</Value></Eq></Where></Query>',
+        CAMLViewFields: '<ViewFields><FieldRef Name="Title" /><FieldRef Name="ID" /></ViewFields>',
+        completefunc: function (Data, Status) {
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
+                });
+
+                return false;
+            }
+
+            $(Data.responseXML).SPFilterNode("z:row").each(function () {
+                $minimoPecas = AtributoNumber($(this).attr("ows_CapacidadeMin"));
+                $maximoPecas = AtributoNumber($(this).attr("ows_CapacidadeMax"));
+            });
+
+            $promise.resolve();
+        }
+    });
+
+    if (produtoqtd < $minimoPecas ){
+        return false;
+    } else if (produtoqtd > $maximoPecas ) {
+        return false;
+    }else {
+        return true;
+    }
+}
 
 function VerificarPermissoesDerivar() {
     var result = false;
