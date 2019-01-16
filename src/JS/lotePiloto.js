@@ -2095,7 +2095,6 @@ function ModificarBotoesPorFormState(formState) {
             }
             break;
         case AGENDADO:
-            //$btnExecutado.show();
             if (VerificarGrupoDlPclOuPlantaPiloto()) {
                 $btnCancelar.show();
                 $btnDerivar.show();
@@ -2107,6 +2106,7 @@ function ModificarBotoesPorFormState(formState) {
                     $btnEditarRespOuAcomp.show();
                 }
                 $btnNaoExecutado.show();
+                $btnExecutado.show();
             }
 
             break;
@@ -2126,8 +2126,8 @@ function ModificarBotoesPorFormState(formState) {
             }
             break;
         case REGISTRO_DE_ANALISE:
-            $btnAprovar.show();
-            $btnReprovarAprovar.show();
+            // $btnAprovar.show();
+            // $btnReprovarAprovar.show();
             break;
         case EM_NAO_EXECUCAO:
             if (VerificarGrupoDlPclOuPlantaPiloto()) {
@@ -2236,6 +2236,7 @@ function ModificarStatusPorFormState(formState) {
             break;
         case REGISTRO_DE_ANALISE:
             $status.val(REGISTRO_DE_ANALISE);
+            break;
         case EM_CANCELAMENTO:
             $status.val(CANCELADO);
             break;
