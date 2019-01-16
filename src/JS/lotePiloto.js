@@ -1,3 +1,14 @@
+var listFormState = [
+    'emExibicao',
+    'rascunhoEmEdicao',
+    'agendadoEmEdicao',
+    'emCancelamento',
+    'emNaoExecucao',
+    'emDerivacao'
+];
+
+var formState = "";
+
 function ValidarAgendamentosGeral() {
     var errorAgendamentosGeral = 0;
     LimparValidacoes();
@@ -1986,8 +1997,23 @@ function ListarDependenciasPorSelect(campo) {
     return [];
 }
 
+var listGruposAdm = [
+    'Administradores Lote Piloto',
+    'Agendamento - DLL',
+    'Agendamento - Planta Piloto',
+    'Área - DL PCL'
+]
+
+function VerificarGrupoDlPclOuPlantaPiloto() {
+    return false;
+}
+
+function VerificarGrupoRespOuAcomp() {
+    return false;
+}
+
 function ModificarBotoesPorStatus(status) {
-    var $btnConcluir = $('.btn-concluir');
+    var $btnAgendar = $('.btn-agendar');
     var $btnExecutado = $('.btn-executado');
     var $btnAprovar = $('.btn-aprovar');
     var $btnReprovarAprovar = $('.btn-reprovar');
@@ -1996,8 +2022,9 @@ function ModificarBotoesPorStatus(status) {
     var $btnSalvar = $('.btn-salvar');
     var $btnNaoExecutado = $('.btn-nao-executado');
     var $btnEditar = $('.btn-editar');
+    var $btnEditarRespOuAcomp = $('.btn-editar-resp-acomp');
 
-    $btnConcluir.hide();
+    $btnAgendar.hide();
     $btnExecutado.hide();
     $btnAprovar.hide();
     $btnReprovarAprovar.hide();
@@ -2006,28 +2033,24 @@ function ModificarBotoesPorStatus(status) {
     $btnSalvar.hide();
     $btnNaoExecutado.hide();
     $btnEditar.hide();
+    $btnEditarRespOuAcomp.hide();
 
     switch (status) {
         case 'Rascunho':
-            $btnConcluir.show();
-            if (VerificarPermissoesDerivar()) {
-                $btnDerivar.show();
-                $btnSalvar.show();
-            }
+            if (VerificarGrupoDlPclOuPlantaPiloto()) $btnEditar.show();
+            if (VerificarGrupoDlPclOuPlantaPiloto()) $btnAgendar.show();
+            if (VerificarPermissoesDerivar()) $btnDerivar.show();
             break;
         case 'Agendado':
             $btnExecutado.show();
-            if (VerificarPermissoesCancelar()) {
-                $btnCancelar.show();
-                $btnSalvar.show();
-            }
-            if (VerificarPermissoesNaoExecutado()){
-                $btnNaoExecutado.show();
-                $btnSalvar.show();
-            }
-            if (VerificarPermissoesDerivar()) {
-                $btnDerivar.show();
-                $btnSalvar.show();
+            if (VerificarPermissoesCancelar()) $btnCancelar.show();
+            if (VerificarPermissoesNaoExecutado()) $btnNaoExecutado.show();
+            if (VerificarPermissoesDerivar()) $btnDerivar.show();
+
+            if (VerificarGrupoDlPclOuPlantaPiloto()) {
+                $btnEditar.show();
+            } else if (VerificarGrupoRespOuAcomp()) {
+                $btnEditarRespOuAcomp.show();
             }
             break;
         case 'Registro das Análises':
@@ -2035,12 +2058,21 @@ function ModificarBotoesPorStatus(status) {
             $btnReprovarAprovar.show();
             break;
         case 'Aguardando Reagendamento':
-            if (VerificarPermissoesDerivar()) {
-                $btnDerivar.show();
-                $btnSalvar.show();
-            }
+            if (VerificarPermissoesDerivar()) $btnDerivar.show();
             break;
     }
+
+    if (componenteVisivel($btnDerivar)
+        || componenteVisivel($btnEditar)
+        || componenteVisivel($btnCancelar)
+        || componenteVisivel($btnNaoExecutado)
+        || componenteVisivel($btnEditarRespOuAcomp)) {
+        $btnSalvar.show();
+    }
+}
+
+function componenteVisivel(componente) {
+    return componente.is(":visible");
 }
 
 function ModificarCamposPorStatus(status) {
@@ -2490,7 +2522,6 @@ function RegistrarBotoes() {
         SalvarAgendamento().then(function () {
             var id = $('input[name="ID"]').val();
             window.history.pushState('Object', '', '/sites/DEV_LotePiloto/SiteAssets/main.aspx?action=edit&loteid=' + id);
-            ModificarStatus("");
             alert("Agendamento Salvo");
         }).fail(function (response) {
             alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
@@ -2503,7 +2534,7 @@ function RegistrarBotoes() {
         EscolherAgendamento();
     });
 
-    $('.btn-concluir').click(function () {
+    $('.btn-agendar').click(function () {
         if (ValidarAgendamento()) {
             ModificarStatus('Agendado');
             SalvarAgendamento();
@@ -2593,13 +2624,6 @@ function VerificarPermissoesNaoExecutado() {
     return result;
 }
 
-var listGruposPermitidosBtnCancelar = [
-    'Administradores Lote Piloto',
-    'Agendamento - DLL',
-    'Agendamento - Planta Piloto',
-    'Área - DL PCL'
-]
-
 function VerificarPermissoesCancelar() {
     var result = false;
     $().SPServices({
@@ -2607,7 +2631,7 @@ function VerificarPermissoesCancelar() {
         userLoginName: $().SPServices.SPGetCurrentUser(),
         async: false,
         completefunc: function (xData, Status) {
-            $.each(listGruposPermitidosBtnCancelar, function (k, v) {
+            $.each(listGruposAdm, function (k, v) {
                 if (($(xData.responseXML).find("Group[Name='" + v + "']").length >= 1)) {
                     result = true;
                     return false;
@@ -2622,13 +2646,6 @@ function VerificarPermissoesCancelar() {
     return result;
 }
 
-var listGruposPermitidosBtnDerivar = [
-    'Administradores Lote Piloto',
-    'Agendamento - DLL',
-    'Agendamento - Planta Piloto',
-    'Área - DL PCL'
-]
-
 function VerificarPermissoesDerivar() {
     var result = false;
     $().SPServices({
@@ -2636,7 +2653,7 @@ function VerificarPermissoesDerivar() {
         userLoginName: $().SPServices.SPGetCurrentUser(),
         async: false,
         completefunc: function (xData, Status) {
-            $.each(listGruposPermitidosBtnDerivar, function (k, v) {
+            $.each(listGruposAdm, function (k, v) {
                 if (($(xData.responseXML).find("Group[Name='" + v + "']").length >= 1)) {
                     result = true;
                     return false;
