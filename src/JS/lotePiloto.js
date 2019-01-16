@@ -1995,21 +1995,35 @@ function ModificarBotoesPorStatus(status) {
     switch (status) {
         case 'Rascunho':
             $btnConcluir.show();
-            if (VerificarPermissoesDerivar()) $btnDerivar.show();
+            if (VerificarPermissoesDerivar()) {
+                $btnDerivar.show();
+                $btnSalvar.show();
+            }
             break;
         case 'Agendado':
             $btnExecutado.show();
-            if (VerificarPermissoesCancelar()) $btnCancelar.show();
-            if (VerificarPermissoesNaoExecutado()) $btnNaoExecutado.show();
-            if (VerificarPermissoesDerivar()) $btnDerivar.show();
+            if (VerificarPermissoesCancelar()) {
+                $btnCancelar.show();
+                $btnSalvar.show();
+            }
+            if (VerificarPermissoesNaoExecutado()){
+                $btnNaoExecutado.show();
+                $btnSalvar.show();
+            }
+            if (VerificarPermissoesDerivar()) {
+                $btnDerivar.show();
+                $btnSalvar.show();
+            }
             break;
         case 'Registro das Análises':
             $btnAprovar.show();
             $btnReprovarAprovar.show();
-            $btnDerivar.hide();
             break;
         case 'Aguardando Reagendamento':
-            if (VerificarPermissoesDerivar()) $btnDerivar.show();
+            if (VerificarPermissoesDerivar()) {
+                $btnDerivar.show();
+                $btnSalvar.show();
+            }
             break;
     }
 }
