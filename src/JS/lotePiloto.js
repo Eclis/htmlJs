@@ -1055,7 +1055,7 @@ function ValidarAgendamento() {
     var errorAgendamentosResponsaveis = ValidarAgendamentosResponsaveis($("select#tipoDeLote").val());
     var errorAgendamentosAcompanhamentos = ValidarAgendamentosAcompanhamentos($("select#tipoDeLote").val());
 
-    erroTotal = errosPnlGeral + errosAbaProduto + errorAbaAgendamento + errorAgendamentosResponsaveis + errorAgendamentosAcompanhamentos;
+    erroTotal = errosPnlGeral + errosAbaProduto + errorAbaAgendamento + errorAgendamentosResponsaveis; //+ errorAgendamentosAcompanhamentos;
 
     if (erroTotal > 0) {
         return false;
@@ -2239,6 +2239,9 @@ function ModificarStatusPorFormState(formState) {
         case EM_CANCELAMENTO:
             $status.val(CANCELADO);
             break;
+        case EM_NAO_EXECUCAO:
+            $status.val(LOTE_NAO_EXECUTADO);
+            break;
         case APROVADO:
             $status.val(APROVADO);
             break;
@@ -2249,6 +2252,7 @@ function ModificarStatusPorFormState(formState) {
 }
 
 function ModificarFormState(formState) {
+    this.formState = formState;
     ModificarBotoesPorFormState(formState);
     ModificarCamposPorFormState(formState);
     ModificarAbasPorFormState(formState);
@@ -2572,7 +2576,7 @@ function RegistrarBindings() {
     });
 
     $("#produtoEnvioAmostras").change(function () {
-        if (this.prop('checked')) {
+        if (this.checked) {
             $("#formResponsavelAmostra").show();
         } else {
             $("#formResponsavelAmostra").hide();
@@ -2692,7 +2696,6 @@ function ValidarQtdPecas() {
 
 }
 
-
 function RegistrarBotoes() {
     var $btnSalvar = $('.btn-salvar');
     $btnSalvar.click(function () {
@@ -2781,7 +2784,7 @@ function VerificarGrupoDlPclOuPlantaPiloto() {
 function ValidarLinhaEquipamento(){
     var valSelected = $("select#linhaEquipamento").val();
     if (valSelected) {
-        return BuscarMinimoEMaximoPecas(valSelected)
+        return BuscarMinimoEMaximoPecas(valSelected);
     } else {
         return false;
     }
