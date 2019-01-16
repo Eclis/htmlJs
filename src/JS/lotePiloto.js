@@ -1,13 +1,20 @@
-var listFormState = [
-    'emExibicao',
-    'rascunhoEmEdicao',
-    'agendadoEmEdicao',
-    'emCancelamento',
-    'emNaoExecucao',
-    'emDerivacao'
-];
+var RASCUNHO = 'Rascunho';
+var AGENDADO = 'Agendado';
+var REGISTRO_DE_ANALISE = 'Registro das Análises';
+var CANCELADO = 'Cancelado';
+var APROVADO = 'Aprovado';
+var REPROVADO = 'Reprovado';
+var LOTE_NAO_EXECUTADO = 'Lote Não Executado';
 
-var formState = "";
+var EM_CRIACAO = 'emCriacao';
+var RASCUNHO_EM_EDICAO = 'rascunhoEmEdicao';
+var AGENDAMENTO_EM_EDICAO = 'agendadoEmEdicao';
+var RESP_ACOMP_AGENDADO_EM_EDICAO = 'respAcompAgendadoEmEdicao';
+var EM_CANCELAMENTO = 'emCancelamento';
+var EM_NAO_EXECUCAO = 'emNaoExecucao';
+var EM_DERIVACAO = 'emDerivacao';
+
+var formState;
 
 function ValidarAgendamentosGeral() {
     var errorAgendamentosGeral = 0;
@@ -612,7 +619,7 @@ function ValidarAgendamentosResponsaveis(tipoDeLote) {
         }
     }
 
-    return errorAgendamentosAgendamento;
+    return errorAgendamentosResponsaveis;
 }
 
 function ValidarAgendamentosAcompanhamentosBrinde() {
@@ -1212,6 +1219,7 @@ function onFail(sender, args) {
 function AtualizarAgendamento(id) {
     var $promise = $.Deferred();
     CalcularCamposCalculaveis();
+    ModificarStatusPorFormState(formState);
     var campos = [];
 
     $('#main [name].salvar-campo').each(function () {
@@ -1340,7 +1348,7 @@ function CarregarAgendamento(id) {
             });
 
             CarregarSelects(selectsACarregar);
-            ModificarStatus($('select#status').val());
+            ModificarFormState($('select#status').val());
             $promise.resolve();
         }
     });
@@ -1861,6 +1869,8 @@ function InserirAgendamento() {
         }
     });
 
+    campos.push(['Status', 'Rascunho']);
+
     $().SPServices({
         operation: "UpdateListItems",
         batchCmd: "New",
@@ -2004,15 +2014,40 @@ var listGruposAdm = [
     'Área - DL PCL'
 ]
 
-function VerificarGrupoDlPclOuPlantaPiloto() {
-    return false;
-}
+var listDemaisGrupos = [
+    'Administradores Lote Piloto',
+    'Área - Engenharia de Envase',
+    'Área - Engenharia de Fabricação',
+    'Área - Fábrica',
+    'Área - Inovação DE',
+    'Área - Inovação DF',
+    'Área - Meio Ambiente',
+    'Área - Qualidade'
+];
 
 function VerificarGrupoRespOuAcomp() {
-    return false;
+    var result = false;
+    $().SPServices({
+        operation: "GetGroupCollectionFromUser",
+        userLoginName: $().SPServices.SPGetCurrentUser(),
+        async: false,
+        completefunc: function (xData, Status) {
+            $.each(listDemaisGrupos, function (k, v) {
+                if (($(xData.responseXML).find("Group[Name='" + v + "']").length >= 1)) {
+                    result = true;
+                    return false;
+                } else {
+                    result = false;
+                }
+            });
+
+        }
+    });
+
+    return result;
 }
 
-function ModificarBotoesPorStatus(status) {
+function ModificarBotoesPorFormState(formState) {
     var $btnAgendar = $('.btn-agendar');
     var $btnExecutado = $('.btn-executado');
     var $btnAprovar = $('.btn-aprovar');
@@ -2035,47 +2070,72 @@ function ModificarBotoesPorStatus(status) {
     $btnEditar.hide();
     $btnEditarRespOuAcomp.hide();
 
-    switch (status) {
-        case 'Rascunho':
-            if (VerificarGrupoDlPclOuPlantaPiloto()) $btnEditar.show();
-            if (VerificarGrupoDlPclOuPlantaPiloto()) $btnAgendar.show();
-            if (VerificarPermissoesDerivar()) $btnDerivar.show();
-            break;
-        case 'Agendado':
-            $btnExecutado.show();
-            if (VerificarPermissoesCancelar()) $btnCancelar.show();
-            if (VerificarPermissoesNaoExecutado()) $btnNaoExecutado.show();
-            if (VerificarPermissoesDerivar()) $btnDerivar.show();
-
+    switch (formState) {
+        case EM_CRIACAO:
             if (VerificarGrupoDlPclOuPlantaPiloto()) {
-                $btnEditar.show();
-            } else if (VerificarGrupoRespOuAcomp()) {
-                $btnEditarRespOuAcomp.show();
+                $btnSalvar.show();
             }
             break;
-        case 'Registro das Análises':
+        case RASCUNHO:
+            if (VerificarGrupoDlPclOuPlantaPiloto()) {
+                $btnEditar.show();
+                $btnAgendar.show();
+                $btnDerivar.show();
+            }
+            break;
+        case RASCUNHO_EM_EDICAO:
+            if (VerificarGrupoDlPclOuPlantaPiloto()) {
+                $btnSalvar.show();
+                $btnAgendar.show();
+            }
+            break;
+        case AGENDADO:
+            //$btnExecutado.show();
+            if (VerificarGrupoDlPclOuPlantaPiloto()) {
+                $btnCancelar.show();
+                $btnDerivar.show();
+                $btnEditar.show();
+            }
+
+            if (VerificarGrupoRespOuAcomp()) {
+                if (!$btnEditar.is(':visible')) {
+                    $btnEditarRespOuAcomp.show();
+                }
+                $btnNaoExecutado.show();
+            }
+
+            break;
+        case AGENDAMENTO_EM_EDICAO:
+            if (VerificarGrupoDlPclOuPlantaPiloto()) {
+                $btnSalvar.show();
+            }
+            break;
+        case RESP_ACOMP_AGENDADO_EM_EDICAO:
+            if (VerificarGrupoRespOuAcomp()) {
+                $btnSalvar.show();
+            }
+            break;
+        case EM_CANCELAMENTO:
+            if (VerificarGrupoDlPclOuPlantaPiloto()) {
+                $btnSalvar.show();
+            }
+            break;
+        case REGISTRO_DE_ANALISE:
             $btnAprovar.show();
             $btnReprovarAprovar.show();
             break;
+        case EM_NAO_EXECUCAO:
+            if (VerificarGrupoDlPclOuPlantaPiloto()) {
+                $btnSalvar.show();
+            }
+            break;
         case 'Aguardando Reagendamento':
-            if (VerificarPermissoesDerivar()) $btnDerivar.show();
+            if (VerificarGrupoDlPclOuPlantaPiloto()) $btnDerivar.show();
             break;
     }
-
-    if (componenteVisivel($btnDerivar)
-        || componenteVisivel($btnEditar)
-        || componenteVisivel($btnCancelar)
-        || componenteVisivel($btnNaoExecutado)
-        || componenteVisivel($btnEditarRespOuAcomp)) {
-        $btnSalvar.show();
-    }
 }
 
-function componenteVisivel(componente) {
-    return componente.is(":visible");
-}
-
-function ModificarCamposPorStatus(status) {
+function ModificarCamposPorFormState(formState) {
     var $TipoLote = $('[name=TipoLote]');
     var $Fabrica = $('[name=Fabrica]');
     var $LinhaEquipamento = $('[name=LinhaEquipamento]');
@@ -2101,8 +2161,35 @@ function ModificarCamposPorStatus(status) {
     var $motivoNaoExecutado = $('[name=NaoExecutadoMotivo]');
     var $motivoNaoExecutadoComentarios = $('[name=NaoExecutadoComentarios]');
 
-    switch (status) {
-        case 'Rascunho':
+    $TipoLote.attr('disabled', true);
+    $Fabrica.attr('disabled', true);
+    $LinhaEquipamento.attr('disabled', true);
+    $CodigoProduto.attr('disabled', true);
+    $LinhaProduto.attr('disabled', true);
+    $DescricaoProduto.attr('disabled', true);
+    $Projeto.attr('disabled', true);
+    $CategoriaProjeto.attr('disabled', true);
+    $Formula.attr('disabled', true);
+    $QuantidadePecas.attr('disabled', true);
+    $Motivo.attr('disabled', true);
+    $EnvioAmostras.attr('disabled', true);
+    $ResponsavelAmostra.attr('disabled', true);
+    $QuantidadeAmostra.attr('disabled', true);
+    $CentroCusto.attr('disabled', true);
+    $GrauComplexidade.attr('disabled', true);
+    $InicioProgramado.attr('disabled', true);
+    $DuracaoEstimadaHoras.attr('disabled', true);
+    $DuracaoEstimadaMinutos.attr('disabled', true);
+    $Observacoes.attr('disabled', true);
+    $motivoCancelamento.attr('disabled', true);
+    $motivoComentarios.attr('disabled', true);
+    $motivoNaoExecutado.attr('disabled', true);
+    $motivoNaoExecutadoComentarios.attr('disabled', true);
+
+    switch (formState) {
+        case EM_CRIACAO:
+        case RASCUNHO_EM_EDICAO:
+        case AGENDAMENTO_EM_EDICAO:
             $TipoLote.attr('disabled', false);
             $Fabrica.attr('disabled', false);
             $LinhaEquipamento.attr('disabled', false);
@@ -2124,51 +2211,61 @@ function ModificarCamposPorStatus(status) {
             $DuracaoEstimadaMinutos.attr('disabled', false);
             $Observacoes.attr('disabled', false);
             break;
-        case 'Agendado':
-        case 'Registro das Análises':
-        default:
-            $TipoLote.attr('disabled', true);
-            $Fabrica.attr('disabled', true);
-            $LinhaEquipamento.attr('disabled', true);
-            $CodigoProduto.attr('disabled', true);
-            $LinhaProduto.attr('disabled', true);
-            $DescricaoProduto.attr('disabled', true);
-            $Projeto.attr('disabled', true);
-            $CategoriaProjeto.attr('disabled', true);
-            $Formula.attr('disabled', true);
-            $QuantidadePecas.attr('disabled', true);
-            $Motivo.attr('disabled', true);
-            $EnvioAmostras.attr('disabled', true);
-            $ResponsavelAmostra.attr('disabled', true);
-            $QuantidadeAmostra.attr('disabled', true);
-            $CentroCusto.attr('disabled', true);
-            $GrauComplexidade.attr('disabled', true);
-            $InicioProgramado.attr('disabled', true);
-            $DuracaoEstimadaHoras.attr('disabled', true);
-            $DuracaoEstimadaMinutos.attr('disabled', true);
-            $Observacoes.attr('disabled', true);
-            $motivoCancelamento.attr('disabled', true);
-            $motivoComentarios.attr('disabled', true);
-            $motivoNaoExecutado.attr('disabled', true);
-            $motivoNaoExecutadoComentarios.attr('disabled', true);
+        case EM_CANCELAMENTO:
+            $('[name=CanceladoMotivo]').attr('disabled', false);
+            $('[name=CanceladoComentarios]').attr('disabled', false);
+            break;
+        case EM_NAO_EXECUCAO:
+            $('[name=NaoExecutadoMotivo]').attr('disabled', false);
+            $('[name=NaoExecutadoComentarios]').attr('disabled', false);
             break;
     }
 }
 
-function ModificarStatus(status) {
-    $('select#status').val(status);
-    ModificarBotoesPorStatus(status);
-    ModificarCamposPorStatus(status);
-    ModificarAbasPorStatus(status);
+function ModificarStatusPorFormState(formState) {
+    var $status = $('select#status');
+
+    switch (formState) {
+        case AGENDADO:
+            $status.val(AGENDADO);
+            break;
+        case REGISTRO_DE_ANALISE:
+            $status.val(REGISTRO_DE_ANALISE);
+        case EM_CANCELAMENTO:
+            $status.val(CANCELADO);
+            break;
+        case APROVADO:
+            $status.val(APROVADO);
+            break;
+        case REPROVADO:
+            $status.val(REPROVADO);
+            break;
+    }
 }
 
-function ModificarAbasPorStatus(status) {
-    switch (status) {
-        case 'Cancelado':
+function ModificarFormState(formState) {
+    ModificarBotoesPorFormState(formState);
+    ModificarCamposPorFormState(formState);
+    ModificarAbasPorFormState(formState);
+}
+
+function ModificarAbasPorFormState(formState) {
+    switch (formState) {
+        case EM_CANCELAMENTO:
+            $('#justificativaCancelamento').removeClass('d-md-none');
+            $("#pills-justificativa-tab").removeClass("disabled");
+            $("#pills-justificativa-tab").tab('show');
+            break;
+        case CANCELADO:
             $('#justificativaCancelamento').removeClass('d-md-none');
             $("#pills-justificativa-tab").removeClass("disabled");
             break;
-        case 'Lote Não Executado':
+        case EM_NAO_EXECUCAO:
+            $('#justificativaNaoExecutado').removeClass('d-md-none');
+            $("#pills-justificativa-tab").removeClass("disabled");
+            $("#pills-justificativa-tab").tab('show');
+            break;
+        case LOTE_NAO_EXECUTADO:
             $('#justificativaNaoExecutado').removeClass('d-md-none');
             $("#pills-justificativa-tab").removeClass("disabled");
             break;
@@ -2413,7 +2510,7 @@ function ResetarAgendamento() {
 
         if ($this.is('[type=checkbox]')) {
             $this.attr('checked', false);
-        } else if ($this.is('select')) {
+        } else if ($this.is('select') && !$this.is('select#status')) {
             $this.val('Selecione uma opção');
         } else {
             $this.val('');
@@ -2421,8 +2518,6 @@ function ResetarAgendamento() {
 
         $this.change();
     });
-
-    ModificarStatus('Rascunho');
 }
 
 function SalvarAgendamento() {
@@ -2518,7 +2613,8 @@ function ValidarQtdPecas(){
 
 
 function RegistrarBotoes() {
-    $('.btn-salvar').click(function () {
+    var $btnSalvar = $('.btn-salvar');
+    $btnSalvar.click(function () {
         SalvarAgendamento().then(function () {
             var id = $('input[name="ID"]').val();
             window.history.pushState('Object', '', '/sites/DEV_LotePiloto/SiteAssets/main.aspx?action=edit&loteid=' + id);
@@ -2536,117 +2632,50 @@ function RegistrarBotoes() {
 
     $('.btn-agendar').click(function () {
         if (ValidarAgendamento()) {
-            ModificarStatus('Agendado');
+            ModificarFormState(AGENDADO);
             SalvarAgendamento();
         }
     });
 
     $('.btn-executado').click(function () {
-        ModificarStatus('Registro das Análises');
+        ModificarFormState(REGISTRO_DE_ANALISE);
         SalvarAgendamento();
     });
 
     $('.btn-aprovar').click(function () {
-        ModificarStatus('Aprovado');
+        ModificarFormState(APROVADO);
         SalvarAgendamento();
     });
 
     $('.btn-reprovar').click(function () {
-        ModificarStatus('Reprovado');
+        ModificarFormState(REPROVADO);
         SalvarAgendamento();
     });
 
     $('.btn-derivar').click(function () {
+        $btnSalvar.show();
         DerivarAgendamento();
     });
 
     $('.btn-cancelar-agendamento').click(function () {
-        ModificarStatus('Cancelado');
-        $('[name=CanceladoMotivo]').attr('disabled', false);
-        $('[name=CanceladoComentarios]').attr('disabled', false);
-        $('#justificativaCancelamento').removeClass('d-md-none');
-        $("#pills-justificativa-tab").tab('show');
+        ModificarFormState(EM_CANCELAMENTO);
     });
 
     $('.btn-nao-executado').click(function () {
-        ModificarStatus('Lote Não Executado');
-        $('[name=CanceladoMotivo]').attr('disabled', false);
-        $('[name=CanceladoComentarios]').attr('disabled', false);
-        $('#justificativaNaoExecutado').removeClass('d-md-none');
-        $("#pills-justificativa-tab").tab('show');
+        ModificarFormState(EM_NAO_EXECUCAO);
     });
 
     $('.btn-editar').click(function () {
-        var id = $('input[name="ID"]').val()
-
-        if (id) {
-            window.history.pushState('Object', 'Editar', '/sites/DEV_LotePiloto/SiteAssets/main.aspx?action=edit&loteid=' +id);
-            ResetarAgendamento();
-            CarregarAgendamento(id).fail(function (response) {
-                alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
-            });
-        } else {
-            alert('Agendamento não foi criado.');
+        let status = $('select#status').val();
+        if (status == RASCUNHO) {
+            ModificarFormState(RASCUNHO_EM_EDICAO);
+        } else if (status == AGENDADO) {
+            ModificarFormState(AGENDAMENTO_EM_EDICAO);
         }
      });
 }
 
-var listGruposPermitidosBtnNaoExecutado = [
-    'Administradores Lote Piloto',
-    'Área - Engenharia de Envase',
-    'Área - Engenharia de Fabricação',
-    'Área - Fábrica',
-    'Área - Inovação DE',
-    'Área - Inovação DF',
-    'Área - Meio Ambiente',
-    'Área - Qualidade'
-]
-
-function VerificarPermissoesNaoExecutado() {
-    var result = false;
-    $().SPServices({
-        operation: "GetGroupCollectionFromUser",
-        userLoginName: $().SPServices.SPGetCurrentUser(),
-        async: false,
-        completefunc: function (xData, Status) {
-            $.each(listGruposPermitidosBtnNaoExecutado, function (k, v) {
-                if (($(xData.responseXML).find("Group[Name='" + v + "']").length >= 1)) {
-                    result = true;
-                    return false;
-                } else {
-                    result = false;
-                }
-            });
-
-        }
-    });
-
-    return result;
-}
-
-function VerificarPermissoesCancelar() {
-    var result = false;
-    $().SPServices({
-        operation: "GetGroupCollectionFromUser",
-        userLoginName: $().SPServices.SPGetCurrentUser(),
-        async: false,
-        completefunc: function (xData, Status) {
-            $.each(listGruposAdm, function (k, v) {
-                if (($(xData.responseXML).find("Group[Name='" + v + "']").length >= 1)) {
-                    result = true;
-                    return false;
-                } else {
-                    result = false;
-                }
-            });
-
-        }
-    });
-
-    return result;
-}
-
-function VerificarPermissoesDerivar() {
+function VerificarGrupoDlPclOuPlantaPiloto() {
     var result = false;
     $().SPServices({
         operation: "GetGroupCollectionFromUser",
@@ -2687,7 +2716,9 @@ $(document).ready(function () {
         ResetarAgendamento();
         RegistrarBotoes();
 
-        if (getUrlParameter('action') == 'edit') {
+        if (getUrlParameter('action') == 'new') {
+            ModificarFormState(EM_CRIACAO);
+        } else if (getUrlParameter('action') == 'edit') {
             CarregarAgendamento(getUrlParameter('loteid'));
 
             CarregarHistorico(10267).then(function (registros) {
