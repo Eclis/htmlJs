@@ -1221,6 +1221,10 @@ function onFail(sender, args) {
     alert('Query failed. Error: ' + args.get_message());
 }
 
+function AtributoNumber(number) {
+    return number | 0;
+}
+
 function AtualizarAgendamento(id) {
     var $promise = $.Deferred();
     CalcularCamposCalculaveis();
@@ -1230,8 +1234,8 @@ function AtualizarAgendamento(id) {
     $('#main [name].salvar-campo').each(function () {
         var $this = $(this);
 
-        if ($this.is('[type=checkbox]') && $this.val() != undefined) {
-            campos.push([this.name, $this.val() == 'on']);
+        if ($this.is('[type=checkbox]')) {
+            campos.push([this.name, $this.prop('checked') ? "1" : "0"]);
         } else if ($this.is('.date-time-picker')) {
             campos.push([this.name, moment($this.val(), 'DD/MM/YYYY HH:mm').format('YYYY-MM-DDTHH:mm:ss[-00:00]')]);
         } else if ($this.val() != undefined) {
@@ -1323,7 +1327,7 @@ function CarregarAgendamento(id) {
                 var $elemento = $('#main [name=' + this.name.substr(4) + ' i]');
 
                 if ($elemento.is('[type=checkbox]')) {
-                    $elemento.attr('checked', this.value == "1");
+                    $elemento.prop('checked', this.value == "1");
                     $elemento.change();
                 } else if ($elemento.is('[type=number]')) {
                     $elemento.val(AtributoNumber(this.value));
@@ -1623,10 +1627,6 @@ function CarregarLinhasEquipamentosById(linhaEquipamentoId) {
     return $promise;
 }
 
-function AtributoNumber(number) {
-    return number | 0;
-}
-
 function CarregarListaGrauComplexidade() {
     var $promise = $.Deferred();
 
@@ -1766,7 +1766,7 @@ function CarregarAgendamentoIdOffset() {
     return $promise;
 }
 
-function dispararCarregarLinhasEquipamentos() {
+function DispararCarregarLinhasEquipamentos() {
     var fabricaVal = $("select#fabrica :selected").text();
     var tipoLoteVal = $("select#tipoDeLote").val();
 
@@ -1822,8 +1822,8 @@ function GravarCodigoAgendamento($record) {
             operation: "UpdateListItems",
             batchCmd: 'Update',
             listName: 'Agendamentos',
-            ID: $record.attr('ows_id'),
-            valuepairs: [['CodigoAgendamento', offset + AtributoNumber($record.attr('ows_id'))]],
+            ID: $record.attr('ows_ID'),
+            valuepairs: [['CodigoAgendamento', offset + AtributoNumber($record.attr('ows_ID'))]],
             completefunc: function (xData, Status) {
                 if (Status != 'success') {
                     $promise.reject({
@@ -1856,6 +1856,15 @@ function GravarCodigoAgendamento($record) {
     });
 }
 
+function GerarISPClientPeoplePickerEntityPorUsuario(usuario) {
+    return {
+        Description: usuario.email,
+        DisplayText: usuario.nome,
+        EntityType: 'User',
+        IsResolved: false,
+        Key: usuario.loginName
+    };
+}
 
 function InserirAgendamento() {
     var $promise = $.Deferred();
@@ -1865,8 +1874,8 @@ function InserirAgendamento() {
     $('#main [name].salvar-campo').each(function () {
         var $this = $(this);
 
-        if ($this.is('[type=checkbox]') && $this.val() != undefined) {
-            campos.push([this.name, $this.val() == 'on']);
+        if ($this.is('[type=checkbox]')) {
+            campos.push([this.name, $this.prop('checked') ? '1' : '0']);
         } else if ($this.is('.date-time-picker')) {
             campos.push([this.name, moment($this.val(), 'DD/MM/YYYY HH:mm').format('YYYY-MM-DDTHH:mm:ss[-00:00]')]);
         } else if ($this.val() != undefined) {
@@ -1908,62 +1917,118 @@ function InserirAgendamento() {
     });
 
     return $promise.then(function (response) {
-        return GravarCodigoAgendamento(response.record);
+        return GravarCodigoAgendamento(response.record).then(function (response) {
+            let $TipoLote = $('[name=TipoLote]');
+            let responsaveis = GetCamposResponsaveisPorTipoDeLote($TipoLote.val());
+            let promises = [];
+
+            $.each(responsaveis, function (i, responsavel) {
+                promises.push(InserirResponsavelAgendamento(response.record.attr('ows_CodigoAgendamento'), responsavel));
+            });
+
+            return $.when.apply($, promises).then(function () {
+                return response;
+            });
+        });
     });
 }
 
-function InserirResponsavelAgendamento(codigoAgendamento) {
+function GetCamposResponsaveisPorTipoDeLote(tipoDeLote) {
+    switch (tipoDeLote) {
+        case 'Brinde':
+            return [
+                {campo: 'peoplePickerAbaRespRespDLPCL', nome: 'DL/PCL - Responsável'},
+                {campo: 'peoplePickerAbaRespRespQualidade', nome: 'Qualidade - Responsável'},
+                {campo: 'peoplePickerAbaRespGerQualidade', nome: 'Qualidade - Gerente'}
+            ];
+        case 'Envase':
+            return [
+                {campo: 'peoplePickerAbaRespRespDLPCL', nome: 'DL/PCL - Responsável'} ,
+                {campo: 'peoplePickerAbaRespRespEngEnvase', nome: 'Eng. Envase - Responsável'} ,
+                {campo: 'peoplePickerAbaRespGerEngEnvase', nome: 'Eng. Envase - Gerente'} ,
+                {campo: 'peoplePickerAbaRespRespInovDE', nome: 'Inovação DE - Responsável'} ,
+                {campo: 'peoplePickerAbaRespGerInovDE', nome: 'Inovação DE - Gerente'} ,
+                {campo: 'peoplePickerAbaRespRespQualidade', nome: 'Qualidade - Responsável'} ,
+                {campo: 'peoplePickerAbaRespGerQualidade', nome: 'Qualidade - Gerente'} ,
+                {campo: 'peoplePickerAbaRespCoordProgFabrica', nome: 'Fábrica - Coord. Programação'} ,
+                {campo: 'peoplePickerAbaRespCoordManFabrica', nome: 'Fábrica - Coord. de Manufatura'} ,
+                {campo: 'peoplePickerAbaRespGerFabrica', nome: 'Fábrica - Gerente'}
+            ];
+        case 'Fabricação':
+            return [
+                {campo: 'peoplePickerAbaRespRespDLPCL', nome: 'DL/PCL - Responsável'},
+                {campo: 'peoplePickerAbaRespRespEngFabricacao', nome: 'Eng. Fabricação - Responsável'},
+                {campo: 'peoplePickerAbaRespGerEngFabricacao', nome: 'Eng. Fabricação - Gerente'},
+                {campo: 'peoplePickerAbaAcRespInovDF', nome: 'Inovação DF - Responsável'},
+                {campo: 'peoplePickerAbaAcGerInovDF', nome: 'Inovação DF - Gerente'},
+                {campo: 'peoplePickerAbaRespRespQualidade', nome: 'Qualidade - Responsável'},
+                {campo: 'peoplePickerAbaRespGerQualidade', nome: 'Qualidade - Gerente'},
+                {campo: 'peoplePickerAbaRespCoordProgFabrica', nome: 'Fábrica - Coord. Programação'},
+                {campo: 'peoplePickerAbaRespCoordManFabrica', nome: 'Fábrica - Coord. de Manufatura'},
+                {campo: 'peoplePickerAbaRespGerFabrica', nome: 'Fábrica - Gerente'}
+            ];
+    }
+}
 
-    // var vpTitle = (typeof $('#campo').text === "undefined") ? '' : $('#campo').text;
+function PegarUsuarioDoPeoplePicker(peoplePickerId) {
+    var peoplePickerName = $('#' + peoplePickerId + ' .sp-peoplepicker-topLevel').attr('id');
+    var peoplePickerUser = SPClientPeoplePicker.SPClientPeoplePickerDict[peoplePickerName].GetAllUserInfo().pop();
 
-    // var vpTitle = (typeof $('#campo').text === "undefined") ? ['Title',''] : ['Title',$('#campo').text];
-    // var vpCodigoAgendamento = (typeof $('#campo').text === "undefined") ? ['CodigoAgendamento',''] : ['CodigoAgendamento',$('#campo').text];
-    // var vpTipoResponsavel = (typeof $('#campo').text === "undefined") ? ['TipoResponsavel',''] : ['TipoResponsavel',$('#campo').text];
-    // var vpPessoa = (typeof $('#campo').text === "undefined") ? ['Pessoa',''] : ['Pessoa',$('#campo').text];
+    if (peoplePickerUser == undefined) {
+        return null;
+    }
 
+    return {
+        loginName: peoplePickerUser.Key,
+        nome: peoplePickerUser.DisplayText,
+        email: peoplePickerUser.EntityData.Email
+    };
+}
 
-    var vpCodigoAgendamento = codigoAgendamento;
-    var vpTipoResponsavel = 'DL/PCL - Responsável';
-    var vpTitle = codigoAgendamento + ' - ' + vpTipoResponsavel;
-    var vpPessoa = 21;
+function InserirResponsavelAgendamento(codigoAgendamento, responsavel) {
+    var usuarioDoPeoplePicker = PegarUsuarioDoPeoplePicker(responsavel.campo);
 
-    var campos = [['Title', vpTitle], ['CodigoAgendamento', vpCodigoAgendamento], ['TipoResponsavel', vpTipoResponsavel], ['Pessoa', vpPessoa]];
+    return CarregarUsuario(usuarioDoPeoplePicker.loginName).then(function (usuario) {
+        var $promise = $.Deferred();
 
-    var $promise = $.Deferred();
+        $().SPServices({
+            operation: "UpdateListItems",
+            batchCmd: "New",
+            listName: "Agendamentos - Responsáveis",
+            valuepairs: [
+                ['CodigoAgendamento', codigoAgendamento],
+                ['Title', codigoAgendamento + ' - ' + responsavel.nome],
+                ['TipoResponsavel', responsavel.nome],
+                ['Pessoa', usuario.id]
+            ],
+            completefunc: function (xData, Status) {
+                if (Status != 'success') {
+                    $promise.reject({
+                        errorCode: '0x99999999',
+                        errorText: 'Erro Remoto'
+                    });
 
-    $().SPServices({
-        operation: "UpdateListItems",
-        async: false,
-        batchCmd: "New",
-        listName: "Agendamentos - Responsáveis",
-        valuepairs: campos,
-        completefunc: function (xData, Status) {
-            if (Status != 'success') {
-                $promise.reject({
-                    errorCode: '0x99999999',
-                    errorText: 'Erro Remoto'
-                });
+                    return;
+                }
 
-                return;
+                var $response = $(xData.responseText);
+                var errorCode = $response.find('ErrorCode').text();
+
+                if (errorCode == '0x00000000') {
+                    $promise.resolve({
+                        record: $response.find('z\\:row:first')
+                    });
+                } else {
+                    $promise.reject({
+                        errorCode: errorCode,
+                        errorText: $response.find('ErrorText').text()
+                    });
+                }
             }
+        });
 
-            var $response = $(xData.responseText);
-            var errorCode = $response.find('ErrorCode').text();
-
-            if (errorCode == '0x00000000') {
-                $promise.resolve({
-                    record: $response.find('z\\:row:first')
-                });
-            } else {
-                $promise.reject({
-                    errorCode: errorCode,
-                    errorText: $response.find('ErrorText').text()
-                });
-            }
-        }
+        return $promise;
     });
-
-    return $promise;
 }
 
 function InstanciarDateTimePicker() {
@@ -2489,10 +2554,53 @@ function QueryGroupIdByName(groupName) {
     return $promise;
 }
 
-function PegarUsuarioAtual() {
-    return $().SPServices.SPGetCurrentUser({
-        fieldName: "Email"
+function CarregarUsuarioAtual() {
+    var usuario = $().SPServices.SPGetCurrentUser({
+        fieldNames: [
+            'ID',
+            'Name',
+            'Title',
+            'Email',
+        ]
     });
+
+    return {
+        id: usuario.ID,
+        loginName: usuario.Name,
+        email: usuario.Email,
+        nome: usuario.Title,
+    };
+}
+
+function CarregarUsuario(loginName) {
+    var $promise = $.Deferred();
+    var context = SP.ClientContext.get_current();
+    var usuario = context.get_web().ensureUser(loginName);
+
+    context.load(usuario);
+    context.executeQueryAsync(function () {
+        $promise.resolve({
+            id: usuario.get_id(),
+            loginName: usuario.get_loginName(),
+            nome: usuario.get_title(),
+            email: usuario.get_email()
+        });
+    }, function (sender, args) {
+        $promise.reject({
+            errorCode: args.get_errorCode(),
+            errorMessage: args.get_message()
+        });
+    });
+
+    return $promise;
+}
+
+function PreencherResponsavelDlPcl() {
+    var peoplePicker = SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespRespDLPCL_TopSpan;
+
+    if (peoplePicker.TotalUserCount == 0) {
+        peoplePicker.AddUnresolvedUser(GerarISPClientPeoplePickerEntityPorUsuario(CarregarUsuarioAtual()), true);
+    }
 }
 
 function RegistrarBindings() {
@@ -2509,7 +2617,7 @@ function RegistrarBindings() {
 
     $tipoLote.change(function () {
         ModificarAbasPorTipoDeLote(this.value);
-        dispararCarregarLinhasEquipamentos();
+        DispararCarregarLinhasEquipamentos();
         dispararCarregarFabricas();
     });
 
@@ -2567,7 +2675,7 @@ function RegistrarBindings() {
         }
     });
 
-    $fabrica.change(dispararCarregarLinhasEquipamentos);
+    $fabrica.change(DispararCarregarLinhasEquipamentos);
 
     $linhaEquipamento.change(function () {
         var valSelected = $("select#linhaEquipamento").val();
@@ -2595,7 +2703,7 @@ function ResetarAgendamento() {
         var $this = $(this);
 
         if ($this.is('[type=checkbox]')) {
-            $this.attr('checked', false);
+            $this.prop('checked', false);
         } else if ($this.is('select') && !$this.is('select#status')) {
             $this.val('Selecione uma opção');
         } else {
