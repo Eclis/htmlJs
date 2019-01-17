@@ -2187,7 +2187,7 @@ function ModificarBotoesPorFormState(formState) {
             // $btnReprovarAprovar.show();
             break;
         case EM_NAO_EXECUCAO:
-            if (VerificarGrupoDlPclOuPlantaPiloto()) {
+            if (VerificarGrupoRespOuAcomp()) {
                 $btnSalvar.show();
             }
             break;
