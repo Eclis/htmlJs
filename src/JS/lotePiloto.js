@@ -102,10 +102,6 @@ function ValidarAgendamentosProduto() {
         errorAgendamentosProduto++;
         NotificarErroValidacao('text', 'input#produtoQuantidade', '', '');
     }
-    else if (ValidarLinhaEquipamento() === false) {
-        errorAgendamentosProduto++;
-        NotificarErroValidacao('text', 'input#produtoQuantidade', '', '');
-    } 
     else {
         LimparValidacao('text', 'input#produtoQuantidade', '');
     }
@@ -164,6 +160,8 @@ function ValidarAgendamentosAgendamento() {
     if ($('input#agendamentoDataInicioProgramado').val() === null || $('input#agendamentoDataInicioProgramado').val() == '') {
         errorAgendamentosAgendamento++;
         NotificarErroValidacao('text', 'input#agendamentoDataInicioProgramado', '', '');
+         $("input#agendamentoDataInicioProgramado").tooltip({
+                title: "Verificar data de início", placement: "bottom"});
     }
     else {
         var SelectedDate = new Date($('input#agendamentoDataInicioProgramado').val().substring(6, 10), $('input#agendamentoDataInicioProgramado').val().substring(3, 5) - 1, $('input#agendamentoDataInicioProgramado').val().substring(0, 2));
@@ -173,6 +171,8 @@ function ValidarAgendamentosAgendamento() {
         if (CurrentDate > SelectedDate) {
             errorAgendamentosAgendamento++;
             NotificarErroValidacao('text', 'input#agendamentoDataInicioProgramado', '', '');
+             $("input#agendamentoDataInicioProgramado").tooltip({
+                title: "Verificar data de início", placement: "bottom"});
         }
         else {
             LimparValidacao('text', 'input#agendamentoDataInicioProgramado', '');
@@ -1117,6 +1117,7 @@ function NotificarErroValidacao(controlType, control, controlValidator, message)
                     "border-color": "#a94442",
                     "-webkit-box-shadow": "inset 0 1px 1px rgba(0,0,0,.075)",
                     "box-shadow": "inset 0 1px 1px rgba(0,0,0,.075)"
+
                 });
                 break;
             }
@@ -2429,7 +2430,7 @@ function ModificarAbasPorTipoDeLote(tipoDeLote) {
             $('#AbaAcRespsInovDE').hide();
             $('#AbaAcRespsFabrica').hide();
             $('#AbaAcRespsMeioAmbiente').hide();
-           
+
             break;
         default:
             $("#pills-responsaveis-tab").addClass("disabled");
@@ -2782,16 +2783,19 @@ function VerificarGrupoDlPclOuPlantaPiloto() {
     return result;
 }
 
-function ValidarLinhaEquipamento(){
+function ValidarLinhaEquipamento() {
     var valSelected = $("select#linhaEquipamento").val();
     if (valSelected) {
-        return BuscarMinimoEMaximoPecas(valSelected);
+        var mensagem = BuscarMinimoEMaximoPecas(valSelected);
+        $("input#produtoQuantidade").tooltip({
+            title: mensagem, placement: "bottom"
+        });
     } else {
         return false;
     }
 }
 
-function BuscarMinimoEMaximoPecas(linhaEquipamentoId){
+function BuscarMinimoEMaximoPecas(linhaEquipamentoId) {
     var $promise = $.Deferred();
     var $minimoPecas = "";
     var $maximoPecas = "";
@@ -2821,10 +2825,16 @@ function BuscarMinimoEMaximoPecas(linhaEquipamentoId){
         }
     });
 
-    if (produtoqtd < $minimoPecas ){
-        return false;
+    if (produtoqtd < $minimoPecas) {
+
+        NotificarErroValidacao('text', 'input#produtoQuantidade', '', '');
+        return "Valor digitado está fora da capacidade do equipamento";
+
     } else if (produtoqtd > $maximoPecas ) {
-        return false;
+
+        NotificarErroValidacao('text', 'input#produtoQuantidade', '', '');
+        return "Valor digitado está fora da capacidade do equipamento";
+
     } else {
         return true;
     }
