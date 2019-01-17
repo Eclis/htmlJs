@@ -1,3 +1,5 @@
+'use strict';
+
 var RASCUNHO = 'Rascunho';
 var AGENDADO = 'Agendado';
 var REGISTRO_DE_ANALISE = 'Registro das Análises';
@@ -14,7 +16,7 @@ var EM_CANCELAMENTO = 'emCancelamento';
 var EM_NAO_EXECUCAO = 'emNaoExecucao';
 var EM_DERIVACAO = 'emDerivacao';
 
-var formState;
+var state;
 
 function ValidarAgendamentosGeral() {
     var errorAgendamentosGeral = 0;
@@ -1462,19 +1464,12 @@ function CarregarMotivoNaoExecutado() {
 
 function CarregarFabricas() {
     var $promise = $.Deferred();
-    var fabricas = $('select#fabrica');
 
     $().SPServices({
         operation: 'GetListItems',
         listName: 'Fábricas Internas e Armazenamento de Fábricas Terceiras',
         CAMLViewFields: '<ViewFields><FieldRef Name="Title" /><FieldRef Name="ID" /><FieldRef Name="Numero" /></ViewFields>',
         completefunc: function (Data, Status) {
-            fabricas.find('option')
-                .remove()
-                .end()
-                .append('<option disabled selected>Selecione uma opção</option>')
-                ;
-
             if (Status != 'success') {
                 $promise.reject({
                     errorCode: '0x99999999',
@@ -1772,13 +1767,6 @@ function DispararCarregarLinhasEquipamentos() {
 
     if (tipoLoteVal && fabricaVal) {
         CarregarLinhasEquipamentos(fabricaVal, tipoLoteVal);
-    }
-}
-
-function dispararCarregarFabricas() {
-    var tipoLoteVal = $("select#tipoDeLote").val();
-    if (tipoLoteVal) {
-        CarregarFabricas();
     }
 }
 
@@ -2318,7 +2306,7 @@ function ModificarStatusPorFormState(formState) {
 }
 
 function ModificarFormState(formState) {
-    this.formState = formState;
+    state = formState;
     ModificarBotoesPorFormState(formState);
     ModificarCamposPorFormState(formState);
     ModificarAbasPorFormState(formState);
@@ -2618,7 +2606,6 @@ function RegistrarBindings() {
     $tipoLote.change(function () {
         ModificarAbasPorTipoDeLote(this.value);
         DispararCarregarLinhasEquipamentos();
-        dispararCarregarFabricas();
     });
 
     $acRespEngEnvaseAcomp.change(function () {
@@ -2712,6 +2699,8 @@ function ResetarAgendamento() {
 
         $this.change();
     });
+
+    PreencherResponsavelDlPcl();
 }
 
 function SalvarAgendamento() {
@@ -2940,14 +2929,15 @@ function BuscarMinimoEMaximoPecas(linhaEquipamentoId){
 
 $(document).ready(function () {
     $('[data-toggle="tooltip"]').tooltip();
+
     $.when(
         CarregarCategoriaProjeto(),
+        CarregarFabricas(),
         CarregarLinhasDoProduto(),
         CarregarListaGrauComplexidade(),
         CarregarListaMotivos(),
         CarregarListaStatus(),
         CarregarListaTiposLotes(),
-        dispararCarregarFabricas(),
         CarregarMotivoCancelamento(),
         CarregarMotivoNaoExecutado(),
         InitializeAllPeoplePickers()
