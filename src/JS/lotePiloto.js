@@ -2116,6 +2116,7 @@ function ModificarBotoesPorFormState(formState) {
     var $btnNaoExecutado = $('.btn-nao-executado');
     var $btnEditar = $('.btn-editar');
     var $btnEditarRespOuAcomp = $('.btn-editar-resp-acomp');
+    var $btnAbandonar = $('.btn-abandonar');
 
     $btnAgendar.hide();
     $btnExecutado.hide();
@@ -2127,6 +2128,7 @@ function ModificarBotoesPorFormState(formState) {
     $btnNaoExecutado.hide();
     $btnEditar.hide();
     $btnEditarRespOuAcomp.hide();
+    $btnAbandonar.hide();
 
     switch (formState) {
         case EM_CRIACAO:
@@ -2166,11 +2168,13 @@ function ModificarBotoesPorFormState(formState) {
         case AGENDAMENTO_EM_EDICAO:
             if (VerificarGrupoDlPclOuPlantaPiloto()) {
                 $btnSalvar.show();
+                $btnAbandonar.show();
             }
             break;
         case RESP_ACOMP_AGENDADO_EM_EDICAO:
             if (VerificarGrupoRespOuAcomp()) {
                 $btnSalvar.show();
+                $btnAbandonar.show();
             }
             break;
         case EM_CANCELAMENTO:
@@ -2218,6 +2222,28 @@ function ModificarCamposPorFormState(formState) {
     var $motivoComentarios = $('[name=CanceladoComentarios]');
     var $motivoNaoExecutado = $('[name=NaoExecutadoMotivo]');
     var $motivoNaoExecutadoComentarios = $('[name=NaoExecutadoComentarios]');
+    var $dlpclResponsavelPP = $('#peoplePickerAbaRespRespDLPCL_TopSpan_EditorInput');
+    var $envaseResponsavelAcompanhamento = $('[name=EngenhariaEnvaseAcompanhamento]');
+    var $envaseResponsavelPPResp = $('#peoplePickerAbaRespRespEngEnvase_TopSpan_EditorInput');
+    var $envaseResponsavelPPGer = $('#peoplePickerAbaRespGerEngEnvase_TopSpan_EditorInput');
+    var $engFabResponsavelAcompanhamento = $('[name=EngenhariaFabricacaoAcompanhamen]');
+    var $engFabResponsavelPPResp = $('#peoplePickerAbaRespRespEngFabricacao_TopSpan_EditorInput');
+    var $engFabResponsavelPPGer = $('#peoplePickerAbaRespRespGerFabricacao_TopSpan_EditorInput');
+    var $inovDfResponsavelAcompanhamento = $('[name=InovacaoDfAcompanhamento]');
+    var $inovDfResponsavelPPResp = $('#peoplePickerAbaRespRespInovDF_TopSpan_EditorInput');
+    var $inovDfResponsavelPPGer = $('#peoplePickerAbaRespGerInovDF_TopSpan_EditorInput');
+    var $inovDeResponsavelAcompanhamento = $('[name=InovacaoDeAcompanhamento]');
+    var $inovDeResponsavelPPResp = $('#peoplePickerAbaRespRespInovDE_TopSpan_EditorInput');
+    var $inovDeResponsavelPPGer = $('#peoplePickerAbaRespGerInovDE_TopSpan_EditorInput');
+    var $fabricaResponsavelAcompanhamento = $('[name=FabricaAcompanhamento]');
+    var $fabricaResponsavelPPCoordProg = $('#peoplePickerAbaRespCoordProgFabrica_TopSpan_EditorInput');
+    var $fabricaResponsavelPPCoordMan = $('#peoplePickerAbaRespCoordManFabrica_TopSpan_EditorInput');
+    var $fabricaResponsavelPPGer = $('#peoplePickerAbaRespGerInovDE_TopSpan_EditorInput');
+    var $qualidadeResponsavelAcompanhamento = $('[name=QualidadeAcompanhamento]');
+    var $qualidadeResponsavelPPResp = $('#peoplePickerAbaRespRespQualidade_TopSpan_EditorInput');
+    var $qualidadeResponsavelPPGer = $('#peoplePickerAbaRespGerQualidade_TopSpan_EditorInput');
+    var $meioAmbienteResponsavelAcompanhamento = $('[name=MeioAmbienteAcompanhamento]');
+    var $meioAmbienteResponsavelPPResp = $('#peoplePickerAbaAcRespMeioAmbiente_TopSpan_EditorInput');
 
     $TipoLote.attr('disabled', true);
     $Fabrica.attr('disabled', true);
@@ -2243,6 +2269,28 @@ function ModificarCamposPorFormState(formState) {
     $motivoComentarios.attr('disabled', true);
     $motivoNaoExecutado.attr('disabled', true);
     $motivoNaoExecutadoComentarios.attr('disabled', true);
+    $dlpclResponsavelPP.attr('disabled', true);
+    $envaseResponsavelAcompanhamento.attr('disabled', true);
+    $envaseResponsavelPPResp.attr('disabled', true);
+    $envaseResponsavelPPGer.attr('disabled', true);
+    $engFabResponsavelAcompanhamento.attr('disabled', true);
+    $engFabResponsavelPPResp.attr('disabled', true);
+    $engFabResponsavelPPGer.attr('disabled', true);
+    $inovDfResponsavelAcompanhamento.attr('disabled', true);
+    $inovDfResponsavelPPResp.attr('disabled', true);
+    $inovDfResponsavelPPGer.attr('disabled', true);
+    $inovDeResponsavelAcompanhamento.attr('disabled', true);
+    $inovDeResponsavelPPResp.attr('disabled', true);
+    $inovDeResponsavelPPGer.attr('disabled', true);
+    $fabricaResponsavelAcompanhamento.attr('disabled', true);
+    $fabricaResponsavelPPCoordProg.attr('disabled', true);
+    $fabricaResponsavelPPCoordMan.attr('disabled', true);
+    $fabricaResponsavelPPGer.attr('disabled', true);
+    $qualidadeResponsavelAcompanhamento.attr('disabled', true);
+    $qualidadeResponsavelPPResp.attr('disabled', true);
+    $qualidadeResponsavelPPGer.attr('disabled', true);
+    $meioAmbienteResponsavelAcompanhamento.attr('disabled', true);
+    $meioAmbienteResponsavelPPResp.attr('disabled', true);
 
     switch (formState) {
         case EM_CRIACAO:
@@ -2268,6 +2316,52 @@ function ModificarCamposPorFormState(formState) {
             $DuracaoEstimadaHoras.attr('disabled', false);
             $DuracaoEstimadaMinutos.attr('disabled', false);
             $Observacoes.attr('disabled', false);
+            $dlpclResponsavelPP.attr('disabled', false);
+            $envaseResponsavelAcompanhamento.attr('disabled', false);
+            $envaseResponsavelPPResp.attr('disabled', false);
+            $envaseResponsavelPPGer.attr('disabled', false);
+            $engFabResponsavelAcompanhamento.attr('disabled', false);
+            $engFabResponsavelPPResp.attr('disabled', false);
+            $engFabResponsavelPPGer.attr('disabled', false);
+            $inovDfResponsavelAcompanhamento.attr('disabled', false);
+            $inovDfResponsavelPPResp.attr('disabled', false);
+            $inovDfResponsavelPPGer.attr('disabled', false);
+            $inovDeResponsavelAcompanhamento.attr('disabled', false);
+            $inovDeResponsavelPPResp.attr('disabled', false);
+            $inovDeResponsavelPPGer.attr('disabled', false);
+            $fabricaResponsavelAcompanhamento.attr('disabled', false);
+            $fabricaResponsavelPPCoordProg.attr('disabled', false);
+            $fabricaResponsavelPPCoordMan.attr('disabled', false);
+            $fabricaResponsavelPPGer.attr('disabled', false);
+            $qualidadeResponsavelAcompanhamento.attr('disabled', false);
+            $qualidadeResponsavelPPResp.attr('disabled', false);
+            $qualidadeResponsavelPPGer.attr('disabled', false);
+            $meioAmbienteResponsavelAcompanhamento.attr('disabled', false);
+            $meioAmbienteResponsavelPPResp.attr('disabled', false);
+            break;
+        case RESP_ACOMP_AGENDADO_EM_EDICAO:
+            $dlpclResponsavelPP.attr('disabled', false);
+            $envaseResponsavelAcompanhamento.attr('disabled', false);
+            $envaseResponsavelPPResp.attr('disabled', false);
+            $envaseResponsavelPPGer.attr('disabled', false);
+            $engFabResponsavelAcompanhamento.attr('disabled', false);
+            $engFabResponsavelPPResp.attr('disabled', false);
+            $engFabResponsavelPPGer.attr('disabled', false);
+            $inovDfResponsavelAcompanhamento.attr('disabled', false);
+            $inovDfResponsavelPPResp.attr('disabled', false);
+            $inovDfResponsavelPPGer.attr('disabled', false);
+            $inovDeResponsavelAcompanhamento.attr('disabled', false);
+            $inovDeResponsavelPPResp.attr('disabled', false);
+            $inovDeResponsavelPPGer.attr('disabled', false);
+            $fabricaResponsavelAcompanhamento.attr('disabled', false);
+            $fabricaResponsavelPPCoordProg.attr('disabled', false);
+            $fabricaResponsavelPPCoordMan.attr('disabled', false);
+            $fabricaResponsavelPPGer.attr('disabled', false);
+            $qualidadeResponsavelAcompanhamento.attr('disabled', false);
+            $qualidadeResponsavelPPResp.attr('disabled', false);
+            $qualidadeResponsavelPPGer.attr('disabled', false);
+            $meioAmbienteResponsavelAcompanhamento.attr('disabled', false);
+            $meioAmbienteResponsavelPPResp.attr('disabled', false);
             break;
         case EM_CANCELAMENTO:
             $('[name=CanceladoMotivo]').attr('disabled', false);
@@ -2357,7 +2451,7 @@ function ModificarAbasPorTipoDeLote(tipoDeLote) {
             $("#pills-inov-de-acomp-tab").show();
             $("#pills-qualidade-acomp-tab").hide();
             $("#pills-fabrica-acomp-tab").show();
-            $("#pills-meioambiente-acomp-tab").hide();
+            $("#pills-meioambiente-acomp-tab").show();
 
             $('input[type=checkbox]#acRespEngEnvaseAcomp').prop('checked',false);
             $('input[type=checkbox]#acRespEngfabricacaoAcomp').prop('checked',false);
@@ -2680,6 +2774,23 @@ function RegistrarBindings() {
             $("#produtoQuantidadeAmostra").text('');
         }
     });
+
+    espelharCheckBox('#acRespQualidade', '#acRespQualidadeAcomp');
+    espelharCheckBox('#acRespEngEnvase', '#acRespEngEnvaseAcomp');
+    espelharCheckBox('#acRespEngfabricacao', '#acRespEngfabricacaoAcomp');
+    espelharCheckBox('#acRespInofDF', '#acRespInofDFAcomp');
+    espelharCheckBox('#acRespInofDE', '#acRespInofDEAcomp');
+    espelharCheckBox('#acRespFabrica', '#acRespFabricaAcomp');
+}
+
+function espelharCheckBox(checkA, checkB) {
+    $(checkA).change(function () {
+        $(checkB).prop('checked', this.checked);
+    });
+
+    $(checkB).change(function () {
+        $(checkA).prop('checked', this.checked);
+    });
 }
 
 function ResetarAgendamento() {
@@ -2765,9 +2876,11 @@ function InitializePeoplePicker(elementId, groupName) {
     $groupIdPromise.then(function (groupId) {
         schema['SharePointGroupID'] = groupId;
         SPClientPeoplePicker_InitStandaloneControlWrapper(elementId, null, schema);
+        $("#" + elementId + '_TopSpan').addClass('form-control');
         $promise.resolve();
     }).fail(function () {
         SPClientPeoplePicker_InitStandaloneControlWrapper(elementId, null, schema);
+        $("#" + elementId + '_TopSpan').addClass('form-control');
         $promise.resolve();
     });
 
@@ -2854,7 +2967,15 @@ function RegistrarBotoes() {
         } else if (status == AGENDADO) {
             ModificarFormState(AGENDAMENTO_EM_EDICAO);
         }
-     });
+    });
+
+    $('.btn-editar-resp-acomp').click(function () {
+        ModificarFormState(RESP_ACOMP_AGENDADO_EM_EDICAO);
+    });
+
+    $('.btn-abandonar').click(function () {
+        ModificarFormState($('select#status').val());
+    });
 }
 
 function VerificarGrupoDlPclOuPlantaPiloto() {
