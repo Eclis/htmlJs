@@ -1360,7 +1360,63 @@ function CarregarAgendamento(id) {
 
             CarregarSelects(selectsACarregar);
             ModificarFormState($('select#status').val());
-            $promise.resolve();
+
+            CarregarResponsaveis(atributos.ows_CodigoAgendamento.value).then(function () {
+                $promise.resolve();
+            }).fail(function (response) {
+                $promise.reject(response);
+            });
+        }
+    });
+
+    return $promise;
+}
+
+function CarregarResponsaveis(agendamento) {
+    var $promise = $.Deferred();
+
+    $().SPServices({
+        operation: 'GetListItems',
+        listName: 'Agendamentos - Responsáveis',
+        CAMLQuery: '<Query><Where><Eq><FieldRef Name="CodigoAgendamento" /><Value Type="Text">' + agendamento + '</Value></Eq></Where></Query>',
+        CAMLViewFields: '<ViewFields><FieldRef Name="Title" /><FieldRef Name="CodigoAgendamento" /><FieldRef Name="TipoResponsavel" /><FieldRef Name="Pessoa" /><FieldRef Name="Resultado" /><FieldRef Name="ExecucaoLoteAcompanhada" /><FieldRef Name="Avaliado" /><FieldRef Name="Avaliador" /><FieldRef Name="Observacoes" /><FieldRef Name="MeioAmbienteAbastecimentoVacuo" /><FieldRef Name="MeioAmbienteAbastecimentoGranel" /><FieldRef Name="MeioAmbienteAbastecimentoManual" /><FieldRef Name="MeioAmbienteAcondicionamentoMate" /><FieldRef Name="MeioAmbienteAcondicionamentoReci" /><FieldRef Name="MeioAmbienteAumentoGeracaoResidu" /><FieldRef Name="MeioAmbienteTipoResiduosGeradosJ" /><FieldRef Name="MeioAmbienteAumentoConsumoAguaLi" /><FieldRef Name="MeioAmbienteAumentoConsumoEnergi" /><FieldRef Name="MeioAmbienteAumentoConsumoAguaFa" /><FieldRef Name="SimilarCodigoAgendamento" /><FieldRef Name="ReprovadoMotivo" /><FieldRef Name="Modified" /><FieldRef Name="Created" /><FieldRef Name="Author" /><FieldRef Name="Editor" /></ViewFields>',
+        completefunc: function (Data, Status) {
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
+                });
+
+                return;
+            }
+
+            var registros = $(Data.responseText).find('z\\:row');
+
+            if (registros.length <= 0) {
+                $promise.reject({
+                    errorCode: '0x99999998',
+                    errorText: 'Registros de responsáveis não encontrados'
+                });
+
+                return;
+            }
+
+            var promessas = [];
+
+            $.each(registros, function () {
+                var responsavel = GetResponsavelPorNome(this.attributes.ows_TipoResponsavel.value);
+                var usuarioNome = this.attributes.ows_Pessoa.value.slice(this.attributes.ows_Pessoa.value.indexOf(';#') + ';#'.length);
+
+                promessas.push(CarregarUsuarioPorLoginName(usuarioNome).then(function (usuario) {
+                    PreencherPeoplePicker(responsavel.peoplePickerId, usuario);
+                }));
+            });
+
+            $.when($, promessas).then(function () {
+                $promise.resolve(registros);
+            }).fail(function () {
+                $promise.resolve(registros);
+            });
         }
     });
 
@@ -1907,7 +1963,7 @@ function InserirAgendamento() {
     return $promise.then(function (response) {
         return GravarCodigoAgendamento(response.record).then(function (response) {
             let $TipoLote = $('[name=TipoLote]');
-            let responsaveis = GetCamposResponsaveisPorTipoDeLote($TipoLote.val());
+            let responsaveis = GetResponsaveisPorTipoDeLote($TipoLote.val());
             let promises = [];
 
             $.each(responsaveis, function (i, responsavel) {
@@ -1921,46 +1977,52 @@ function InserirAgendamento() {
     });
 }
 
-function GetCamposResponsaveisPorTipoDeLote(tipoDeLote) {
-    switch (tipoDeLote) {
-        case 'Brinde':
-            return [
-                {campo: 'peoplePickerAbaRespRespDLPCL', nome: 'DL/PCL - Responsável'},
-                {campo: 'peoplePickerAbaRespRespQualidade', nome: 'Qualidade - Responsável'},
-                {campo: 'peoplePickerAbaRespGerQualidade', nome: 'Qualidade - Gerente'}
-            ];
-        case 'Envase':
-            return [
-                {campo: 'peoplePickerAbaRespRespDLPCL', nome: 'DL/PCL - Responsável'} ,
-                {campo: 'peoplePickerAbaRespRespEngEnvase', nome: 'Eng. Envase - Responsável'} ,
-                {campo: 'peoplePickerAbaRespGerEngEnvase', nome: 'Eng. Envase - Gerente'} ,
-                {campo: 'peoplePickerAbaRespRespInovDE', nome: 'Inovação DE - Responsável'} ,
-                {campo: 'peoplePickerAbaRespGerInovDE', nome: 'Inovação DE - Gerente'} ,
-                {campo: 'peoplePickerAbaRespRespQualidade', nome: 'Qualidade - Responsável'} ,
-                {campo: 'peoplePickerAbaRespGerQualidade', nome: 'Qualidade - Gerente'} ,
-                {campo: 'peoplePickerAbaRespCoordProgFabrica', nome: 'Fábrica - Coord. Programação'} ,
-                {campo: 'peoplePickerAbaRespCoordManFabrica', nome: 'Fábrica - Coord. de Manufatura'} ,
-                {campo: 'peoplePickerAbaRespGerFabrica', nome: 'Fábrica - Gerente'}
-            ];
-        case 'Fabricação':
-            return [
-                {campo: 'peoplePickerAbaRespRespDLPCL', nome: 'DL/PCL - Responsável'},
-                {campo: 'peoplePickerAbaRespRespEngFabricacao', nome: 'Eng. Fabricação - Responsável'},
-                {campo: 'peoplePickerAbaRespGerEngFabricacao', nome: 'Eng. Fabricação - Gerente'},
-                {campo: 'peoplePickerAbaAcRespInovDF', nome: 'Inovação DF - Responsável'},
-                {campo: 'peoplePickerAbaAcGerInovDF', nome: 'Inovação DF - Gerente'},
-                {campo: 'peoplePickerAbaRespRespQualidade', nome: 'Qualidade - Responsável'},
-                {campo: 'peoplePickerAbaRespGerQualidade', nome: 'Qualidade - Gerente'},
-                {campo: 'peoplePickerAbaRespCoordProgFabrica', nome: 'Fábrica - Coord. Programação'},
-                {campo: 'peoplePickerAbaRespCoordManFabrica', nome: 'Fábrica - Coord. de Manufatura'},
-                {campo: 'peoplePickerAbaRespGerFabrica', nome: 'Fábrica - Gerente'}
-            ];
-    }
+var SetoresResponsaveis = [
+    {tipoDeLote: 'Brinde', peoplePickerId: 'peoplePickerAbaRespRespDLPCL', nome: 'DL/PCL - Responsável'},
+    {tipoDeLote: 'Brinde', peoplePickerId: 'peoplePickerAbaRespRespQualidade', nome: 'Qualidade - Responsável'},
+    {tipoDeLote: 'Brinde', peoplePickerId: 'peoplePickerAbaRespGerQualidade', nome: 'Qualidade - Gerente'},
+    {tipoDeLote: 'Envase', peoplePickerId: 'peoplePickerAbaRespRespDLPCL', nome: 'DL/PCL - Responsável'},
+    {tipoDeLote: 'Envase', peoplePickerId: 'peoplePickerAbaRespRespEngEnvase', nome: 'Eng. Envase - Responsável'} ,
+    {tipoDeLote: 'Envase', peoplePickerId: 'peoplePickerAbaRespGerEngEnvase', nome: 'Eng. Envase - Gerente'},
+    {tipoDeLote: 'Envase', peoplePickerId: 'peoplePickerAbaRespRespInovDE', nome: 'Inovação DE - Responsável'},
+    {tipoDeLote: 'Envase', peoplePickerId: 'peoplePickerAbaRespGerInovDE', nome: 'Inovação DE - Gerente'},
+    {tipoDeLote: 'Envase', peoplePickerId: 'peoplePickerAbaRespRespQualidade', nome: 'Qualidade - Responsável'},
+    {tipoDeLote: 'Envase', peoplePickerId: 'peoplePickerAbaRespGerQualidade', nome: 'Qualidade - Gerente'},
+    {tipoDeLote: 'Envase', peoplePickerId: 'peoplePickerAbaRespCoordProgFabrica', nome: 'Fábrica - Coord. Programação'},
+    {tipoDeLote: 'Envase', peoplePickerId: 'peoplePickerAbaRespCoordManFabrica', nome: 'Fábrica - Coord. de Manufatura'},
+    {tipoDeLote: 'Envase', peoplePickerId: 'peoplePickerAbaRespGerFabrica', nome: 'Fábrica - Gerente'},
+    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespRespDLPCL', nome: 'DL/PCL - Responsável'},
+    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespRespEngFabricacao', nome: 'Eng. Fabricação - Responsável'},
+    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespGerEngFabricacao', nome: 'Eng. Fabricação - Gerente'},
+    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaAcRespInovDF', nome: 'Inovação DF - Responsável'},
+    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaAcGerInovDF', nome: 'Inovação DF - Gerente'},
+    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespRespQualidade', nome: 'Qualidade - Responsável'},
+    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespGerQualidade', nome: 'Qualidade - Gerente'},
+    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespCoordProgFabrica', nome: 'Fábrica - Coord. Programação'},
+    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespCoordManFabrica', nome: 'Fábrica - Coord. de Manufatura'},
+    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespGerFabrica', nome: 'Fábrica - Gerente'},
+];
+
+function GetResponsavelPorNome(nome) {
+    return $.grep(SetoresResponsaveis, function (responsavel) {
+        return responsavel.nome == nome;
+    }).pop();
+}
+
+function GetResponsaveisPorTipoDeLote(tipoDeLote) {
+    return $.grep(SetoresResponsaveis, function (responsavel) {
+        return responsavel.tipoDeLote == tipoDeLote;
+    });
+}
+
+function PegarPeoplePickerPorId(peoplePickerId) {
+    var peoplePickerName = $('#' + peoplePickerId + ' .sp-peoplepicker-topLevel').attr('id');
+
+    return SPClientPeoplePicker.SPClientPeoplePickerDict[peoplePickerName];
 }
 
 function PegarUsuarioDoPeoplePicker(peoplePickerId) {
-    var peoplePickerName = $('#' + peoplePickerId + ' .sp-peoplepicker-topLevel').attr('id');
-    var peoplePickerUser = SPClientPeoplePicker.SPClientPeoplePickerDict[peoplePickerName].GetAllUserInfo().pop();
+    var peoplePickerUser = PegarPeoplePickerPorId(peoplePickerId).GetAllUserInfo().pop();
 
     if (peoplePickerUser == undefined) {
         return null;
@@ -1974,9 +2036,9 @@ function PegarUsuarioDoPeoplePicker(peoplePickerId) {
 }
 
 function InserirResponsavelAgendamento(codigoAgendamento, responsavel) {
-    var usuarioDoPeoplePicker = PegarUsuarioDoPeoplePicker(responsavel.campo);
+    var usuarioDoPeoplePicker = PegarUsuarioDoPeoplePicker(responsavel.peoplePickerId);
 
-    return CarregarUsuario(usuarioDoPeoplePicker.loginName).then(function (usuario) {
+    return CarregarUsuarioPorLoginName(usuarioDoPeoplePicker.loginName).then(function (usuario) {
         var $promise = $.Deferred();
 
         $().SPServices({
@@ -2700,12 +2762,12 @@ function CarregarUsuarioAtual() {
     };
 }
 
-function CarregarUsuario(loginName) {
+function CarregarUsuarioPorLoginName(loginName) {
     var $promise = $.Deferred();
     var context = SP.ClientContext.get_current();
     var usuario = context.get_web().ensureUser(loginName);
-
     context.load(usuario);
+
     context.executeQueryAsync(function () {
         $promise.resolve({
             id: usuario.get_id(),
@@ -2723,12 +2785,14 @@ function CarregarUsuario(loginName) {
     return $promise;
 }
 
-function PreencherResponsavelDlPcl() {
-    var peoplePicker = SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespRespDLPCL_TopSpan;
+function PreencherPeoplePicker(peoplePickerId, usuario) {
+    var peoplePicker = PegarPeoplePickerPorId(peoplePickerId);
+    peoplePicker.DeleteProcessedUser();
+    peoplePicker.AddUnresolvedUser(GerarISPClientPeoplePickerEntityPorUsuario(usuario), true);
+}
 
-    if (peoplePicker.TotalUserCount == 0) {
-        peoplePicker.AddUnresolvedUser(GerarISPClientPeoplePickerEntityPorUsuario(CarregarUsuarioAtual()), true);
-    }
+function PreencherResponsavelDlPcl() {
+    PreencherPeoplePicker('peoplePickerAbaRespRespDLPCL', CarregarUsuarioAtual());
 }
 
 function RegistrarBindings() {
