@@ -2117,6 +2117,7 @@ function ModificarBotoesPorFormState(formState) {
     var $btnEditar = $('.btn-editar');
     var $btnEditarRespOuAcomp = $('.btn-editar-resp-acomp');
     var $btnAbandonar = $('.btn-abandonar');
+    var $btnReagendar = $('.btn-reagendar');
 
     $btnAgendar.hide();
     $btnExecutado.hide();
@@ -2129,6 +2130,7 @@ function ModificarBotoesPorFormState(formState) {
     $btnEditar.hide();
     $btnEditarRespOuAcomp.hide();
     $btnAbandonar.hide();
+    $btnReagendar.hide();
 
     switch (formState) {
         case EM_CRIACAO:
@@ -2180,6 +2182,7 @@ function ModificarBotoesPorFormState(formState) {
         case EM_CANCELAMENTO:
             if (VerificarGrupoDlPclOuPlantaPiloto()) {
                 $btnSalvar.show();
+                $btnAbandonar.show();
             }
             break;
         case REGISTRO_DE_ANALISE:
@@ -2189,12 +2192,22 @@ function ModificarBotoesPorFormState(formState) {
         case EM_NAO_EXECUCAO:
             if (VerificarGrupoRespOuAcomp()) {
                 $btnSalvar.show();
+                $btnAbandonar.show();
+            }
+            break;
+        case LOTE_NAO_EXECUTADO:
+            if (VerificarGrupoDlPclOuPlantaPiloto()) {
+                $btnReagendar.show();
             }
             break;
         case 'Aguardando Reagendamento':
             if (VerificarGrupoDlPclOuPlantaPiloto()) $btnDerivar.show();
             break;
     }
+}
+
+function usuarioPertenceAoGrupo($xml, grupo) {
+    return $xml.find("Group[Name='" + grupo + "']").length >= 1;
 }
 
 function ModificarCamposPorFormState(formState) {
@@ -2340,28 +2353,61 @@ function ModificarCamposPorFormState(formState) {
             $meioAmbienteResponsavelPPResp.attr('disabled', false);
             break;
         case RESP_ACOMP_AGENDADO_EM_EDICAO:
-            $dlpclResponsavelPP.attr('disabled', false);
-            $envaseResponsavelAcompanhamento.attr('disabled', false);
-            $envaseResponsavelPPResp.attr('disabled', false);
-            $envaseResponsavelPPGer.attr('disabled', false);
-            $engFabResponsavelAcompanhamento.attr('disabled', false);
-            $engFabResponsavelPPResp.attr('disabled', false);
-            $engFabResponsavelPPGer.attr('disabled', false);
-            $inovDfResponsavelAcompanhamento.attr('disabled', false);
-            $inovDfResponsavelPPResp.attr('disabled', false);
-            $inovDfResponsavelPPGer.attr('disabled', false);
-            $inovDeResponsavelAcompanhamento.attr('disabled', false);
-            $inovDeResponsavelPPResp.attr('disabled', false);
-            $inovDeResponsavelPPGer.attr('disabled', false);
-            $fabricaResponsavelAcompanhamento.attr('disabled', false);
-            $fabricaResponsavelPPCoordProg.attr('disabled', false);
-            $fabricaResponsavelPPCoordMan.attr('disabled', false);
-            $fabricaResponsavelPPGer.attr('disabled', false);
-            $qualidadeResponsavelAcompanhamento.attr('disabled', false);
-            $qualidadeResponsavelPPResp.attr('disabled', false);
-            $qualidadeResponsavelPPGer.attr('disabled', false);
-            $meioAmbienteResponsavelAcompanhamento.attr('disabled', false);
-            $meioAmbienteResponsavelPPResp.attr('disabled', false);
+            $().SPServices({
+                operation: "GetGroupCollectionFromUser",
+                userLoginName: $().SPServices.SPGetCurrentUser(),
+                async: false,
+                completefunc: function (xData, Status) {
+                    var $xml = $(xData.responseXML);
+                    var envase = listDemaisGrupos[1];
+                    var engFabricacao = listDemaisGrupos[2];
+                    var fabrica = listDemaisGrupos[3];
+                    var inovDe = listDemaisGrupos[4];
+                    var inovDf = listDemaisGrupos[5];
+                    var meioAmbiente = listDemaisGrupos[6];
+                    var qualidade = listDemaisGrupos[7];
+                    if (usuarioPertenceAoGrupo($xml, envase)) {
+                        $envaseResponsavelAcompanhamento.attr('disabled', false);
+                        $envaseResponsavelPPResp.attr('disabled', false);
+                        $envaseResponsavelPPGer.attr('disabled', false);
+                    }
+                    if (usuarioPertenceAoGrupo($xml, engFabricacao)) {
+                        $engFabResponsavelAcompanhamento.attr('disabled', false);
+                        $engFabResponsavelPPResp.attr('disabled', false);
+                        $engFabResponsavelPPGer.attr('disabled', false);
+                    }
+
+                    if (usuarioPertenceAoGrupo($xml, inovDf)) {
+                        $inovDfResponsavelAcompanhamento.attr('disabled', false);
+                        $inovDfResponsavelPPResp.attr('disabled', false);
+                        $inovDfResponsavelPPGer.attr('disabled', false);
+                    }
+
+                    if (usuarioPertenceAoGrupo($xml, inovDe)) {
+                        $inovDeResponsavelAcompanhamento.attr('disabled', false);
+                        $inovDeResponsavelPPResp.attr('disabled', false);
+                        $inovDeResponsavelPPGer.attr('disabled', false);
+                    }
+
+                    if (usuarioPertenceAoGrupo($xml, fabrica)) {
+                        $fabricaResponsavelAcompanhamento.attr('disabled', false);
+                        $fabricaResponsavelPPCoordProg.attr('disabled', false);
+                        $fabricaResponsavelPPCoordMan.attr('disabled', false);
+                        $fabricaResponsavelPPGer.attr('disabled', false);
+                    }
+
+                    if (usuarioPertenceAoGrupo($xml, qualidade)) {
+                        $qualidadeResponsavelAcompanhamento.attr('disabled', false);
+                        $qualidadeResponsavelPPResp.attr('disabled', false);
+                        $qualidadeResponsavelPPGer.attr('disabled', false);
+                    }
+
+                    if (usuarioPertenceAoGrupo($xml, meioAmbiente)) {
+                        $meioAmbienteResponsavelAcompanhamento.attr('disabled', false);
+                        $meioAmbienteResponsavelPPResp.attr('disabled', false);
+                    }
+                }
+            });
             break;
         case EM_CANCELAMENTO:
             $('[name=CanceladoMotivo]').attr('disabled', false);
@@ -2975,6 +3021,10 @@ function RegistrarBotoes() {
 
     $('.btn-abandonar').click(function () {
         ModificarFormState($('select#status').val());
+    });
+
+    $('.btn-reagendar').click(function () {
+        ModificarFormState(RASCUNHO);
     });
 }
 
