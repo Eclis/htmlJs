@@ -1230,7 +1230,7 @@ function AtributoNumber(number) {
 function AtualizarAgendamento(id) {
     var $promise = $.Deferred();
     CalcularCamposCalculaveis();
-    ModificarStatusPorFormState(formState);
+    ModificarStatusPorFormState(state);
     var campos = [];
 
     $('#main [name].salvar-campo').each(function () {
