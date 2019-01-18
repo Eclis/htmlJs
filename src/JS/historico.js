@@ -1,12 +1,17 @@
 var ID_AGENDAMENTOS = $('#inputId').val();
-var ID_AGENGAMENTOS_RESPONSAVEIS = 0;
+var ID_AGENGAMENTOS_CODIGO_PRODUTO = $('#CodigoProduto').val();
+var ID_AGENGAMENTO_RESPONSAVEL = 0;
 var AGENDAMENTOS_LIST = "Agendamentos";
 var AGENDAMENTOS_RESPONSAVEIS_LIST = "Agendamentos - Responsáveis";
 
-// var AGENDAMENTOS_REST_QUERY = "/_api/web/lists/GetByTitle('" + AGENDAMENTOS_LIST + "')/items(" + ID_AGENDAMENTOS + ")/Versions?$select=VersionLabel,Created,IsCurrentVersion,Title,CodigoProduto,LinhaProduto,DescricaoProduto,Projeto,CategoriaProjeto,Motivo,TipoLote,QuantidadePecas,Formula,EnvioAmostras,ResponsavelAmostra,QuantidadeAmostra,InicioProgramado,DuracaoEstimadaHoras,DuracaoEstimadaMinutos,FimProgramado,Fabrica,LinhaEquipamento,CentroCusto,GrauComplexidade,MaoObra,Observacoes,Status,EngenhariaFabricacaoAcompanhamen,EngenhariaEnvaseAcompanhamento,InovacaoDfAcompanhamento,InovacaoDeAcompanhamento,QualidadeAcompanhamento,FabricaAcompanhamento,CodigoAgendamento,NaoExecutadoMotivo,NaoExecutadoComentarios,CanceladoMotivo,CanceladoComentarios,ReagendamentoContador,CalendarioTitulo,CalendarioSubtitulo,Executado,MeioAmbienteAcompanhamento,RegistroAnalisesInicio,LinhaEquipamento,Editor&$expand=Linha_x005f_x0020_x005f_ou_x005f_x0020_x005f_Equipamento/ID&$orderby=VersionLabel asc";
-var AGENDAMENTOS_REST_QUERY = "/_api/web/lists/GetByTitle('" + AGENDAMENTOS_LIST + "')/items(" + ID_AGENDAMENTOS + ")/Versions?$select=VersionLabel,Created,Title,CodigoProduto,LinhaProduto,DescricaoProduto,Projeto,CategoriaProjeto,Motivo,TipoLote,QuantidadePecas,Formula,EnvioAmostras,ResponsavelAmostra,QuantidadeAmostra,InicioProgramado,DuracaoEstimadaHoras,DuracaoEstimadaMinutos,FimProgramado,Fabrica,LinhaEquipamento,CentroCusto,GrauComplexidade,MaoObra,Observacoes,Status,EngenhariaFabricacaoAcompanhamen,EngenhariaEnvaseAcompanhamento,InovacaoDfAcompanhamento,InovacaoDeAcompanhamento,QualidadeAcompanhamento,FabricaAcompanhamento,CodigoAgendamento,NaoExecutadoMotivo,NaoExecutadoComentarios,CanceladoMotivo,CanceladoComentarios,ReagendamentoContador,CalendarioTitulo,CalendarioSubtitulo,Executado,MeioAmbienteAcompanhamento,RegistroAnalisesInicio,LinhaEquipamento,Editor&$expand=Linha_x005f_x0020_x005f_ou_x005f_x0020_x005f_Equipamento/ID&$orderby=VersionLabel asc";
-var AGENDAMENTOS_RESPONSAVEIS_REST_QUERY = "/_api/web/lists/GetByTitle('" + AGENDAMENTOS_RESPONSAVEIS_LIST + "')/items(" + ID_AGENGAMENTOS_RESPONSAVEIS + ")/Versions";
+var AGENDAMENTOS_HISTORY_REST_QUERY = "/_api/web/lists/GetByTitle('" + AGENDAMENTOS_LIST + "')/items(" + ID_AGENDAMENTOS + ")/Versions?$select=VersionLabel,Created,Title,CodigoProduto,LinhaProduto,DescricaoProduto,Projeto,CategoriaProjeto,Motivo,TipoLote,QuantidadePecas,Formula,EnvioAmostras,ResponsavelAmostra,QuantidadeAmostra,InicioProgramado,DuracaoEstimadaHoras,DuracaoEstimadaMinutos,FimProgramado,Fabrica,LinhaEquipamento,CentroCusto,GrauComplexidade,MaoObra,Observacoes,Status,EngenhariaFabricacaoAcompanhamen,EngenhariaEnvaseAcompanhamento,InovacaoDfAcompanhamento,InovacaoDeAcompanhamento,QualidadeAcompanhamento,FabricaAcompanhamento,CodigoAgendamento,NaoExecutadoMotivo,NaoExecutadoComentarios,CanceladoMotivo,CanceladoComentarios,ReagendamentoContador,CalendarioTitulo,CalendarioSubtitulo,Executado,MeioAmbienteAcompanhamento,RegistroAnalisesInicio,LinhaEquipamento,Editor&$expand=Linha_x005f_x0020_x005f_ou_x005f_x0020_x005f_Equipamento/ID&$orderby=VersionLabel asc";
+var AGENDAMENTOS_RESPONSAVEIS_REST_QUERY = "/_api/web/lists/GetByTitle('" + AGENDAMENTOS_RESPONSAVEIS_LIST + "')/items/?$select=Id&$filter=CodigoAgendamento eq " + ID_AGENGAMENTOS_CODIGO_PRODUTO;
+var AGENDAMENTO_RESPONSAVEL_VERSION_REST_QUERY = "/_api/web/lists/GetByTitle('" + AGENDAMENTOS_RESPONSAVEIS_LIST + "')/items(" + ID_AGENGAMENTO_RESPONSAVEL + ")/Versions?$select=VersionLabel,Title,CodigoAgendamento,TipoResponsavel,Pessoa,Resultado,ExecucaoLoteAcompanhada,Avaliado,Avaliador,Observacoes,MeioAmbienteAbastecimentoVacuo,MeioAmbienteAbastecimentoGranel,MeioAmbienteAbastecimentoManual,MeioAmbienteAcondicionamentoMate,MeioAmbienteAcondicionamentoReci,MeioAmbienteAumentoGeracaoResidu,MeioAmbienteTipoResiduosGeradosJ,MeioAmbienteAumentoConsumoAguaLi,MeioAmbienteAumentoConsumoEnergi,MeioAmbienteAumentoConsumoAguaFa,SimilarCodigoAgendamento,ReprovadoMotivo,ID,Modified,Editor";
 
+var agendamentos = [];
+var agendamentosResponsaveisIds = [];
+var agendamentosResponsaveis = [];
+var agendamentosProcessados = [];
 class Agendamento {
     constructor() {
         this.propriedades = {};
@@ -58,7 +63,7 @@ class Propriedade {
 }
 
 var openAGENDAMENTOS_Call = $.ajax({
-    url: _spPageContextInfo.webAbsoluteUrl + AGENDAMENTOS_REST_QUERY,
+    url: _spPageContextInfo.webAbsoluteUrl + AGENDAMENTOS_HISTORY_REST_QUERY,
     type: "GET",
     dataType: "json",
     headers: {
@@ -66,18 +71,74 @@ var openAGENDAMENTOS_Call = $.ajax({
     }
 });
 
-// var openAGENDAMENTOS_RESPONSAVEIS_Call = $.ajax({
-//     url: _spPageContextInfo.webAbsoluteUrl + AGENDAMENTOS_RESPONSAVEIS_REST_QUERY,
-//     type: "GET",
-//     dataType: "json",
-//     headers: {
-//         Accept: "application/json;odata=verbose"
-//     }
-// });
+var openAGENDAMENTOS_RESPONSAVEIS_IDS_Call = $.ajax({
+    url: _spPageContextInfo.webAbsoluteUrl + AGENDAMENTOS_RESPONSAVEIS_REST_QUERY,
+    type: "GET",
+    dataType: "json",
+    headers: {
+        Accept: "application/json;odata=verbose"
+    }
+});
 
+var openAGENDAMENTO_RESPONSAVEL_VERSIONS_Call = $.ajax({
+    url: _spPageContextInfo.webAbsoluteUrl + AGENDAMENTO_RESPONSAVEL_VERSION_REST_QUERY,
+    type: "GET",
+    dataType: "json",
+    headers: {
+        Accept: "application/json;odata=verbose"
+    }
+});
 
-var agendamentos = [];
-var agendamentosProcessados = [];
+openAGENDAMENTOS_RESPONSAVEIS_IDS_Call.done(function (data, textStatus, jqXHR) {
+    for (index in data.d.results) {
+        agendamentosResponsaveisIds.push(data.d.results[index].Id);
+    }
+    for (indexVersions in agendamentosResponsaveisIds) {
+        ID_AGENGAMENTO_RESPONSAVEL = agendamentosResponsaveisIds[indexVersions];
+
+        openAGENDAMENTO_RESPONSAVEL_VERSIONS_Call.done(function (dataVersion, textStatusVersion, jqXHRVersion) {
+            for (indexResp in dataVersion.d.results) {
+                var responsavel = new AgendamentoResponsavel();
+                responsavel.add(new Propriedade('VersionLabel', 'string', (typeof dataVersion.d.results[indexResp].VersionLabel === "undefined") ? '' : dataVersion.d.results[indexResp].VersionLabel));
+                responsavel.add(new Propriedade('Title', 'string', (typeof dataVersion.d.results[indexResp].Title === "undefined") ? '' : dataVersion.d.results[indexResp].Title));
+                responsavel.add(new Propriedade('CodigoAgendamento', 'string', (typeof dataVersion.d.results[indexResp].CodigoAgendamento === "undefined") ? '' : dataVersion.d.results[indexResp].CodigoAgendamento));
+                responsavel.add(new Propriedade('TipoResponsavel', 'string', (typeof dataVersion.d.results[indexResp].TipoResponsavel === "undefined") ? '' : dataVersion.d.results[indexResp].TipoResponsavel));
+                responsavel.add(new Propriedade('Pessoa', 'string', (typeof dataVersion.d.results[indexResp].Pessoa === "undefined") ? '' : dataVersion.d.results[indexResp].Pessoa));
+                responsavel.add(new Propriedade('Resultado', 'string', (typeof dataVersion.d.results[indexResp].Resultado === "undefined") ? '' : dataVersion.d.results[indexResp].Resultado));
+                responsavel.add(new Propriedade('ExecucaoLoteAcompanhada', 'string', (typeof dataVersion.d.results[indexResp].ExecucaoLoteAcompanhada === "undefined") ? '' : dataVersion.d.results[indexResp].ExecucaoLoteAcompanhada));
+                responsavel.add(new Propriedade('Avaliado', 'string', (typeof dataVersion.d.results[indexResp].Avaliado === "undefined") ? '' : dataVersion.d.results[indexResp].Avaliado));
+                responsavel.add(new Propriedade('Avaliador', 'string', (typeof dataVersion.d.results[indexResp].Avaliador === "undefined") ? '' : dataVersion.d.results[indexResp].Avaliador));
+                responsavel.add(new Propriedade('Observacoes', 'string', (typeof dataVersion.d.results[indexResp].Observacoes === "undefined") ? '' : dataVersion.d.results[indexResp].Observacoes));
+                responsavel.add(new Propriedade('MeioAmbienteAbastecimentoVacuo', 'string', (typeof dataVersion.d.results[indexResp].MeioAmbienteAbastecimentoVacuo === "undefined") ? '' : dataVersion.d.results[indexResp].MeioAmbienteAbastecimentoVacuo));
+                responsavel.add(new Propriedade('MeioAmbienteAbastecimentoGranel', 'string', (typeof dataVersion.d.results[indexResp].MeioAmbienteAbastecimentoGranel === "undefined") ? '' : dataVersion.d.results[indexResp].MeioAmbienteAbastecimentoGranel));
+                responsavel.add(new Propriedade('MeioAmbienteAbastecimentoManual', 'string', (typeof dataVersion.d.results[indexResp].MeioAmbienteAbastecimentoManual === "undefined") ? '' : dataVersion.d.results[indexResp].MeioAmbienteAbastecimentoManual));
+                responsavel.add(new Propriedade('MeioAmbienteAcondicionamentoMate', 'string', (typeof dataVersion.d.results[indexResp].MeioAmbienteAcondicionamentoMate === "undefined") ? '' : dataVersion.d.results[indexResp].MeioAmbienteAcondicionamentoMate));
+                responsavel.add(new Propriedade('MeioAmbienteAcondicionamentoReci', 'string', (typeof dataVersion.d.results[indexResp].MeioAmbienteAcondicionamentoReci === "undefined") ? '' : dataVersion.d.results[indexResp].MeioAmbienteAcondicionamentoReci));
+                responsavel.add(new Propriedade('MeioAmbienteAumentoGeracaoResidu', 'string', (typeof dataVersion.d.results[indexResp].MeioAmbienteAumentoGeracaoResidu === "undefined") ? '' : dataVersion.d.results[indexResp].MeioAmbienteAumentoGeracaoResidu));
+                responsavel.add(new Propriedade('MeioAmbienteTipoResiduosGeradosJ', 'string', (typeof dataVersion.d.results[indexResp].MeioAmbienteTipoResiduosGeradosJ === "undefined") ? '' : dataVersion.d.results[indexResp].MeioAmbienteTipoResiduosGeradosJ));
+                responsavel.add(new Propriedade('MeioAmbienteAumentoConsumoAguaLi', 'string', (typeof dataVersion.d.results[indexResp].MeioAmbienteAumentoConsumoAguaLi === "undefined") ? '' : dataVersion.d.results[indexResp].MeioAmbienteAumentoConsumoAguaLi));
+                responsavel.add(new Propriedade('MeioAmbienteAumentoConsumoEnergi', 'string', (typeof dataVersion.d.results[indexResp].MeioAmbienteAumentoConsumoEnergi === "undefined") ? '' : dataVersion.d.results[indexResp].MeioAmbienteAumentoConsumoEnergi));
+                responsavel.add(new Propriedade('MeioAmbienteAumentoConsumoAguaFa', 'string', (typeof dataVersion.d.results[indexResp].MeioAmbienteAumentoConsumoAguaFa === "undefined") ? '' : dataVersion.d.results[indexResp].MeioAmbienteAumentoConsumoAguaFa));
+                responsavel.add(new Propriedade('SimilarCodigoAgendamento', 'string', (typeof dataVersion.d.results[indexResp].SimilarCodigoAgendamento === "undefined") ? '' : dataVersion.d.results[indexResp].SimilarCodigoAgendamento));
+                responsavel.add(new Propriedade('ReprovadoMotivo', 'string', (typeof dataVersion.d.results[indexResp].ReprovadoMotivo === "undefined") ? '' : dataVersion.d.results[indexResp].ReprovadoMotivo));
+                responsavel.add(new Propriedade('ID', 'string', (typeof dataVersion.d.results[indexResp].ID === "undefined") ? '' : dataVersion.d.results[indexResp].ID));
+                responsavel.add(new Propriedade('Modified', 'string', (typeof moment.utc(dataVersion.d.results[indexResp].Modified).local() === "undefined") ? '' : moment.utc(dataVersion.d.results[indexResp].Modified).local()));
+                responsavel.add(new Propriedade('Editor', 'string', (typeof dataVersion.d.results[indexResp].Editor === "undefined") ? '' : dataVersion.d.results[indexResp].Editor));
+
+                agendamentos.push(responsavel);
+
+                if (indexResp > 0) {
+                    agendamentosProcessados.push(ProcessaAgendamento(agendamentos[indexResp], agendamentos[indexResp - 1]));
+                }
+                else {
+                    agendamentosProcessados.push(agendamento);
+                }
+            }
+        });
+    }
+
+    ProcessaHistorico(agendamentosProcessados);
+});
 
 openAGENDAMENTOS_Call.done(function (data, textStatus, jqXHR) {
 
@@ -85,7 +146,6 @@ openAGENDAMENTOS_Call.done(function (data, textStatus, jqXHR) {
         var agendamento = new Agendamento();
         agendamento.add(new Propriedade('VersionLabel', 'string', (typeof data.d.results[index].VersionLabel === "undefined") ? '' : data.d.results[index].VersionLabel));
         agendamento.add(new Propriedade('Created', 'date', (typeof moment.utc(data.d.results[index].Created).local() === "undefined") ? '' : moment.utc(data.d.results[index].Created).local()));
-        // agendamento.add(new Propriedade('IsCurrentVersion', 'string', (typeof data.d.results[index].IsCurrentVersion === "undefined") ? '' : data.d.results[index].IsCurrentVersion));
         agendamento.add(new Propriedade('Title', 'string', (typeof data.d.results[index].Title === "undefined") ? '' : data.d.results[index].Title));
         agendamento.add(new Propriedade('CodigoProduto', 'string', (typeof data.d.results[index].CodigoProduto === "undefined") ? '' : data.d.results[index].CodigoProduto));
         agendamento.add(new Propriedade('LinhaProduto', 'string', (typeof data.d.results[index].LinhaProduto === "undefined") ? '' : data.d.results[index].LinhaProduto));
@@ -132,11 +192,9 @@ openAGENDAMENTOS_Call.done(function (data, textStatus, jqXHR) {
         agendamentos.push(agendamento);
 
         if (index > 0) {
-            console.log("Processando: " + agendamentos[index].find('VersionLabel').valor);
             agendamentosProcessados.push(ProcessaAgendamento(agendamentos[index], agendamentos[index - 1]));
         }
         else {
-            console.log("Processando: " + agendamentos[index].find('VersionLabel').valor);
             agendamentosProcessados.push(agendamento);
         }
     }
