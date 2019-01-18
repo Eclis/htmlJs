@@ -14,7 +14,6 @@ var AGENDAMENTO_EM_EDICAO = 'agendadoEmEdicao';
 var RESP_ACOMP_AGENDADO_EM_EDICAO = 'respAcompAgendadoEmEdicao';
 var EM_CANCELAMENTO = 'emCancelamento';
 var EM_NAO_EXECUCAO = 'emNaoExecucao';
-var EM_DERIVACAO = 'emDerivacao';
 
 var state;
 
@@ -1049,6 +1048,7 @@ function ValidarAgendamentosAcompanhamentos(tipoDeLote) {
 }
 
 function ValidarAgendamento() {
+
     var erroTotal = 0;
     var errosPnlGeral = ValidarAgendamentosGeral();
     var errosAbaProduto = ValidarAgendamentosProduto();
@@ -2504,6 +2504,9 @@ function ModificarStatusPorFormState(formState) {
         case REPROVADO:
             $status.val(REPROVADO);
             break;
+        case EM_CRIACAO:
+            $status.val("")
+            break;
     }
 }
 
@@ -3005,10 +3008,11 @@ function getUrlParameter(name) {
 }
 
 function DerivarAgendamento() {
-    document.getElementById('inputId').value = "";
-    document.getElementById('codigoProduto').value = "";
-    document.getElementById('produtoDescricao').value = "";
-    ModificarStatus('Rascunho');
+    $('#inputId').val("");
+    $('#codigoProduto').val("");
+    $('#produtoDescricao').val("");
+    ModificarStatusPorFormState(EM_CRIACAO);
+    ModificarFormState(EM_CRIACAO);
     window.history.pushState("object", "", "main.aspx?action=new");
 }
 
