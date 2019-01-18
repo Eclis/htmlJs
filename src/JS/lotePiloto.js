@@ -2114,6 +2114,10 @@ function PegarUsuarioDoPeoplePicker(peoplePickerId) {
 function InserirResponsavelAgendamento(codigoAgendamento, responsavel) {
     var usuarioDoPeoplePicker = PegarUsuarioDoPeoplePicker(responsavel.peoplePickerId);
 
+    if (!usuarioDoPeoplePicker) {
+        return $.when(false);
+    }
+
     return CarregarUsuarioPorLoginName(usuarioDoPeoplePicker.loginName).then(function (usuario) {
         var $promise = $.Deferred();
 
