@@ -2170,8 +2170,6 @@ function VerificarGrupoRespOuAcomp() {
 function ModificarBotoesPorFormState(formState) {
     var $btnAgendar = $('.btn-agendar');
     var $btnExecutado = $('.btn-executado');
-    var $btnAprovar = $('.btn-aprovar');
-    var $btnReprovarAprovar = $('.btn-reprovar');
     var $btnDerivar = $('.btn-derivar');
     var $btnCancelar = $('.btn-cancelar-agendamento');
     var $btnSalvar = $('.btn-salvar');
@@ -2183,8 +2181,6 @@ function ModificarBotoesPorFormState(formState) {
 
     $btnAgendar.hide();
     $btnExecutado.hide();
-    $btnAprovar.hide();
-    $btnReprovarAprovar.hide();
     $btnDerivar.hide();
     $btnCancelar.hide();
     $btnSalvar.hide();
@@ -2248,8 +2244,6 @@ function ModificarBotoesPorFormState(formState) {
             }
             break;
         case REGISTRO_DE_ANALISE:
-            // $btnAprovar.show();
-            // $btnReprovarAprovar.show();
             break;
         case EM_NAO_EXECUCAO:
             if (VerificarGrupoRespOuAcomp()) {
@@ -3044,16 +3038,6 @@ function RegistrarBotoes() {
 
     $('.btn-executado').click(function () {
         ModificarFormState(REGISTRO_DE_ANALISE);
-        SalvarAgendamento();
-    });
-
-    $('.btn-aprovar').click(function () {
-        ModificarFormState(APROVADO);
-        SalvarAgendamento();
-    });
-
-    $('.btn-reprovar').click(function () {
-        ModificarFormState(REPROVADO);
         SalvarAgendamento();
     });
 
