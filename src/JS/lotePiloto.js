@@ -1435,6 +1435,7 @@ function CarregarSelects(selectsACarregar) {
         select.elemento.val(select.valor);
         select.elemento.change();
     });
+    CarregarListaResultadoAnalise();
 }
 
 function CarregarCategoriaProjeto() {
@@ -1750,6 +1751,73 @@ function CarregarListaStatus() {
 
             $(Data.responseXML).find('Field[DisplayName="Status"] CHOICE').each(function () {
                 $('select#status').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+            });
+
+            $promise.resolve();
+        }
+    });
+
+    return $promise;
+}
+
+function CarregarListaResultadoAnalise() {
+    if ($('select[name=GrauComplexidade] :selected').val() == 2) {
+        CarregarListaResultadoAnaliseComSimilaridade();
+    } else {
+        CarregarListaResultadoAnaliseSemSimilaridade();
+    }
+}
+
+function CarregarListaResultadoAnaliseComSimilaridade() {
+    var $promise = $.Deferred();
+
+    $().SPServices({
+        operation: 'GetList',
+        listName: 'Agendamentos - Responsáveis',
+        completefunc: function (Data, Status) {
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
+                });
+
+                return;
+            }
+
+            var $resultado = $('select[name=resultado]');
+            $(Data.responseXML).find('Field[DisplayName="Resultado"] CHOICE').each(function () {
+                $resultado.append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+            });
+
+            $promise.resolve();
+        }
+    });
+
+    return $promise;
+}
+
+function CarregarListaResultadoAnaliseSemSimilaridade() {
+    var $promise = $.Deferred();
+
+    $().SPServices({
+        operation: 'GetList',
+        listName: 'Agendamentos - Responsáveis',
+        completefunc: function (Data, Status) {
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
+                });
+
+                return;
+            }
+
+            var $resultado = $('select[name=resultado]');
+            $(Data.responseXML).find('Field[DisplayName="Resultado"] CHOICE').each(function () {
+                if (this.innerHTML == 'Aprovado por Similaridade') {
+                    return true;
+                }
+                $resultado.append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
             });
 
             $promise.resolve();
