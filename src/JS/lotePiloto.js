@@ -104,10 +104,6 @@ function ValidarAgendamentosProduto() {
         errorAgendamentosProduto++;
         NotificarErroValidacao('text', 'input#produtoQuantidade', '', '');
     }
-    else if (ValidarLinhaEquipamento() === false) {
-        errorAgendamentosProduto++;
-        NotificarErroValidacao('text', 'input#produtoQuantidade', '', '');
-    } 
     else {
         LimparValidacao('text', 'input#produtoQuantidade', '');
     }
@@ -165,6 +161,7 @@ function ValidarAgendamentosAgendamento() {
 
     if ($('input#agendamentoDataInicioProgramado').val() === null || $('input#agendamentoDataInicioProgramado').val() == '') {
         errorAgendamentosAgendamento++;
+        $('input#agendamentoDataInicioProgramado').attr("title", "Data não pode ser inválida.");
         NotificarErroValidacao('text', 'input#agendamentoDataInicioProgramado', '', '');
     }
     else {
@@ -174,9 +171,11 @@ function ValidarAgendamentosAgendamento() {
 
         if (CurrentDate > SelectedDate) {
             errorAgendamentosAgendamento++;
+             $('input#agendamentoDataInicioProgramado').attr("title", "Data não pode ser menor do que a atual.");
             NotificarErroValidacao('text', 'input#agendamentoDataInicioProgramado', '', '');
         }
         else {
+            $('input#agendamentoDataInicioProgramado').removeAttr("title");
             LimparValidacao('text', 'input#agendamentoDataInicioProgramado', '');
         }
     }
@@ -1119,6 +1118,7 @@ function NotificarErroValidacao(controlType, control, controlValidator, message)
                     "border-color": "#a94442",
                     "-webkit-box-shadow": "inset 0 1px 1px rgba(0,0,0,.075)",
                     "box-shadow": "inset 0 1px 1px rgba(0,0,0,.075)"
+
                 });
                 break;
             }
@@ -1680,6 +1680,12 @@ function CarregarLinhasEquipamentosById(linhaEquipamentoId) {
 
 function CarregarListaGrauComplexidade() {
     var $promise = $.Deferred();
+    var mensagem = {
+        1: "1 - Sem modificação",
+        2: "2 - Leve ",
+        3: "3 - Avançado",
+        4: "4 - Inovador"
+    };
 
     $().SPServices({
         operation: 'GetList',
@@ -1695,7 +1701,9 @@ function CarregarListaGrauComplexidade() {
             }
 
             $(Data.responseXML).find('Field[DisplayName="Grau de complexidade"] CHOICE').each(function () {
-                $('select#grauComplexidade').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+                if(this.innerHTML > 0) {
+                    $('select#grauComplexidade').append('<option value="' + this.innerHTML + '">' + mensagem[this.innerHTML] + '</option>');
+                }
             });
 
             $promise.resolve();
@@ -2678,7 +2686,7 @@ function ModificarAbasPorTipoDeLote(tipoDeLote) {
             $('#AbaAcRespsInovDE').hide();
             $('#AbaAcRespsFabrica').hide();
             $('#AbaAcRespsMeioAmbiente').hide();
-           
+
             break;
         default:
             $("#pills-responsaveis-tab").addClass("disabled");
@@ -3098,16 +3106,17 @@ function VerificarGrupoDlPclOuPlantaPiloto() {
     return result;
 }
 
-function ValidarLinhaEquipamento(){
+function ValidarLinhaEquipamento() {
     var valSelected = $("select#linhaEquipamento").val();
     if (valSelected) {
-        return BuscarMinimoEMaximoPecas(valSelected);
+        var mensagem = BuscarMinimoEMaximoPecas(valSelected);
+        $('input#produtoQuantidade').attr("title", mensagem);
     } else {
         return false;
     }
 }
 
-function BuscarMinimoEMaximoPecas(linhaEquipamentoId){
+function BuscarMinimoEMaximoPecas(linhaEquipamentoId) {
     var $promise = $.Deferred();
     var $minimoPecas = "";
     var $maximoPecas = "";
@@ -3137,18 +3146,23 @@ function BuscarMinimoEMaximoPecas(linhaEquipamentoId){
         }
     });
 
-    if (produtoqtd < $minimoPecas ){
-        return false;
+    if (produtoqtd < $minimoPecas) {
+
+        NotificarErroValidacao('text', 'input#produtoQuantidade', '', '');
+        return "Valor digitado está fora da capacidade do equipamento";
+
     } else if (produtoqtd > $maximoPecas ) {
-        return false;
+
+        NotificarErroValidacao('text', 'input#produtoQuantidade', '', '');
+        return "Valor digitado está fora da capacidade do equipamento";
+
     } else {
-        return true;
+        $('input#produtoQuantidade').removeAttr("title");
+        return null;
     }
 }
 
 $(document).ready(function () {
-    $('[data-toggle="tooltip"]').tooltip();
-
     $.when(
         CarregarCategoriaProjeto(),
         CarregarFabricas(),

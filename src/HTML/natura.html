@@ -121,7 +121,8 @@
                 </div>
                 <div class="col-md-6">
                     <label for="produtoQuantidade">Quantidade (peças)</label>
-                    <input type="number" class="form-control salvar-campo" id="produtoQuantidade" name="QuantidadePecas">
+                    <input type="number" class="form-control salvar-campo" id="produtoQuantidade" name="QuantidadePecas"
+                     onfocusout="ValidarLinhaEquipamento()">
                 </div>
             </div>
             <div class="row" style="margin-top: 10px;">
@@ -336,7 +337,7 @@
                     </div>
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-auto">
-                            <label for="peoplePickerAbaRespCoordProgFabrica">Fábrica - Coord. Programação</label>
+                            <label for="peoplePickerAbaRespCoordProgFabrica">Fábrica - Planejamento de Fábrica</label>
                             <div id="peoplePickerAbaRespCoordProgFabrica"></div>
                         </div>
                         <div class="col-md-auto">
@@ -490,7 +491,7 @@
                     </div>
                     <div class="row" style="margin-top: 10px;" id="AbaAcRespsFabrica">
                         <div class="col-md-auto">
-                            <label for="peoplePickerAbaAcCoordProgFabrica">Fábrica - Coordenador de Programação</label>
+                            <label for="peoplePickerAbaAcCoordProgFabrica">Fábrica - Planejamento de Fábrica</label>
                             <div id="peoplePickerAbaAcCoordProgFabrica"></div>
                         </div>
                         <div class="col-md-auto">
