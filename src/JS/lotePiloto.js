@@ -1048,6 +1048,7 @@ function ValidarAgendamentosAcompanhamentos(tipoDeLote) {
 }
 
 function ValidarAgendamento() {
+    verificarErros();
 
     var erroTotal = 0;
     var errosPnlGeral = ValidarAgendamentosGeral();
@@ -2167,6 +2168,8 @@ function VerificarGrupoRespOuAcomp() {
     return result;
 }
 
+
+
 function ModificarBotoesPorFormState(formState) {
     var $btnAgendar = $('.btn-agendar');
     var $btnExecutado = $('.btn-executado');
@@ -2227,7 +2230,6 @@ function ModificarBotoesPorFormState(formState) {
                 $btnNaoExecutado.show();
                 $btnExecutado.show();
             }
-
             break;
         case AGENDAMENTO_EM_EDICAO:
             if (VerificarGrupoDlPclOuPlantaPiloto()) {
@@ -2248,8 +2250,8 @@ function ModificarBotoesPorFormState(formState) {
             }
             break;
         case REGISTRO_DE_ANALISE:
-            // $btnAprovar.show();
-            // $btnReprovarAprovar.show();
+            
+
             break;
         case EM_NAO_EXECUCAO:
             if (VerificarGrupoRespOuAcomp()) {
@@ -2515,27 +2517,40 @@ function ModificarFormState(formState) {
     ModificarBotoesPorFormState(formState);
     ModificarCamposPorFormState(formState);
     ModificarAbasPorFormState(formState);
+
 }
 
+
 function ModificarAbasPorFormState(formState) {
+    console.log(formState);
     switch (formState) {
         case EM_CANCELAMENTO:
             $('#justificativaCancelamento').removeClass('d-md-none');
             $("#pills-justificativa-tab").removeClass("disabled");
             $("#pills-justificativa-tab").tab('show');
+            $('#pills-analises-tab').addClass('disabled');
             break;
         case CANCELADO:
             $('#justificativaCancelamento').removeClass('d-md-none');
             $("#pills-justificativa-tab").removeClass("disabled");
+            $('#pills-analises-tab').addClass('disabled');
             break;
         case EM_NAO_EXECUCAO:
             $('#justificativaNaoExecutado').removeClass('d-md-none');
             $("#pills-justificativa-tab").removeClass("disabled");
             $("#pills-justificativa-tab").tab('show');
+            $('#pills-analises-tab').addClass('disabled');
             break;
         case LOTE_NAO_EXECUTADO:
             $('#justificativaNaoExecutado').removeClass('d-md-none');
             $("#pills-justificativa-tab").removeClass("disabled");
+            $('#pills-analises-tab').addClass('disabled');
+            break;
+        case EM_CRIACAO:
+            $('#pills-analises-tab').addClass('disabled');
+            break;
+        case REGISTRO_DE_ANALISE:
+            $('#pills-analises-tab').removeClass('disabled');
             break;
     }
 }
@@ -2929,7 +2944,7 @@ function ResetarAgendamento() {
 
 function SalvarAgendamento() {
     var id = $('input[name="ID"]').val();
-
+    
     if (id) {
         return AtualizarAgendamento(id).then(function (response) {
             return CarregarAgendamento(response.record.attr('ows_ID'));
@@ -3164,6 +3179,64 @@ function BuscarMinimoEMaximoPecas(linhaEquipamentoId){
     } else {
         return true;
     }
+}
+
+function verificarErros(){
+    var $campos = {
+        tipoDeLote,
+        fabrica,
+        linhaEquipamento,
+        codigoProduto,
+        linhaDoProduto,
+        produtoDescricao,
+        produtoProjeto,
+        categoriaDoProjeto,
+        produtoFormula,
+        produtoQuantidade,
+        motivo,
+        produtoEnvioAmostras,
+        produtoResponsavelAmostra,
+        produtoQuantidadeAmostra,
+        agendamentoCentroCusto,
+        grauComplexidade,
+        agendamentoDataInicioProgramado,
+        agendamentoDuracaoHoras,
+        agendamentoDuracaoMinutos,
+        agendamentoFim,
+        agendamentoObservacoes
+    };
+
+    var itens;
+    for ( itens in $campos) {
+        var $atributo =  $('#'+itens);
+        var $classe = $atributo.attr('class');
+
+        console.log($classe.indexOf('tom-selec'));
+        var $tabItem = $atributo.parents('div.tab-pane');
+        var tabId = $tabItem.attr('id');
+        var $tabContent = $tabItem.parents('div.tab-content');
+        var $link = $tabContent.parent().find('ul.nav.nav-tabs li a[href="#' + tabId + '"]');
+        $link.tab('show');
+
+        if($classe.indexOf('tom-selec') > 0){
+            console.log("passou Select");
+            if( $atributo.children('option:selected').val()  === 'Selecione uma opção') {
+                $atributo.first().focus();
+                break;
+            }
+        } else {
+            console.log("passou outros");
+            if ($atributo.val().length == 0 ){
+                $atributo.focus();
+                break;
+            }
+        }
+    }
+
+}
+
+function scrollToElement(ele) {
+    $(window).scrollTop(ele.offset().top);
 }
 
 $(document).ready(function () {
