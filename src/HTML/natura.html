@@ -61,37 +61,29 @@
     </div>
     <ul class="nav nav-tabs" id="nav-tab" role="tablist">
         <li class="nav-item">
-            <a class="nav-link active" id="pills-produto-tab" data-toggle="pill" href="#pills-produto" role="tab" aria-controls="pills-produto"
-                aria-selected="true">Produto</a>
+            <a class="nav-link active" id="pills-produto-tab" data-toggle="pill" href="#pills-produto" role="tab">Produto</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="pills-agendamento-tab" data-toggle="pill" href="#pills-agendamento" role="tab" aria-controls="pills-agendamento"
-                aria-selected="false">Agendamento</a>
+            <a class="nav-link" id="pills-agendamento-tab" data-toggle="pill" href="#pills-agendamento" role="tab">Agendamento</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="pills-responsaveis-tab" data-toggle="pill" href="#pills-responsaveis" role="tab" aria-controls="pills-responsaveis"
-                aria-selected="false">Responsáveis</a>
+            <a class="nav-link" id="pills-responsaveis-tab" data-toggle="pill" href="#pills-responsaveis" role="tab">Responsáveis</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="pills-acompanhamento-tab" data-toggle="pill" href="#pills-acompanhamento" role="tab" aria-controls="pills-acompanhamento"
-                aria-selected="false">Acompanhamento</a>
+            <a class="nav-link" id="pills-acompanhamento-tab" data-toggle="pill" href="#pills-acompanhamento" role="tab">Acompanhamento</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="pills-analises-tab" data-toggle="pill" href="#pills-analises" role="tab" aria-controls="pills-analises"
-                aria-selected="false">Análises</a>
+            <a class="nav-link" id="pills-analises-tab" data-toggle="pill" href="#pills-analises" role="tab">Análises</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="pills-historico-tab" data-toggle="pill" href="#pills-historico" role="tab" aria-controls="pills-historico"
-                aria-selected="false">Histórico</a>
+            <a class="nav-link" id="pills-historico-tab" data-toggle="pill" href="#pills-historico" role="tab">Histórico</a>
         </li>
         <li class="nav-item" title="Esta aba só habilitará para preenchimento nos status &ldquo;Cancelado&rdquo; e &ldquo;Não Executado&rdquo;">
-            <a class="nav-link disabled" id="pills-justificativa-tab" data-toggle="pill" href="#pills-justificativa" role="tab" aria-controls="pills-justificativa"
-                aria-selected="false">Justificativa</a>
+            <a class="nav-link disabled" id="pills-justificativa-tab" data-toggle="pill" href="#pills-justificativa" role="tab">Justificativa</a>
         </li>
     </ul>
     <div class="tab-content" id="pills-tabContent">
-        <div class="tab-pane fade show active" id="pills-produto" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel"
-            aria-labelledby="pills-produto-tab">
+        <div class="tab-pane fade show active" id="pills-produto" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel">
             <div class="row" style="margin-top: 10px;">
                 <div class="col-md-6">
                     <label for="codigoProduto">Código do produto</label>
@@ -129,7 +121,8 @@
                 </div>
                 <div class="col-md-6">
                     <label for="produtoQuantidade">Quantidade (peças)</label>
-                    <input type="number" class="form-control salvar-campo" id="produtoQuantidade" name="QuantidadePecas">
+                    <input type="number" class="form-control salvar-campo" id="produtoQuantidade" name="QuantidadePecas"
+                     onfocusout="ValidarLinhaEquipamento()">
                 </div>
             </div>
             <div class="row" style="margin-top: 10px;">
@@ -159,8 +152,7 @@
                 </div>
             </div>
         </div>
-        <div class="tab-pane fade" id="pills-agendamento" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel"
-            aria-labelledby="pills-agendamento-tab">
+        <div class="tab-pane fade" id="pills-agendamento" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel">
             <div class="row" style="margin-top: 10px;">
                 <div class="col-md-6">
                     <label for="agendamentoCentroCusto">Centro de custo - PEP - NT</label>
@@ -201,41 +193,32 @@
                 </div>
             </div>
         </div>
-        <div class="tab-pane fade" id="pills-responsaveis" style="background-color: rgb(242, 242, 242); padding: 10px; margin-bottom: 10px;"
-            role="tabpanel" aria-labelledby="pills-responsaveis-tab">
+        <div class="tab-pane fade" id="pills-responsaveis" style="background-color: rgb(242, 242, 242); padding: 10px; margin-bottom: 10px;">
             <ul class="nav nav-tabs" id="nav-tab-responsaveis" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link active" id="pills-dlpcl-tab" data-toggle="pill" href="#pills-dlpcl" role="tab" aria-controls="pills-dlpcl"
-                        aria-selected="true">DL/PCL</a>
+                    <a class="nav-link active" id="pills-dlpcl-tab" data-toggle="pill" href="#pills-dlpcl" role="tab">DL/PCL</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="pills-eng-envase-tab" data-toggle="pill" href="#pills-eng-envase" role="tab" aria-controls="pills-eng-envase"
-                        aria-selected="false">Eng. Envase</a>
+                    <a class="nav-link" id="pills-eng-envase-tab" data-toggle="pill" href="#pills-eng-envase" role="tab">Eng. Envase</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="pills-eng-fabricacao-tab" data-toggle="pill" href="#pills-eng-fabricacao" role="tab" aria-controls="pills-eng-fabricacao"
-                        aria-selected="false">Eng. Fabricação</a>
+                    <a class="nav-link" id="pills-eng-fabricacao-tab" data-toggle="pill" href="#pills-eng-fabricacao" role="tab">Eng. Fabricação</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="pills-inov-df-tab" data-toggle="pill" href="#pills-inov-df" role="tab" aria-controls="pills-inov-df"
-                        aria-selected="false">Inov. DF</a>
+                    <a class="nav-link" id="pills-inov-df-tab" data-toggle="pill" href="#pills-inov-df" role="tab">Inov. DF</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="pills-inov-de-tab" data-toggle="pill" href="#pills-inov-de" role="tab" aria-controls="pills-inov-de"
-                        aria-selected="false">Inov. DE</a>
+                    <a class="nav-link" id="pills-inov-de-tab" data-toggle="pill" href="#pills-inov-de" role="tab">Inov. DE</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="pills-qualidade-tab" data-toggle="pill" href="#pills-qualidade" role="tab" aria-controls="pills-qualidade"
-                        aria-selected="false">Qualidade</a>
+                    <a class="nav-link" id="pills-qualidade-tab" data-toggle="pill" href="#pills-qualidade" role="tab">Qualidade</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="pills-fabrica-tab" data-toggle="pill" href="#pills-fabrica" role="tab" aria-controls="pills-fabrica"
-                        aria-selected="false">Fábrica</a>
+                    <a class="nav-link" id="pills-fabrica-tab" data-toggle="pill" href="#pills-fabrica" role="tab">Fábrica</a>
                 </li>
             </ul>
             <div class="tab-content" id="pills-tabContent-responsaveis">
-                <div class="tab-pane fade show active" id="pills-dlpcl" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel"
-                    aria-labelledby="pills-dlpcl-tab">
+                <div class="tab-pane fade show active" id="pills-dlpcl" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel">
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-auto">
                             <label for="peoplePickerAbaRespRespDLPCL">DL/PCL - Responsável</label>
@@ -243,8 +226,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="pills-eng-envase" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel"
-                    aria-labelledby="pills-eng-envase-tab">
+                <div class="tab-pane fade" id="pills-eng-envase" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel">
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-auto">
                             <div class="custom-control custom-checkbox">
@@ -264,8 +246,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="pills-eng-fabricacao" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel"
-                    aria-labelledby="pills-eng-fabricacao-tab">
+                <div class="tab-pane fade" id="pills-eng-fabricacao" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel">
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-auto">
                             <div class="custom-control custom-checkbox">
@@ -285,8 +266,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="pills-inov-df" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel"
-                    aria-labelledby="pills-inov-df-tab">
+                <div class="tab-pane fade" id="pills-inov-df" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel">
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-auto">
                             <div class="custom-control custom-checkbox">
@@ -306,8 +286,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="pills-inov-de" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel"
-                    aria-labelledby="pills-inov-de-tab">
+                <div class="tab-pane fade" id="pills-inov-de" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel">
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-auto">
                             <div class="custom-control custom-checkbox">
@@ -327,8 +306,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="pills-qualidade" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel"
-                    aria-labelledby="pills-qualidade-tab">
+                <div class="tab-pane fade" id="pills-qualidade" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel">
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-auto">
                             <div class="custom-control custom-checkbox">
@@ -348,8 +326,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="pills-fabrica" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel"
-                    aria-labelledby="pills-fabrica-tab">
+                <div class="tab-pane fade" id="pills-fabrica" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel">
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-auto">
                             <div class="custom-control custom-checkbox">
@@ -360,7 +337,7 @@
                     </div>
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-auto">
-                            <label for="peoplePickerAbaRespCoordProgFabrica">Fábrica - Coord. Programação</label>
+                            <label for="peoplePickerAbaRespCoordProgFabrica">Fábrica - Planejamento de Fábrica</label>
                             <div id="peoplePickerAbaRespCoordProgFabrica"></div>
                         </div>
                         <div class="col-md-auto">
@@ -375,45 +352,35 @@
                 </div>
             </div>
         </div>
-        <div class="tab-pane fade" id="pills-acompanhamento" style="background-color: rgb(242, 242, 242); padding: 10px; margin-bottom: 10px;"
-            role="tabpanel" aria-labelledby="pills-acompanhamento-tab">
+        <div class="tab-pane fade" id="pills-acompanhamento" style="background-color: rgb(242, 242, 242); padding: 10px; margin-bottom: 10px;" role="tabpanel">
             <ul class="nav nav-tabs" id="nav-tab-acompanhamento" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link active" id="pills-dlpcl-acomp-tab" data-toggle="pill" href="#pills-dlpcl-acomp" role="tab" aria-controls="pills-dlpcl-acomp"
-                        aria-selected="true">DL/PCL</a>
+                    <a class="nav-link active" id="pills-dlpcl-acomp-tab" data-toggle="pill" href="#pills-dlpcl-acomp" role="tab">DL/PCL</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="pills-eng-envase-acomp-tab" data-toggle="pill" href="#pills-eng-envase-acomp" role="tab" aria-controls="pills-eng-envase-acomp"
-                        aria-selected="false">Eng. Envase</a>
+                    <a class="nav-link" id="pills-eng-envase-acomp-tab" data-toggle="pill" href="#pills-eng-envase-acomp" role="tab">Eng. Envase</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="pills-eng-fabricacao-acomp-tab" data-toggle="pill" href="#pills-eng-fabricacao-acomp" role="tab"
-                        aria-controls="pills-eng-fabricacao-acomp" aria-selected="false">Eng. Fabricação</a>
+                    <a class="nav-link" id="pills-eng-fabricacao-acomp-tab" data-toggle="pill" href="#pills-eng-fabricacao-acomp" role="tab">Eng. Fabricação</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="pills-inov-df-acomp-tab" data-toggle="pill" href="#pills-inov-df-acomp" role="tab" aria-controls="pills-inov-df-acomp"
-                        aria-selected="false">Inov. DF</a>
+                    <a class="nav-link" id="pills-inov-df-acomp-tab" data-toggle="pill" href="#pills-inov-df-acomp" role="tab">Inov. DF</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="pills-inov-de-acomp-tab" data-toggle="pill" href="#pills-inov-de-acomp" role="tab" aria-controls="pills-inov-de-acomp"
-                        aria-selected="false">Inov. DE</a>
+                    <a class="nav-link" id="pills-inov-de-acomp-tab" data-toggle="pill" href="#pills-inov-de-acomp" role="tab">Inov. DE</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="pills-qualidade-acomp-tab" data-toggle="pill" href="#pills-qualidade-acomp" role="tab" aria-controls="pills-qualidade-acomp"
-                        aria-selected="false">Qualidade</a>
+                    <a class="nav-link" id="pills-qualidade-acomp-tab" data-toggle="pill" href="#pills-qualidade-acomp" role="tab">Qualidade</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="pills-fabrica-acomp-tab" data-toggle="pill" href="#pills-fabrica-acomp" role="tab" aria-controls="pills-fabrica-acomp"
-                        aria-selected="false">Fábrica</a>
+                    <a class="nav-link" id="pills-fabrica-acomp-tab" data-toggle="pill" href="#pills-fabrica-acomp" role="tab" >Fábrica</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="pills-meioambiente-acomp-tab" data-toggle="pill" href="#pills-meioambiente-acomp" role="tab" aria-controls="pills-meioambiente-acomp"
-                        aria-selected="false">Meio Ambiente</a>
+                    <a class="nav-link" id="pills-meioambiente-acomp-tab" data-toggle="pill" href="#pills-meioambiente-acomp" role="tab">Meio Ambiente</a>
                 </li>
             </ul>
             <div class="tab-content" id="pills-tabContent-acompanhamento">
-                <div class="tab-pane fade show active" id="pills-dlpcl-acomp" style="background-color: rgb(242, 242, 242); padding: 10px;"
-                    role="tabpanel" aria-labelledby="pills-dlpcl-acomp-tab">
+                <div class="tab-pane fade show active" id="pills-dlpcl-acomp" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel" >
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-auto">
                             <div class="custom-control custom-checkbox">
@@ -423,8 +390,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="pills-eng-envase-acomp" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel"
-                    aria-labelledby="pills-eng-envase-acomp-tab">
+                <div class="tab-pane fade" id="pills-eng-envase-acomp" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel">
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-auto">
                             <div class="custom-control custom-checkbox">
@@ -435,17 +401,16 @@
                     </div>
                     <div class="row" style="margin-top: 10px;" id="AbaAcRespsEngEnvase">
                         <div class="col-md-auto">
-                            <label for="peoplePickerAbaAcRespEngEnvase">Engenharia Evase - Responsável</label>
+                            <label for="peoplePickerAbaAcRespEngEnvase">Engenharia Envase - Responsável</label>
                             <div id="peoplePickerAbaAcRespEngEnvase"></div>
                         </div>
                         <div class="col-md-auto">
-                            <label for="peoplePickerAbaAcGerEngEnvase">Engenharia Evase - Gerente</label>
+                            <label for="peoplePickerAbaAcGerEngEnvase">Engenharia Envase - Gerente</label>
                             <div id="peoplePickerAbaAcGerEngEnvase"></div>
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="pills-eng-fabricacao-acomp" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel"
-                    aria-labelledby="pills-eng-fabricacao-acomp-tab">
+                <div class="tab-pane fade" id="pills-eng-fabricacao-acomp" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel">
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-auto">
                             <div class="custom-control custom-checkbox">
@@ -465,8 +430,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="pills-inov-df-acomp" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel"
-                    aria-labelledby="pills-inov-df-acomp-tab">
+                <div class="tab-pane fade" id="pills-inov-df-acomp" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel">
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-auto">
                             <div class="custom-control custom-checkbox">
@@ -486,8 +450,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="pills-inov-de-acomp" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel"
-                    aria-labelledby="pills-inov-de-acomp-tab">
+                <div class="tab-pane fade" id="pills-inov-de-acomp" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel">
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-auto">
                             <div class="custom-control custom-checkbox">
@@ -507,19 +470,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="pills-inov-de-acomp" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel"
-                    aria-labelledby="pills-inov-de-acomp-tab">
-                    <div class="row" style="margin-top: 10px;">
-                        <div class="col-md-auto">
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="acRespInovDEAcomp">
-                                <label class="custom-control-label" for="acRespInovDEAcomp">Haverá acompanhamento durante a execução do lote?</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="pills-qualidade-acomp" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel"
-                    aria-labelledby="pills-qualidade-acomp-tab">
+                <div class="tab-pane fade" id="pills-qualidade-acomp" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel">
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-auto">
                             <div class="custom-control custom-checkbox">
@@ -529,8 +480,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="pills-fabrica-acomp" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel"
-                    aria-labelledby="pills-fabrica-acomp-tab">
+                <div class="tab-pane fade" id="pills-fabrica-acomp" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel">
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-auto">
                             <div class="custom-control custom-checkbox">
@@ -541,7 +491,7 @@
                     </div>
                     <div class="row" style="margin-top: 10px;" id="AbaAcRespsFabrica">
                         <div class="col-md-auto">
-                            <label for="peoplePickerAbaAcCoordProgFabrica">Fábrica - Coordenador de Programação</label>
+                            <label for="peoplePickerAbaAcCoordProgFabrica">Fábrica - Planejamento de Fábrica</label>
                             <div id="peoplePickerAbaAcCoordProgFabrica"></div>
                         </div>
                         <div class="col-md-auto">
@@ -554,8 +504,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="pills-meioambiente-acomp" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel"
-                    aria-labelledby="pills-meioambiente-acomp-tab">
+                <div class="tab-pane fade" id="pills-meioambiente-acomp" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel">
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-auto">
                             <div class="custom-control custom-checkbox">
@@ -573,26 +522,112 @@
                 </div>
             </div>
         </div>
-        <div class="tab-pane fade" id="pills-analises" style="background-color: rgb(242, 242, 242); padding: 10px; margin-bottom: 10px;"
-            role="tabpanel">
+        <div class="tab-pane fade" id="pills-analises" style="background-color: rgb(242, 242, 242); padding: 10px; margin-bottom: 10px;" role="tabpanel">
             <ul class="nav nav-tabs" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link active" data-toggle="pill" href="#tab-analise-qualidade" role="tab">Qualidade</a>
+                    <a class="nav-link" data-toggle="pill" href="#tab-qualidade-resp" role="tab">Qualidade</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="pill" href="#tab-eng-envase-resp" role="tab">Eng. Envase</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="pill" href="#tab-eng-fabricacao-resp" role="tab">Eng. Fabricação</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="pill" href="#tab-inov-df-resp" role="tab">Inov. DF</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="pill" href="#tab-inov-de-resp" role="tab">Inov. DE</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="pill" href="#tab-fabrica-resp" role="tab">Fábrica</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="pill" href="#tab-analise-qualidade-ger" role="tab">Qualidade Gerente</a>
                 </li>
             </ul>
-            <div class="tab-content" id="tab-analise-conteudo">
-                <div class="tab-pane fade show active" id="tab-analise-qualidade" style="background-color: rgb(242, 242, 242); padding: 10px;"
-                    role="tabpanel">
-                    <input id="txtAtt-tab-analise-qualidade" type="file"/>
+            <div class="tab-content">
+                <div class="tab-pane fade show active" id="tab-qualidade-resp" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel">
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-6">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="qualidadeRespAcompanhamento">
+                                <label class="custom-control-label" for="qualidadeRespAcompanhamento">Houve acompanhamento durante a execução do lote?</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-6">
+                            <label for="qualidadeRespPessoa">Pessoa</label>
+                            <input id="qualidadeRespPessoa" class="form-control" type="text"/>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="qualidadeRespResultado">Resultado</label>
+                            <select class="custom-select select-enum" id="qualidadeRespResultado" name="resultado">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-12">
+                            <label for="qualidadeRespObservacoes">Observações</label>
+                            <textarea class="form-control" id="qualidadeRespObservacoes" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-auto">
+                            <label for="txtAtt-tab-analise-qualidade">Anexos</label>
+                            <input id="txtAtt-tab-analise-qualidade" class="form-control-file" type="file"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="tab-eng-envase-resp" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel">
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-auto">
+                            CONTEUDO ENVASE
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="tab-eng-fabricacao-resp" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel">
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-auto">
+                            CONTEUDO ENG FABRICACAO
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="tab-inov-df-resp" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel">
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-auto">
+                            CONTEUDO INOV DF
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="tab-inov-de-resp" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel">
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-auto">
+                            CONTEUDO INOF DE
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="tab-fabrica-resp" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel">
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-auto">
+                            CONTEUDO FABRICA
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="tab-analise-qualidade-ger" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel">
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-auto">
+                            CONTEUDO QUALIDADE GERENTE
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="tab-pane fade" id="pills-historico" style="background-color: rgb(242, 242, 242); padding: 10px; margin-bottom: 10px;"
-            role="tabpanel" aria-labelledby="pills-historico-tab">
+        <div class="tab-pane fade" id="pills-historico" style="background-color: rgb(242, 242, 242); padding: 10px; margin-bottom: 10px;" role="tabpanel">
             <table id="data-table"></table>
         </div>
-        <div class="tab-pane fade" id="pills-justificativa" style="background-color: rgb(242, 242, 242); padding: 10px; margin-bottom: 10px;"
-            role="tabpanel" aria-labelledby="pills-justificativa-tab">
+        <div class="tab-pane fade" id="pills-justificativa" style="background-color: rgb(242, 242, 242); padding: 10px; margin-bottom: 10px;" role="tabpanel">
                 <div class="d-md-none" id="justificativaCancelamento">
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-12">
@@ -632,8 +667,6 @@
         <a href="#" class="btn btn-primary btn-carregar" role="button">Carregar</a>
         <a href="#" class="btn btn-primary btn-agendar" role="button">Agendar</a>
         <a href="#" class="btn btn-primary btn-executado" role="button">Executado</a>
-        <a href="#" class="btn btn-primary btn-aprovar" role="button">Aprovar</a>
-        <a href="#" class="btn btn-primary btn-reprovar" role="button">Reprovar</a>
         <a href="#" class="btn btn-primary btn-cancelar-agendamento" role="button">Cancelar Agendamento</a>
         <a href="#" class="btn btn-primary btn-nao-executado" role="button">Não Executado</a>
         <a href="#" class="btn btn-primary btn-derivar" role="button">Derivar</a>
