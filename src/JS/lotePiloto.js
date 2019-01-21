@@ -2731,31 +2731,27 @@ function ModificarFormState(formState) {
 
 
 function ModificarAbasPorFormState(formState) {
+    $('#pills-analises-tab').addClass('disabled');
     switch (formState) {
         case EM_CANCELAMENTO:
             $('#justificativaCancelamento').removeClass('d-md-none');
             $("#pills-justificativa-tab").removeClass("disabled");
             $("#pills-justificativa-tab").tab('show');
-            $('#pills-analises-tab').addClass('disabled');
             break;
         case CANCELADO:
             $('#justificativaCancelamento').removeClass('d-md-none');
             $("#pills-justificativa-tab").removeClass("disabled");
-            $('#pills-analises-tab').addClass('disabled');
             break;
         case EM_NAO_EXECUCAO:
             $('#justificativaNaoExecutado').removeClass('d-md-none');
             $("#pills-justificativa-tab").removeClass("disabled");
             $("#pills-justificativa-tab").tab('show');
-            $('#pills-analises-tab').addClass('disabled');
             break;
         case LOTE_NAO_EXECUTADO:
             $('#justificativaNaoExecutado').removeClass('d-md-none');
             $("#pills-justificativa-tab").removeClass("disabled");
-            $('#pills-analises-tab').addClass('disabled');
             break;
         case EM_CRIACAO:
-            $('#pills-analises-tab').addClass('disabled');
             break;
         case REGISTRO_DE_ANALISE:
             $('#pills-analises-tab').removeClass('disabled');
