@@ -2450,6 +2450,7 @@ function ModificarBotoesPorFormState(formState) {
             if (VerificarGrupoDlPclOuPlantaPiloto()) {
                 $btnSalvar.show();
                 $btnAgendar.show();
+                $btnAbandonar.show();
             }
             break;
         case AGENDADO:
@@ -2744,8 +2745,6 @@ function ModificarCamposPorFormState(formState) {
 
 function ModificarStatusPorFormState(formState) {
     var $status = $('select#status');
-    //TODO
-    var $qualidadeGerResultado = $('select#qualidadeRespResultado');
 
     switch (formState) {
         case AGENDADO:
@@ -2768,6 +2767,12 @@ function ModificarStatusPorFormState(formState) {
             break;
         case EM_CRIACAO:
             $status.val("");
+            break;
+        case RASCUNHO:
+            $status.val(RASCUNHO);
+            break;
+        case RASCUNHO_EM_EDICAO:
+            $status.val(RASCUNHO);
             break;
     }
 }
@@ -3361,7 +3366,7 @@ function RegistrarBotoes() {
     });
 
     $('.btn-reagendar').click(function () {
-        ModificarFormState(RASCUNHO);
+        ModificarFormState(RASCUNHO_EM_EDICAO);
     });
 }
 
