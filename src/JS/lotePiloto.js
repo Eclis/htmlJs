@@ -14,6 +14,7 @@ var AGENDAMENTO_EM_EDICAO = 'agendadoEmEdicao';
 var RESP_ACOMP_AGENDADO_EM_EDICAO = 'respAcompAgendadoEmEdicao';
 var EM_CANCELAMENTO = 'emCancelamento';
 var EM_NAO_EXECUCAO = 'emNaoExecucao';
+var EM_REGISTRO_DE_ANALISE = 'emRegistroDeAnalise';
 
 var state;
 var aprovacoes = null;
@@ -1515,6 +1516,7 @@ function CarregarSelects(selectsACarregar) {
         select.elemento.change();
     });
     CarregarListaResultadoAnalise();
+    CarregarListaMotivoAnalise();
 }
 
 function CarregarCategoriaProjeto() {
@@ -1873,6 +1875,34 @@ function CarregarListaResultadoAnaliseComSimilaridade() {
 
             var $resultado = $('select[name=resultado]');
             $(Data.responseXML).find('Field[DisplayName="Resultado"] CHOICE').each(function () {
+                $resultado.append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+            });
+
+            $promise.resolve();
+        }
+    });
+
+    return $promise;
+}
+
+function CarregarListaMotivoAnalise() {
+    var $promise = $.Deferred();
+
+    $().SPServices({
+        operation: 'GetList',
+        listName: 'Agendamentos - Responsáveis',
+        completefunc: function (Data, Status) {
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
+                });
+
+                return;
+            }
+
+            var $resultado = $('select[name=motivoAnalise]');
+            $(Data.responseXML).find('Field[DisplayName="Motivo Reprovação"] CHOICE').each(function () {
                 $resultado.append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
             });
 
@@ -2403,6 +2433,7 @@ function ModificarBotoesPorFormState(formState) {
             }
             break;
         case REGISTRO_DE_ANALISE:
+            $btnEditar.show();
             break;
         case EM_NAO_EXECUCAO:
             if (VerificarGrupoRespOuAcomp()) {
@@ -2414,6 +2445,10 @@ function ModificarBotoesPorFormState(formState) {
             if (VerificarGrupoDlPclOuPlantaPiloto()) {
                 $btnReagendar.show();
             }
+            break;
+        case EM_REGISTRO_DE_ANALISE:
+            $btnSalvar.show();
+            $btnAbandonar.show();
             break;
         case 'Aguardando Reagendamento':
             if (VerificarGrupoDlPclOuPlantaPiloto()) $btnDerivar.show();
@@ -2472,6 +2507,12 @@ function ModificarCamposPorFormState(formState) {
     var $qualidadeResponsavelPPGer = $('#peoplePickerAbaRespGerQualidade_TopSpan_EditorInput');
     var $meioAmbienteResponsavelAcompanhamento = $('[name=MeioAmbienteAcompanhamento]');
     var $meioAmbienteResponsavelPPResp = $('#peoplePickerAbaAcRespMeioAmbiente_TopSpan_EditorInput');
+    var $qualidadeRespAcompanhamento = $('#qualidadeRespAcompanhamento');
+    var $qualidadeRespPessoa = $('#qualidadeRespPessoa');
+    var $qualidadeRespResultado = $('#qualidadeRespResultado');
+    var $qualidadeRespObservacoes = $('#qualidadeRespObservacoes');
+    var $txtAttTabAnaliseQualidade = $('#txtAtt-tab-analise-qualidade');
+    var $qualidadeRespMotivo = $('#qualidadeRespMotivo');
 
     $TipoLote.attr('disabled', true);
     $Fabrica.attr('disabled', true);
@@ -2519,6 +2560,12 @@ function ModificarCamposPorFormState(formState) {
     $qualidadeResponsavelPPGer.attr('disabled', true);
     $meioAmbienteResponsavelAcompanhamento.attr('disabled', true);
     $meioAmbienteResponsavelPPResp.attr('disabled', true);
+    $qualidadeRespAcompanhamento.attr('disabled', true);
+    $qualidadeRespPessoa.attr('disabled', true);
+    $qualidadeRespResultado.attr('disabled', true);
+    $qualidadeRespObservacoes.attr('disabled', true);
+    $txtAttTabAnaliseQualidade.attr('disabled', true);
+    $qualidadeRespMotivo.attr('disabled', true);
 
     switch (formState) {
         case EM_CRIACAO:
@@ -2632,11 +2679,20 @@ function ModificarCamposPorFormState(formState) {
             $('[name=NaoExecutadoMotivo]').attr('disabled', false);
             $('[name=NaoExecutadoComentarios]').attr('disabled', false);
             break;
+        case EM_REGISTRO_DE_ANALISE:
+            $qualidadeRespAcompanhamento.attr('disabled', false);
+            $qualidadeRespPessoa.attr('disabled', false);
+            $qualidadeRespResultado.attr('disabled', false);
+            $qualidadeRespObservacoes.attr('disabled', false);
+            $txtAttTabAnaliseQualidade.attr('disabled', false);
+            break;
     }
 }
 
 function ModificarStatusPorFormState(formState) {
     var $status = $('select#status');
+    //TODO
+    var $qualidadeGerResultado = $('select#qualidadeRespResultado');
 
     switch (formState) {
         case AGENDADO:
@@ -3223,6 +3279,8 @@ function RegistrarBotoes() {
             ModificarFormState(RASCUNHO_EM_EDICAO);
         } else if (status == AGENDADO) {
             ModificarFormState(AGENDAMENTO_EM_EDICAO);
+        } else if(status == REGISTRO_DE_ANALISE) {
+            ModificarFormState(EM_REGISTRO_DE_ANALISE);
         }
     });
 
