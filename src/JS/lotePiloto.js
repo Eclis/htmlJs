@@ -2811,7 +2811,14 @@ function ModificarAbasPorFormState(formState) {
 }
 
 function ModificarAbasPorTipoDeLote(tipoDeLote) {
-    $('#qualidadeGerAcompanhamento');
+    $('#pills-tab-qualidade-resp').hide();
+    $('#pills-tab-eng-envase-resp').hide();
+    $('#pills-tab-eng-fabricacao-resp').hide();
+    $('#pills-tab-inov-df-resp').hide();
+    $('#pills-tab-inov-de-resp').hide();
+    $('#pills-tab-fabrica-resp').hide();
+    $('#pills-tab-analise-qualidade-ger').hide();
+
 
     switch (tipoDeLote) {
         case 'Brinde':
@@ -2850,6 +2857,9 @@ function ModificarAbasPorTipoDeLote(tipoDeLote) {
             $('#AbaAcRespsFabrica').hide();
             $('#AbaAcRespsMeioAmbiente').hide();
 
+            $('#pills-tab-qualidade-resp').show();
+            $('#pills-tab-analise-qualidade-ger').show();
+
             break;
         case 'Envase':
             $("#pills-responsaveis-tab").removeClass("disabled");
@@ -2886,6 +2896,12 @@ function ModificarAbasPorTipoDeLote(tipoDeLote) {
             $('#AbaAcRespsInovDE').hide();
             $('#AbaAcRespsFabrica').hide();
             $('#AbaAcRespsMeioAmbiente').hide();
+
+            $('#pills-tab-qualidade-resp').show();
+            $('#pills-tab-eng-envase-resp').show();
+            $('#pills-tab-inov-de-resp').show();
+            $('#pills-tab-analise-qualidade-ger').show();
+            $('#pills-tab-fabrica-resp').show();
 
             break;
         case 'Fabricação':
@@ -2924,41 +2940,11 @@ function ModificarAbasPorTipoDeLote(tipoDeLote) {
             $('#AbaAcRespsFabrica').hide();
             $('#AbaAcRespsMeioAmbiente').hide();
 
-            break;
-        case 'Picking':
-            $("#pills-responsaveis-tab").addClass("disabled");
-            $("#pills-acompanhamento-tab").addClass("disabled");
-
-            $("#pills-dlpcl-tab").hide();
-            $("#pills-eng-envase-tab").hide();
-            $("#pills-eng-fabricacao-tab").hide();
-            $("#pills-inov-df-tab").hide();
-            $("#pills-inov-de-tab").hide();
-            $("#pills-qualidade-tab").hide();
-            $("#pills-fabrica-tab").hide();
-
-            $("#pills-dlpcl-acomp-tab").hide();
-            $("#pills-eng-envase-acomp-tab").hide();
-            $("#pills-eng-fabricacao-acomp-tab").hide();
-            $("#pills-inov-df-acomp-tab").hide();
-            $("#pills-inov-de-acomp-tab").hide();
-            $("#pills-qualidade-acomp-tab").hide();
-            $("#pills-fabrica-acomp-tab").hide();
-            $("#pills-meioambiente-acomp-tab").hide();
-
-            $('input[type=checkbox]#acRespEngEnvaseAcomp').prop('checked',false);
-            $('input[type=checkbox]#acRespEngfabricacaoAcomp').prop('checked',false);
-            $('input[type=checkbox]#acRespInovDFAcomp').prop('checked',false);
-            $('input[type=checkbox]#acRespInovDEAcomp').prop('checked',false);
-            $('input[type=checkbox]#acRespFabricaAcomp').prop('checked',false);
-            $('input[type=checkbox]#acRespMeioAmbienteAcomp').prop('checked',false);
-
-            $('#AbaAcRespsEngEnvase').hide();
-            $('#AbaAcRespsEngFabricacao').hide();
-            $('#AbaAcRespsInovDF').hide();
-            $('#AbaAcRespsInovDE').hide();
-            $('#AbaAcRespsFabrica').hide();
-            $('#AbaAcRespsMeioAmbiente').hide();
+            $('#pills-tab-eng-fabricacao-resp').hide();
+            $('#pills-tab-inov-df-resp').hide();
+            $('#pills-tab-fabrica-resp').hide();
+            $('#pills-tab-qualidade-resp').hide();
+            $('#pills-tab-analise-qualidade-ger').hide();
 
             break;
         default:
@@ -2995,6 +2981,14 @@ function ModificarAbasPorTipoDeLote(tipoDeLote) {
             $('#AbaAcRespsInovDE').hide();
             $('#AbaAcRespsFabrica').hide();
             $('#AbaAcRespsMeioAmbiente').hide();
+
+            $('#pills-tab-qualidade-resp').hide();
+            $('#pills-tab-eng-envase-resp').hide();
+            $('#pills-tab-eng-fabricacao-resp').hide();
+            $('#pills-tab-inov-df-resp').hide();
+            $('#pills-tab-inov-de-resp').hide();
+            $('#pills-tab-fabrica-resp').hide();
+            $('#pills-tab-analise-qualidade-ger').hide();
 
             break;
     }
