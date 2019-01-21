@@ -1287,7 +1287,13 @@ function AtualizarAgendamento(id) {
         let promises = [];
 
         $.each(responsaveis, function (i, responsavel) {
-            promises.push(AtualizarResponsavelAgendamento(response.record.attr('ows_CodigoAgendamento'), responsavel));
+            var usuarioDoPeoplePicker = PegarUsuarioDoPeoplePicker(responsavel.peoplePickerId);
+
+            if (usuarioDoPeoplePicker) {
+                promises.push(CarregarUsuarioPorLoginName(usuarioDoPeoplePicker.loginName).then(function (usuario) {
+                    return AtualizarResponsavelAgendamento(response.record.attr('ows_CodigoAgendamento'), responsavel, usuario);
+                }));
+            }
         });
 
         return $.when.apply($, promises).then(function () {
@@ -1296,55 +1302,56 @@ function AtualizarAgendamento(id) {
     });
 }
 
-function AtualizarResponsavelAgendamento(codigoAgendamento, responsavel) {
-    var $promise = $.Deferred();
-    var campos = [];
-    var aprovacao = aprovacoes[responsavel.nome];
-
-    if (aprovacao == null) {
-        return InserirResponsavelAgendamento(codigoAgendamento, responsavel);
+function AtualizarResponsavelAgendamento(codigoAgendamento, responsavel, usuario) {
+    if (aprovacoes[responsavel.nome] == null) {
+        return InserirResponsavelAgendamento(codigoAgendamento, responsavel, usuario);
     }
 
-    Object.keys(aprovacao).forEach(function (index) {
-        if (aprovacao[index] != null) {
-            campos.push([index, aprovacao[index]]);
-        }
-    });
+    return AtualizarResponsavelAgendamentoParaMemoria(responsavel).then(function (aprovacao) {
+        var $promise = $.Deferred();
+        var campos = [];
 
-    $().SPServices({
-        operation: "UpdateListItems",
-        async: false,
-        batchCmd: "Update",
-        listName: "Agendamentos - Responsáveis",
-        ID: aprovacao.ID,
-        valuepairs: campos,
-        completefunc: function (xData, Status) {
-            if (Status != 'success') {
-                $promise.reject({
-                    errorCode: '0x99999999',
-                    errorText: 'Erro Remoto'
-                });
-
-                return;
+        Object.keys(aprovacao).forEach(function (index) {
+            if (aprovacao[index] != null) {
+                campos.push([index, aprovacao[index]]);
             }
+        });
 
-            var $response = $(xData.responseText);
-            var errorCode = $response.find('ErrorCode').text();
+        $().SPServices({
+            operation: "UpdateListItems",
+            async: false,
+            batchCmd: "Update",
+            listName: "Agendamentos - Responsáveis",
+            ID: aprovacao.ID,
+            valuepairs: campos,
+            completefunc: function (xData, Status) {
+                if (Status != 'success') {
+                    $promise.reject({
+                        errorCode: '0x99999999',
+                        errorText: 'Erro Remoto'
+                    });
 
-            if (errorCode == '0x00000000') {
-                $promise.resolve({
-                    record: $response.find('z\\:row:first')
-                });
-            } else {
-                $promise.reject({
-                    errorCode: errorCode,
-                    errorText: $response.find('ErrorText').text()
-                });
+                    return;
+                }
+
+                var $response = $(xData.responseText);
+                var errorCode = $response.find('ErrorCode').text();
+
+                if (errorCode == '0x00000000') {
+                    $promise.resolve({
+                        record: $response.find('z\\:row:first')
+                    });
+                } else {
+                    $promise.reject({
+                        errorCode: errorCode,
+                        errorText: $response.find('ErrorText').text()
+                    });
+                }
             }
-        }
-    });
+        });
 
-    return $promise;
+        return $promise;
+    });
 }
 
 function CalcularCamposCalculaveis() {
@@ -1424,7 +1431,7 @@ function CarregarAgendamento(id) {
                 }
             });
 
-            CarregarSelects(selectsACarregar);
+            PreencherSelectsConsiderandoDependencia(selectsACarregar);
             ModificarFormState($('select#status').val());
 
             CarregarAgendamentoResponsaveis(atributos.ows_CodigoAgendamento.value).then(function () {
@@ -1506,6 +1513,30 @@ function CarregarAgendamentoResponsaveis(agendamento) {
     return $promise;
 }
 
+function AtualizarResponsavelAgendamentoParaMemoria(responsavel) {
+    aprovacoes[responsavel.nome].Pessoa = null;
+
+    if (responsavel.abaAnaliseId) {
+        var $tab = $('#' + responsavel.abaAnaliseId);
+        aprovacoes[responsavel.nome].ExecucaoLoteAcompanhada = $tab.find('[name=ExecucaoLoteAcompanhada]').prop('checked') ? '1' : '0';
+        aprovacoes[responsavel.nome].Resultado = $tab.find('[name=Resultado]').val();
+        aprovacoes[responsavel.nome].Observacoes = $tab.find('[name=ObservacoesAnalise]').val();
+        aprovacoes[responsavel.nome].ReprovadoMotivo = $tab.find('[name=ReprovadoMotivo]').val();
+    }
+
+    var usuarioDoPeoplePicker = PegarUsuarioDoPeoplePicker(responsavel.peoplePickerId);
+
+    if (!usuarioDoPeoplePicker) {
+        return $.when(aprovacoes[responsavel.nome]);
+    }
+
+    return CarregarUsuarioPorLoginName(usuarioDoPeoplePicker.loginName).then(function (usuario) {
+        aprovacoes[responsavel.nome].Pessoa = usuario.id;
+
+        return aprovacoes[responsavel.nome];
+    });
+}
+
 function FiltrarNomeUsuarioPorPessoaId(pessoaId) {
     return pessoaId.slice(pessoaId.indexOf(';#') + ';#'.length);
 }
@@ -1519,13 +1550,14 @@ function PreencherAbaAnalises(responsavel) {
 
     var $abaAnalise = $('#' + responsavel.abaAnaliseId);
 
-    $abaAnalise.find('[name="ExecucaoLoteAcompanhada"]').prop('checked', aprovacao.ExecucaoLoteAcompanhada == "1");
-    $abaAnalise.find('[name="Pessoa"]').val(FiltrarNomeUsuarioPorPessoaId(aprovacao.Pessoa));
-    $abaAnalise.find('[name="Resultado"]').val(aprovacao.Resultado);
-    $abaAnalise.find('[name="ObservacoesAnalise"]').val(aprovacao.Observacoes);
+    $abaAnalise.find('[name="ExecucaoLoteAcompanhada"]').prop('checked', aprovacao.ExecucaoLoteAcompanhada == "1").change();
+    $abaAnalise.find('[name="Pessoa"]').val(FiltrarNomeUsuarioPorPessoaId(aprovacao.Pessoa)).change();
+    $abaAnalise.find('[name="Resultado"]').val(aprovacao.Resultado).change();
+    $abaAnalise.find('[name="ObservacoesAnalise"]').val(aprovacao.Observacoes).change();
+    if (aprovacao.ReprovadoMotivo != null) $abaAnalise.find('[name="ReprovadoMotivo"]').val(aprovacao.ReprovadoMotivo).change();
 }
 
-function CarregarSelects(selectsACarregar) {
+function PreencherSelectsConsiderandoDependencia(selectsACarregar) {
     var sorter = new Toposort();
 
     Object.keys(selectsACarregar).forEach(function (index) {
@@ -1537,8 +1569,6 @@ function CarregarSelects(selectsACarregar) {
         select.elemento.val(select.valor);
         select.elemento.change();
     });
-    CarregarListaResultadoAnalise();
-    CarregarListaMotivoAnalise();
 }
 
 function CarregarCategoriaProjeto() {
@@ -1873,9 +1903,9 @@ function CarregarListaStatus() {
 
 function CarregarListaResultadoAnalise() {
     if ($('select[name=GrauComplexidade] :selected').val() == 2) {
-        CarregarListaResultadoAnaliseComSimilaridade();
+        return CarregarListaResultadoAnaliseComSimilaridade();
     } else {
-        CarregarListaResultadoAnaliseSemSimilaridade();
+        return CarregarListaResultadoAnaliseSemSimilaridade();
     }
 }
 
@@ -1924,7 +1954,8 @@ function CarregarListaMotivoAnalise() {
                 return;
             }
 
-            var $resultado = $('select[name=motivoAnalise]');
+            var $resultado = $('select[name=ReprovadoMotivo]');
+
             $(Data.responseXML).find('Field[DisplayName="Motivo Reprovação"] CHOICE').each(function () {
                 $resultado.append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
             });
@@ -2175,7 +2206,13 @@ function InserirAgendamento() {
             let promises = [];
 
             $.each(responsaveis, function (i, responsavel) {
-                promises.push(InserirResponsavelAgendamento(response.record.attr('ows_CodigoAgendamento'), responsavel));
+                var usuarioDoPeoplePicker = PegarUsuarioDoPeoplePicker(responsavel.peoplePickerId);
+
+                if (usuarioDoPeoplePicker) {
+                    promises.push(CarregarUsuarioPorLoginName(usuarioDoPeoplePicker.loginName).then(function (usuario) {
+                        return InserirResponsavelAgendamento(response.record.attr('ows_CodigoAgendamento'), responsavel, usuario);
+                    }));
+                }
             });
 
             return $.when.apply($, promises).then(function () {
@@ -2243,54 +2280,46 @@ function PegarUsuarioDoPeoplePicker(peoplePickerId) {
     };
 }
 
-function InserirResponsavelAgendamento(codigoAgendamento, responsavel) {
-    var usuarioDoPeoplePicker = PegarUsuarioDoPeoplePicker(responsavel.peoplePickerId);
+function InserirResponsavelAgendamento(codigoAgendamento, responsavel, usuario) {
+    var $promise = $.Deferred();
 
-    if (!usuarioDoPeoplePicker) {
-        return $.when(false);
-    }
+    $().SPServices({
+        operation: "UpdateListItems",
+        batchCmd: "New",
+        listName: "Agendamentos - Responsáveis",
+        valuepairs: [
+            ['CodigoAgendamento', codigoAgendamento],
+            ['Title', codigoAgendamento + ' - ' + responsavel.nome],
+            ['TipoResponsavel', responsavel.nome],
+            ['Pessoa', usuario.id]
+        ],
+        completefunc: function (xData, Status) {
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
+                });
 
-    return CarregarUsuarioPorLoginName(usuarioDoPeoplePicker.loginName).then(function (usuario) {
-        var $promise = $.Deferred();
-
-        $().SPServices({
-            operation: "UpdateListItems",
-            batchCmd: "New",
-            listName: "Agendamentos - Responsáveis",
-            valuepairs: [
-                ['CodigoAgendamento', codigoAgendamento],
-                ['Title', codigoAgendamento + ' - ' + responsavel.nome],
-                ['TipoResponsavel', responsavel.nome],
-                ['Pessoa', usuario.id]
-            ],
-            completefunc: function (xData, Status) {
-                if (Status != 'success') {
-                    $promise.reject({
-                        errorCode: '0x99999999',
-                        errorText: 'Erro Remoto'
-                    });
-
-                    return;
-                }
-
-                var $response = $(xData.responseText);
-                var errorCode = $response.find('ErrorCode').text();
-
-                if (errorCode == '0x00000000') {
-                    $promise.resolve({
-                        record: $response.find('z\\:row:first')
-                    });
-                } else {
-                    $promise.reject({
-                        errorCode: errorCode,
-                        errorText: $response.find('ErrorText').text()
-                    });
-                }
+                return;
             }
-        });
 
-        return $promise;
+            var $response = $(xData.responseText);
+            var errorCode = $response.find('ErrorCode').text();
+
+            if (errorCode == '0x00000000') {
+                $promise.resolve({
+                    record: $response.find('z\\:row:first')
+                });
+            } else {
+                $promise.reject({
+                    errorCode: errorCode,
+                    errorText: $response.find('ErrorText').text()
+                });
+            }
+        }
     });
+
+    return $promise;
 }
 
 function InstanciarDateTimePicker() {
@@ -2738,7 +2767,7 @@ function ModificarStatusPorFormState(formState) {
             $status.val(REPROVADO);
             break;
         case EM_CRIACAO:
-            $status.val("")
+            $status.val("");
             break;
     }
 }
@@ -3137,6 +3166,17 @@ function RegistrarBindings() {
     espelharCheckBox('#acRespInofDF', '#acRespInofDFAcomp');
     espelharCheckBox('#acRespInofDE', '#acRespInofDEAcomp');
     espelharCheckBox('#acRespFabrica', '#acRespFabricaAcomp');
+
+    $('[name="ReprovadoMotivo"]').change(function () {
+        var $this = $(this);
+        var $tab = $this.parents('.tab-pane[role="tabpanel"]');
+        var $
+        var $reprovadoMotivo = $tab.find('[name="ReprovadoMotivo"]');
+
+        if($reprovadoMotivo.val() == 'Reprovado') {
+
+        }
+    });
 }
 
 function espelharCheckBox(checkA, checkB) {
@@ -3525,7 +3565,9 @@ $(document).ready(function () {
         CarregarListaTiposLotes(),
         CarregarMotivoCancelamento(),
         CarregarMotivoNaoExecutado(),
-        InitializeAllPeoplePickers()
+        InitializeAllPeoplePickers(),
+        CarregarListaResultadoAnalise(),
+        CarregarListaMotivoAnalise()
     ).then(function () {
         InstanciarDateTimePicker();
         RegistrarBindings();
