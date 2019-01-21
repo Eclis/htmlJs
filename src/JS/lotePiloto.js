@@ -1267,8 +1267,6 @@ function AtualizarAgendamento(id) {
             var errorCode = $response.find('ErrorCode').text();
 
             if (errorCode == '0x00000000') {
-                AtualizarAgendamentoResponsaveis();
-
                 $promise.resolve({
                     record: $response.find('z\\:row:first')
                 });
@@ -1287,7 +1285,7 @@ function AtualizarAgendamento(id) {
         let promises = [];
 
         $.each(responsaveis, function (i, responsavel) {
-            promises.push(AtualizarResponsavelAgendamento(responsavel));
+            promises.push(AtualizarResponsavelAgendamento(response.record.attr('ows_CodigoAgendamento'), responsavel));
         });
 
         return $.when.apply($, promises).then(function () {
@@ -1296,13 +1294,19 @@ function AtualizarAgendamento(id) {
     });
 }
 
-function AtualizarResponsavelAgendamento(responsavel) {
+function AtualizarResponsavelAgendamento(codigoAgendamento, responsavel) {
     var $promise = $.Deferred();
     var campos = [];
     var aprovacao = aprovacoes[responsavel.nome];
 
+    if (aprovacao == null) {
+        return InserirResponsavelAgendamento(codigoAgendamento, responsavel);
+    }
+
     Object.keys(aprovacao).forEach(function (index) {
-        campos.push([index, aprovacao[index]]);
+        if (aprovacao[index] != null) {
+            campos.push([index, aprovacao[index]]);
+        }
     });
 
     $().SPServices({
