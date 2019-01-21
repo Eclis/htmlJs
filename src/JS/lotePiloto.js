@@ -2811,7 +2811,7 @@ function ModificarAbasPorFormState(formState) {
 }
 
 function ModificarAbasPorTipoDeLote(tipoDeLote) {
-
+    $('#qualidadeGerAcompanhamento');
 
     switch (tipoDeLote) {
         case 'Brinde':
