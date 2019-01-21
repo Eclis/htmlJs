@@ -2598,7 +2598,6 @@ function ModificarFormState(formState) {
 
 
 function ModificarAbasPorFormState(formState) {
-    console.log(formState);
     switch (formState) {
         case EM_CANCELAMENTO:
             $('#justificativaCancelamento').removeClass('d-md-none');
@@ -3277,36 +3276,83 @@ function verificarErros(){
         agendamentoDuracaoHoras,
         agendamentoDuracaoMinutos,
         agendamentoFim,
-        agendamentoObservacoes
+        agendamentoObservacoes,
     };
+
+    var erro = 0;
 
     var itens;
     for ( itens in $campos) {
         var $atributo =  $('#'+itens);
         var $classe = $atributo.attr('class');
 
-        console.log($classe.indexOf('tom-selec'));
-        var $tabItem = $atributo.parents('div.tab-pane');
-        var tabId = $tabItem.attr('id');
-        var $tabContent = $tabItem.parents('div.tab-content');
-        var $link = $tabContent.parent().find('ul.nav.nav-tabs li a[href="#' + tabId + '"]');
-        $link.tab('show');
-
         if($classe.indexOf('tom-selec') > 0){
-            console.log("passou Select");
             if( $atributo.children('option:selected').val()  === 'Selecione uma opção') {
+                var $tabItem = $atributo.parents('div.tab-pane');
+                var tabId = $tabItem.attr('id');
+                var $tabContent = $tabItem.parents('div.tab-content');
+                var $link = $tabContent.parent().find('ul.nav.nav-tabs li a[href="#' + tabId + '"]');
+                $link.tab('show');
                 $atributo.first().focus();
+                erro = 1;
                 break;
             }
         } else {
-            console.log("passou outros");
             if ($atributo.val().length == 0 ){
+                var $tabItem = $atributo.parents('div.tab-pane');
+                var tabId = $tabItem.attr('id');
+                var $tabContent = $tabItem.parents('div.tab-content');
+                var $link = $tabContent.parent().find('ul.nav.nav-tabs li a[href="#' + tabId + '"]');
+                $link.tab('show');
                 $atributo.focus();
+                erro = 1;
                 break;
             }
         }
     }
 
+    var $camposPeople = {
+        peoplePickerAbaRespGerQualidade_TopSpan,
+        peoplePickerAbaRespRespQualidade_TopSpan
+    }
+
+    var people;
+
+    if (erro == 0){
+        for ( people in $camposPeople) {
+            var $atributo =  $('#'+people);
+
+            if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespRespQualidade_TopSpan.HasResolvedUsers()) {
+                var $tabItem = $atributo.parents('div.tab-pane');
+                var $tabPai = $tabItem.parents('div.tab-pane');
+                var tabId = $tabItem.attr('id');
+                var tabPaiId = $tabPai.attr('id');
+                var $tabContent = $tabItem.parents('div.tab-content');
+                var $tabContentPai = $tabPai.parents('div.tab-content');
+                var $link = $tabContent.parent().find('ul.nav.nav-tabs li a[href="#' + tabId + '"]');
+                var $linkPai = $tabContentPai.parent().find('ul.nav.nav-tabs li a[href="#' + tabPaiId + '"]');
+                $linkPai.tab('show');
+                $link.tab('show');
+
+                $atributo.focus();
+                break;
+            } else if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespRespQualidade_TopSpan.HasInputError) {
+                var $tabItem = $atributo.parents('div.tab-pane');
+                var $tabPai = $tabItem.parents('div.tab-pane');
+                var tabId = $tabItem.attr('id');
+                var tabPaiId = $tabPai.attr('id');
+                var $tabContent = $tabItem.parents('div.tab-content');
+                var $tabContentPai = $tabPai.parents('div.tab-content');
+                var $link = $tabContent.parent().find('ul.nav.nav-tabs li a[href="#' + tabId + '"]');
+                var $linkPai = $tabContentPai.parent().find('ul.nav.nav-tabs li a[href="#' + tabPaiId + '"]');
+                $linkPai.tab('show');
+                $link.tab('show');
+
+                $atributo.focus();
+                break;
+            }
+        }
+    }
 }
 
 function scrollToElement(ele) {
