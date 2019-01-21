@@ -1485,11 +1485,13 @@ function CarregarAgendamentoResponsaveis(agendamento) {
                     ReprovadoMotivo: this.attributes.ows_ReprovadoMotivo != undefined ? this.attributes.ows_ReprovadoMotivo.value : null,
                 };
 
-                var usuarioNome = this.attributes.ows_Pessoa.value.slice(this.attributes.ows_Pessoa.value.indexOf(';#') + ';#'.length);
+                var usuarioNome = FiltrarNomeUsuarioPorPessoaId(this.attributes.ows_Pessoa.value);
 
                 promessas.push(CarregarUsuarioPorLoginName(usuarioNome).then(function (usuario) {
                     PreencherPeoplePicker(responsavel.peoplePickerId, usuario);
                 }));
+
+                promessas.push(PreencherAbaAnalises(responsavel));
             });
 
             $.when($, promessas).then(function () {
@@ -1501,6 +1503,25 @@ function CarregarAgendamentoResponsaveis(agendamento) {
     });
 
     return $promise;
+}
+
+function FiltrarNomeUsuarioPorPessoaId(pessoaId) {
+    return pessoaId.slice(pessoaId.indexOf(';#') + ';#'.length);
+}
+
+function PreencherAbaAnalises(responsavel) {
+    var aprovacao = aprovacoes[responsavel.nome];
+
+    if (responsavel.abaAnaliseId == null) {
+        return;
+    }
+
+    var $abaAnalise = $('#' + responsavel.abaAnaliseId);
+
+    $abaAnalise.find('[name="ExecucaoLoteAcompanhada"]').prop('checked', aprovacao.ExecucaoLoteAcompanhada == "1");
+    $abaAnalise.find('[name="Pessoa"]').val(FiltrarNomeUsuarioPorPessoaId(aprovacao.Pessoa));
+    $abaAnalise.find('[name="Resultado"]').val(aprovacao.Resultado);
+    $abaAnalise.find('[name="ObservacoesAnalise"]').val(aprovacao.Observacoes);
 }
 
 function CarregarSelects(selectsACarregar) {
@@ -1873,7 +1894,8 @@ function CarregarListaResultadoAnaliseComSimilaridade() {
                 return;
             }
 
-            var $resultado = $('select[name=resultado]');
+            var $resultado = $('select[name=Resultado]');
+
             $(Data.responseXML).find('Field[DisplayName="Resultado"] CHOICE').each(function () {
                 $resultado.append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
             });
@@ -1929,7 +1951,7 @@ function CarregarListaResultadoAnaliseSemSimilaridade() {
                 return;
             }
 
-            var $resultado = $('select[name=resultado]');
+            var $resultado = $('select[name=Resultado]');
             $(Data.responseXML).find('Field[DisplayName="Resultado"] CHOICE').each(function () {
                 if (this.innerHTML == 'Aprovado por Similaridade') {
                     return true;
@@ -2163,29 +2185,29 @@ function InserirAgendamento() {
 }
 
 var SetoresResponsaveis = [
-    {tipoDeLote: 'Brinde', peoplePickerId: 'peoplePickerAbaRespRespDLPCL', nome: 'DL/PCL - Responsável'},
-    {tipoDeLote: 'Brinde', peoplePickerId: 'peoplePickerAbaRespRespQualidade', nome: 'Qualidade - Responsável'},
-    {tipoDeLote: 'Brinde', peoplePickerId: 'peoplePickerAbaRespGerQualidade', nome: 'Qualidade - Gerente'},
-    {tipoDeLote: 'Envase', peoplePickerId: 'peoplePickerAbaRespRespDLPCL', nome: 'DL/PCL - Responsável'},
-    {tipoDeLote: 'Envase', peoplePickerId: 'peoplePickerAbaRespRespEngEnvase', nome: 'Eng. Envase - Responsável'} ,
-    {tipoDeLote: 'Envase', peoplePickerId: 'peoplePickerAbaRespGerEngEnvase', nome: 'Eng. Envase - Gerente'},
-    {tipoDeLote: 'Envase', peoplePickerId: 'peoplePickerAbaRespRespInovDE', nome: 'Inovação DE - Responsável'},
-    {tipoDeLote: 'Envase', peoplePickerId: 'peoplePickerAbaRespGerInovDE', nome: 'Inovação DE - Gerente'},
-    {tipoDeLote: 'Envase', peoplePickerId: 'peoplePickerAbaRespRespQualidade', nome: 'Qualidade - Responsável'},
-    {tipoDeLote: 'Envase', peoplePickerId: 'peoplePickerAbaRespGerQualidade', nome: 'Qualidade - Gerente'},
-    {tipoDeLote: 'Envase', peoplePickerId: 'peoplePickerAbaRespCoordProgFabrica', nome: 'Fábrica - Coord. Programação'},
-    {tipoDeLote: 'Envase', peoplePickerId: 'peoplePickerAbaRespCoordManFabrica', nome: 'Fábrica - Coord. de Manufatura'},
-    {tipoDeLote: 'Envase', peoplePickerId: 'peoplePickerAbaRespGerFabrica', nome: 'Fábrica - Gerente'},
-    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespRespDLPCL', nome: 'DL/PCL - Responsável'},
-    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespRespEngFabricacao', nome: 'Eng. Fabricação - Responsável'},
-    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespGerEngFabricacao', nome: 'Eng. Fabricação - Gerente'},
-    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespRespInovDF', nome: 'Inovação DF - Responsável'},
-    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespGerInovDF', nome: 'Inovação DF - Gerente'},
-    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespRespQualidade', nome: 'Qualidade - Responsável'},
-    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespGerQualidade', nome: 'Qualidade - Gerente'},
-    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespCoordProgFabrica', nome: 'Fábrica - Coord. Programação'},
-    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespCoordManFabrica', nome: 'Fábrica - Coord. de Manufatura'},
-    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespGerFabrica', nome: 'Fábrica - Gerente'},
+    {tipoDeLote: 'Brinde',     peoplePickerId: 'peoplePickerAbaRespRespDLPCL',         nome: 'DL/PCL - Responsável',           abaAnaliseId: null},
+    {tipoDeLote: 'Brinde',     peoplePickerId: 'peoplePickerAbaRespRespQualidade',     nome: 'Qualidade - Responsável',        abaAnaliseId: null},
+    {tipoDeLote: 'Brinde',     peoplePickerId: 'peoplePickerAbaRespGerQualidade',      nome: 'Qualidade - Gerente',            abaAnaliseId: null},
+    {tipoDeLote: 'Envase',     peoplePickerId: 'peoplePickerAbaRespRespDLPCL',         nome: 'DL/PCL - Responsável',           abaAnaliseId: null},
+    {tipoDeLote: 'Envase',     peoplePickerId: 'peoplePickerAbaRespRespEngEnvase',     nome: 'Eng. Envase - Responsável',      abaAnaliseId: null},
+    {tipoDeLote: 'Envase',     peoplePickerId: 'peoplePickerAbaRespGerEngEnvase',      nome: 'Eng. Envase - Gerente',          abaAnaliseId: null},
+    {tipoDeLote: 'Envase',     peoplePickerId: 'peoplePickerAbaRespRespInovDE',        nome: 'Inovação DE - Responsável',      abaAnaliseId: null},
+    {tipoDeLote: 'Envase',     peoplePickerId: 'peoplePickerAbaRespGerInovDE',         nome: 'Inovação DE - Gerente',          abaAnaliseId: null},
+    {tipoDeLote: 'Envase',     peoplePickerId: 'peoplePickerAbaRespRespQualidade',     nome: 'Qualidade - Responsável',        abaAnaliseId: null},
+    {tipoDeLote: 'Envase',     peoplePickerId: 'peoplePickerAbaRespGerQualidade',      nome: 'Qualidade - Gerente',            abaAnaliseId: null},
+    {tipoDeLote: 'Envase',     peoplePickerId: 'peoplePickerAbaRespCoordProgFabrica',  nome: 'Fábrica - Coord. Programação',   abaAnaliseId: null},
+    {tipoDeLote: 'Envase',     peoplePickerId: 'peoplePickerAbaRespCoordManFabrica',   nome: 'Fábrica - Coord. de Manufatura', abaAnaliseId: null},
+    {tipoDeLote: 'Envase',     peoplePickerId: 'peoplePickerAbaRespGerFabrica',        nome: 'Fábrica - Gerente',              abaAnaliseId: null},
+    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespRespDLPCL',         nome: 'DL/PCL - Responsável',           abaAnaliseId: null},
+    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespRespEngFabricacao', nome: 'Eng. Fabricação - Responsável',  abaAnaliseId: null},
+    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespGerEngFabricacao',  nome: 'Eng. Fabricação - Gerente',      abaAnaliseId: null},
+    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespRespInovDF',        nome: 'Inovação DF - Responsável',      abaAnaliseId: null},
+    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespGerInovDF',         nome: 'Inovação DF - Gerente',          abaAnaliseId: null},
+    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespRespQualidade',     nome: 'Qualidade - Responsável',        abaAnaliseId: 'tab-qualidade-resp'},
+    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespGerQualidade',      nome: 'Qualidade - Gerente',            abaAnaliseId: null},
+    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespCoordProgFabrica',  nome: 'Fábrica - Coord. Programação',   abaAnaliseId: null},
+    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespCoordManFabrica',   nome: 'Fábrica - Coord. de Manufatura', abaAnaliseId: null},
+    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespGerFabrica',        nome: 'Fábrica - Gerente',              abaAnaliseId: null},
 ];
 
 function GetResponsavelPorNome(nome) {
@@ -2750,6 +2772,8 @@ function ModificarAbasPorFormState(formState) {
 }
 
 function ModificarAbasPorTipoDeLote(tipoDeLote) {
+
+
     switch (tipoDeLote) {
         case 'Brinde':
             $("#pills-responsaveis-tab").removeClass("disabled");
@@ -2773,12 +2797,12 @@ function ModificarAbasPorTipoDeLote(tipoDeLote) {
             $("#pills-fabrica-acomp-tab").show();
             $("#pills-meioambiente-acomp-tab").show();
 
-            $('input[type=checkbox]#acRespEngEnvaseAcomp').prop('checked',false);
-            $('input[type=checkbox]#acRespEngfabricacaoAcomp').prop('checked',false);
-            $('input[type=checkbox]#acRespInovDFAcomp').prop('checked',false);
-            $('input[type=checkbox]#acRespInovDEAcomp').prop('checked',false);
-            $('input[type=checkbox]#acRespFabricaAcomp').prop('checked',false);
-            $('input[type=checkbox]#acRespMeioAmbienteAcomp').prop('checked',false);
+            $('input[type=checkbox]#acRespEngEnvaseAcomp').prop('checked', false);
+            $('input[type=checkbox]#acRespEngfabricacaoAcomp').prop('checked', false);
+            $('input[type=checkbox]#acRespInovDFAcomp').prop('checked', false);
+            $('input[type=checkbox]#acRespInovDEAcomp').prop('checked', false);
+            $('input[type=checkbox]#acRespFabricaAcomp').prop('checked', false);
+            $('input[type=checkbox]#acRespMeioAmbienteAcomp').prop('checked', false);
 
             $('#AbaAcRespsEngEnvase').hide();
             $('#AbaAcRespsEngFabricacao').hide();
