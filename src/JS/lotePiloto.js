@@ -16,6 +16,7 @@ var EM_CANCELAMENTO = 'emCancelamento';
 var EM_NAO_EXECUCAO = 'emNaoExecucao';
 
 var state;
+var aprovacoes = null;
 
 function ValidarAgendamentosGeral() {
     var errorAgendamentosGeral = 0;
@@ -1266,6 +1267,65 @@ function AtualizarAgendamento(id) {
             var errorCode = $response.find('ErrorCode').text();
 
             if (errorCode == '0x00000000') {
+                AtualizarAgendamentoResponsaveis();
+
+                $promise.resolve({
+                    record: $response.find('z\\:row:first')
+                });
+            } else {
+                $promise.reject({
+                    errorCode: errorCode,
+                    errorText: $response.find('ErrorText').text()
+                });
+            }
+        }
+    });
+
+    return $promise.then(function (response) {
+        let $TipoLote = $('[name=TipoLote]');
+        let responsaveis = GetResponsaveisPorTipoDeLote($TipoLote.val());
+        let promises = [];
+
+        $.each(responsaveis, function (i, responsavel) {
+            promises.push(AtualizarResponsavelAgendamento(responsavel));
+        });
+
+        return $.when.apply($, promises).then(function () {
+            return response;
+        });
+    });
+}
+
+function AtualizarResponsavelAgendamento(responsavel) {
+    var $promise = $.Deferred();
+    var campos = [];
+    var aprovacao = aprovacoes[responsavel.nome];
+
+    Object.keys(aprovacao).forEach(function (index) {
+        campos.push([index, aprovacao[index]]);
+    });
+
+    $().SPServices({
+        operation: "UpdateListItems",
+        async: false,
+        batchCmd: "Update",
+        listName: "Agendamentos - Responsáveis",
+        ID: aprovacao.ID,
+        valuepairs: campos,
+        completefunc: function (xData, Status) {
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
+                });
+
+                return;
+            }
+
+            var $response = $(xData.responseText);
+            var errorCode = $response.find('ErrorCode').text();
+
+            if (errorCode == '0x00000000') {
                 $promise.resolve({
                     record: $response.find('z\\:row:first')
                 });
@@ -1361,7 +1421,7 @@ function CarregarAgendamento(id) {
             CarregarSelects(selectsACarregar);
             ModificarFormState($('select#status').val());
 
-            CarregarResponsaveis(atributos.ows_CodigoAgendamento.value).then(function () {
+            CarregarAgendamentoResponsaveis(atributos.ows_CodigoAgendamento.value).then(function () {
                 $promise.resolve();
             }).fail(function (response) {
                 $promise.reject(response);
@@ -1372,14 +1432,14 @@ function CarregarAgendamento(id) {
     return $promise;
 }
 
-function CarregarResponsaveis(agendamento) {
+function CarregarAgendamentoResponsaveis(agendamento) {
     var $promise = $.Deferred();
 
     $().SPServices({
         operation: 'GetListItems',
         listName: 'Agendamentos - Responsáveis',
         CAMLQuery: '<Query><Where><Eq><FieldRef Name="CodigoAgendamento" /><Value Type="Text">' + agendamento + '</Value></Eq></Where></Query>',
-        CAMLViewFields: '<ViewFields><FieldRef Name="Title" /><FieldRef Name="CodigoAgendamento" /><FieldRef Name="TipoResponsavel" /><FieldRef Name="Pessoa" /><FieldRef Name="Resultado" /><FieldRef Name="ExecucaoLoteAcompanhada" /><FieldRef Name="Avaliado" /><FieldRef Name="Avaliador" /><FieldRef Name="Observacoes" /><FieldRef Name="MeioAmbienteAbastecimentoVacuo" /><FieldRef Name="MeioAmbienteAbastecimentoGranel" /><FieldRef Name="MeioAmbienteAbastecimentoManual" /><FieldRef Name="MeioAmbienteAcondicionamentoMate" /><FieldRef Name="MeioAmbienteAcondicionamentoReci" /><FieldRef Name="MeioAmbienteAumentoGeracaoResidu" /><FieldRef Name="MeioAmbienteTipoResiduosGeradosJ" /><FieldRef Name="MeioAmbienteAumentoConsumoAguaLi" /><FieldRef Name="MeioAmbienteAumentoConsumoEnergi" /><FieldRef Name="MeioAmbienteAumentoConsumoAguaFa" /><FieldRef Name="SimilarCodigoAgendamento" /><FieldRef Name="ReprovadoMotivo" /><FieldRef Name="Modified" /><FieldRef Name="Created" /><FieldRef Name="Author" /><FieldRef Name="Editor" /></ViewFields>',
+        CAMLViewFields: '<ViewFields><FieldRef Name="ID" /><FieldRef Name="Title" /><FieldRef Name="CodigoAgendamento" /><FieldRef Name="TipoResponsavel" /><FieldRef Name="Pessoa" /><FieldRef Name="Resultado" /><FieldRef Name="ExecucaoLoteAcompanhada" /><FieldRef Name="Avaliado" /><FieldRef Name="Avaliador" /><FieldRef Name="Observacoes" /><FieldRef Name="MeioAmbienteAbastecimentoVacuo" /><FieldRef Name="MeioAmbienteAbastecimentoGranel" /><FieldRef Name="MeioAmbienteAbastecimentoManual" /><FieldRef Name="MeioAmbienteAcondicionamentoMate" /><FieldRef Name="MeioAmbienteAcondicionamentoReci" /><FieldRef Name="MeioAmbienteAumentoGeracaoResidu" /><FieldRef Name="MeioAmbienteTipoResiduosGeradosJ" /><FieldRef Name="MeioAmbienteAumentoConsumoAguaLi" /><FieldRef Name="MeioAmbienteAumentoConsumoEnergi" /><FieldRef Name="MeioAmbienteAumentoConsumoAguaFa" /><FieldRef Name="SimilarCodigoAgendamento" /><FieldRef Name="ReprovadoMotivo" /></ViewFields>',
         completefunc: function (Data, Status) {
             if (Status != 'success') {
                 $promise.reject({
@@ -1401,10 +1461,25 @@ function CarregarResponsaveis(agendamento) {
                 return;
             }
 
+            aprovacoes = {};
             var promessas = [];
 
             $.each(registros, function () {
                 var responsavel = GetResponsavelPorNome(this.attributes.ows_TipoResponsavel.value);
+
+                aprovacoes[responsavel.nome] = {
+                    ID: this.attributes.ows_ID.value,
+                    Pessoa: this.attributes.ows_Pessoa.value,
+                    TipoResponsavel: this.attributes.ows_TipoResponsavel.value,
+                    Resultado: this.attributes.ows_Resultado.value,
+                    ExecucaoLoteAcompanhada: this.attributes.ows_ExecucaoLoteAcompanhada.value,
+                    Avaliado: this.attributes.ows_Avaliado != undefined ? this.attributes.ows_Avaliado.value : null,
+                    Avaliador: this.attributes.ows_Avaliador != undefined ? this.attributes.ows_Avaliador.value : null,
+                    Observacoes: this.attributes.ows_Observacoes != undefined ? this.attributes.ows_Observacoes.value : null,
+                    SimilarCodigoAgendamento: this.attributes.ows_SimilarCodigoAgendamento != undefined ? this.attributes.ows_SimilarCodigoAgendamento.value : null,
+                    ReprovadoMotivo: this.attributes.ows_ReprovadoMotivo != undefined ? this.attributes.ows_ReprovadoMotivo.value : null,
+                };
+
                 var usuarioNome = this.attributes.ows_Pessoa.value.slice(this.attributes.ows_Pessoa.value.indexOf(';#') + ';#'.length);
 
                 promessas.push(CarregarUsuarioPorLoginName(usuarioNome).then(function (usuario) {
@@ -2070,8 +2145,8 @@ var SetoresResponsaveis = [
     {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespRespDLPCL', nome: 'DL/PCL - Responsável'},
     {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespRespEngFabricacao', nome: 'Eng. Fabricação - Responsável'},
     {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespGerEngFabricacao', nome: 'Eng. Fabricação - Gerente'},
-    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaAcRespInovDF', nome: 'Inovação DF - Responsável'},
-    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaAcGerInovDF', nome: 'Inovação DF - Gerente'},
+    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespRespInovDF', nome: 'Inovação DF - Responsável'},
+    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespGerInovDF', nome: 'Inovação DF - Gerente'},
     {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespRespQualidade', nome: 'Qualidade - Responsável'},
     {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespGerQualidade', nome: 'Qualidade - Gerente'},
     {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespCoordProgFabrica', nome: 'Fábrica - Coord. Programação'},
@@ -2212,7 +2287,7 @@ var listGruposAdm = [
     'Agendamento - DLL',
     'Agendamento - Planta Piloto',
     'Área - DL PCL'
-]
+];
 
 var listDemaisGrupos = [
     'Administradores Lote Piloto',
