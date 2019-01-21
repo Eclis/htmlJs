@@ -1049,6 +1049,7 @@ function ValidarAgendamentosAcompanhamentos(tipoDeLote) {
 }
 
 function ValidarAgendamento() {
+    verificarErros();
 
     var erroTotal = 0;
     var errosPnlGeral = ValidarAgendamentosGeral();
@@ -2378,6 +2379,8 @@ function VerificarGrupoRespOuAcomp() {
     return result;
 }
 
+
+
 function ModificarBotoesPorFormState(formState) {
     var $btnAgendar = $('.btn-agendar');
     var $btnExecutado = $('.btn-executado');
@@ -2434,7 +2437,6 @@ function ModificarBotoesPorFormState(formState) {
                 $btnNaoExecutado.show();
                 $btnExecutado.show();
             }
-
             break;
         case AGENDAMENTO_EM_EDICAO:
             if (VerificarGrupoDlPclOuPlantaPiloto()) {
@@ -2746,9 +2748,12 @@ function ModificarFormState(formState) {
     ModificarBotoesPorFormState(formState);
     ModificarCamposPorFormState(formState);
     ModificarAbasPorFormState(formState);
+
 }
 
+
 function ModificarAbasPorFormState(formState) {
+    $('#pills-analises-tab').addClass('disabled');
     switch (formState) {
         case EM_CANCELAMENTO:
             $('#justificativaCancelamento').removeClass('d-md-none');
@@ -2767,6 +2772,11 @@ function ModificarAbasPorFormState(formState) {
         case LOTE_NAO_EXECUTADO:
             $('#justificativaNaoExecutado').removeClass('d-md-none');
             $("#pills-justificativa-tab").removeClass("disabled");
+            break;
+        case EM_CRIACAO:
+            break;
+        case REGISTRO_DE_ANALISE:
+            $('#pills-analises-tab').removeClass('disabled');
             break;
     }
 }
@@ -3162,7 +3172,7 @@ function ResetarAgendamento() {
 
 function SalvarAgendamento() {
     var id = $('input[name="ID"]').val();
-
+    
     if (id) {
         return AtualizarAgendamento(id).then(function (response) {
             return CarregarAgendamento(response.record.attr('ows_ID'));
@@ -3397,6 +3407,111 @@ function BuscarMinimoEMaximoPecas(linhaEquipamentoId) {
         $('input#produtoQuantidade').removeAttr("title");
         return null;
     }
+}
+
+function verificarErros(){
+    var $campos = {
+        tipoDeLote,
+        fabrica,
+        linhaEquipamento,
+        codigoProduto,
+        linhaDoProduto,
+        produtoDescricao,
+        produtoProjeto,
+        categoriaDoProjeto,
+        produtoFormula,
+        produtoQuantidade,
+        motivo,
+        produtoEnvioAmostras,
+        produtoResponsavelAmostra,
+        produtoQuantidadeAmostra,
+        agendamentoCentroCusto,
+        grauComplexidade,
+        agendamentoDataInicioProgramado,
+        agendamentoDuracaoHoras,
+        agendamentoDuracaoMinutos,
+        agendamentoFim,
+        agendamentoObservacoes,
+    };
+
+    var erro = 0;
+
+    var itens;
+    for ( itens in $campos) {
+        var $atributo =  $('#'+itens);
+        var $classe = $atributo.attr('class');
+
+        if($classe.indexOf('tom-selec') > 0){
+            if( $atributo.children('option:selected').val()  === 'Selecione uma opção') {
+                var $tabItem = $atributo.parents('div.tab-pane');
+                var tabId = $tabItem.attr('id');
+                var $tabContent = $tabItem.parents('div.tab-content');
+                var $link = $tabContent.parent().find('ul.nav.nav-tabs li a[href="#' + tabId + '"]');
+                $link.tab('show');
+                $atributo.first().focus();
+                erro = 1;
+                break;
+            }
+        } else {
+            if ($atributo.val().length == 0 ){
+                var $tabItem = $atributo.parents('div.tab-pane');
+                var tabId = $tabItem.attr('id');
+                var $tabContent = $tabItem.parents('div.tab-content');
+                var $link = $tabContent.parent().find('ul.nav.nav-tabs li a[href="#' + tabId + '"]');
+                $link.tab('show');
+                $atributo.focus();
+                erro = 1;
+                break;
+            }
+        }
+    }
+
+    var $camposPeople = {
+        peoplePickerAbaRespGerQualidade_TopSpan,
+        peoplePickerAbaRespRespQualidade_TopSpan
+    }
+
+    var people;
+
+    if (erro == 0){
+        for ( people in $camposPeople) {
+            var $atributo =  $('#'+people);
+
+            if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespRespQualidade_TopSpan.HasResolvedUsers()) {
+                var $tabItem = $atributo.parents('div.tab-pane');
+                var $tabPai = $tabItem.parents('div.tab-pane');
+                var tabId = $tabItem.attr('id');
+                var tabPaiId = $tabPai.attr('id');
+                var $tabContent = $tabItem.parents('div.tab-content');
+                var $tabContentPai = $tabPai.parents('div.tab-content');
+                var $link = $tabContent.parent().find('ul.nav.nav-tabs li a[href="#' + tabId + '"]');
+                var $linkPai = $tabContentPai.parent().find('ul.nav.nav-tabs li a[href="#' + tabPaiId + '"]');
+                $linkPai.tab('show');
+                $link.tab('show');
+
+                $atributo.focus();
+                break;
+            } else if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespRespQualidade_TopSpan.HasInputError) {
+                var $tabItem = $atributo.parents('div.tab-pane');
+                var $tabPai = $tabItem.parents('div.tab-pane');
+                var tabId = $tabItem.attr('id');
+                var tabPaiId = $tabPai.attr('id');
+                var $tabContent = $tabItem.parents('div.tab-content');
+                var $tabContentPai = $tabPai.parents('div.tab-content');
+                var $link = $tabContent.parent().find('ul.nav.nav-tabs li a[href="#' + tabId + '"]');
+                var $linkPai = $tabContentPai.parent().find('ul.nav.nav-tabs li a[href="#' + tabPaiId + '"]');
+                $linkPai.tab('show');
+                $link.tab('show');
+
+                $atributo.focus();
+                break;
+            }
+        }
+    }
+}
+
+function scrollToElement(ele) {
+    $(window).scrollTop(ele.offset().top);
 }
 
 $(document).ready(function () {
