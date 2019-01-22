@@ -3165,8 +3165,10 @@ function RegistrarBindings() {
     $acRespMeioAmbienteAcomp.change(function () {
         if ($acRespMeioAmbienteAcomp.prop('checked')) {
             $("#AbaAcRespsMeioAmbiente").show();
+            $("#pills-tab-meio-ambiente-resp").removeClass('d-md-none');
         }
         else {
+            $("#pills-tab-meio-ambiente-resp").addClass('d-md-none');
             $("#AbaAcRespsMeioAmbiente").hide();
         }
     });
