@@ -2943,6 +2943,9 @@ function ModificarAbasPorTipoDeLote(tipoDeLote) {
     $('#pills-tab-fabrica-resp').hide();
     $('#pills-analise-qualidade-ger').hide();
 
+    $('#envaseMeioAmbiente').hide();
+    $('#fabricacaoMeioAmbiente').hide();
+
     switch (tipoDeLote) {
         case 'Brinde':
             $("#pills-responsaveis-tab").removeClass("disabled");
@@ -3026,7 +3029,7 @@ function ModificarAbasPorTipoDeLote(tipoDeLote) {
             $('#pills-tab-inov-de-resp').show();
             $('#pills-tab-analise-qualidade-ger').show();
             $('#pills-tab-fabrica-resp').show();
-
+            $('#envaseMeioAmbiente').show();
             break;
         case 'Fabricação':
             $("#pills-responsaveis-tab").removeClass("disabled");
@@ -3069,7 +3072,7 @@ function ModificarAbasPorTipoDeLote(tipoDeLote) {
             $('#pills-tab-inov-df-resp').show();
             $('#pills-tab-fabrica-resp').show();
             $('#pills-tab-analise-qualidade-ger').show();
-
+            $('#fabricacaoMeioAmbiente').show();
             break;
         default:
             $("#pills-responsaveis-tab").addClass("disabled");
@@ -3113,6 +3116,9 @@ function ModificarAbasPorTipoDeLote(tipoDeLote) {
             $('#pills-tab-inov-de-resp').hide();
             $('#pills-tab-fabrica-resp').hide();
             $('#pills-tab-analise-qualidade-ger').hide();
+
+            $('#envaseMeioAmbiente').hide();
+            $('#fabricaMeioAmbiente').hide();
 
             break;
     }

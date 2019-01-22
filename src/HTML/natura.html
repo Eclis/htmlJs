@@ -785,11 +785,97 @@
                     </div>
                 </div>
                 <div class="tab-pane fade " id="tab-meio-ambiente-resp" style="background-color: rgb(242, 242, 242); padding: 10px;" role="tabpanel">
-                    <div class="row" style="margin-top: 10px;">
-                        <div class="col-md-6">
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" name="ExecucaoLoteAcompanhada" class="custom-control-input" id="meioAmbienteAcompanhamento">
-                                <label class="custom-control-label" for="meioAmbienteAcompanhamento">Houve acompanhamento durante a execução do lote?</label>
+                    <div id="fabricacaoMeioAmbiente">
+                        <div class="row" style="margin-top: 10px;">
+                            <div class="col-md-6">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" name="ExecucaoLoteAcompanhada" class="custom-control-input" id="meioAmbienteAcompanhamentoFab">
+                                    <label class="custom-control-label" for="meioAmbienteAcompanhamentoFab">Houve acompanhamento durante a execução do lote?</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="aumentoConsumoAguaLimpeza">
+                                    <label class="custom-control-label" for="aumentoConsumoAguaLimpeza">Aumento do consumo de água para limpeza?</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top: 10px;">
+                            <div class="col-md-6">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="aumentoConsumoEnergia">
+                                    <label class="custom-control-label" for="aumentoConsumoEnergia">Aumento de consumo de energia?</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="aumentoConsumoAguaFabricacao">
+                                    <label class="custom-control-label" for="aumentoConsumoAguaFabricacao">Aumento de consumo de água para fabricação?</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top: 20px;">
+                            <div class="col-md-4">
+                                <label for="abastecimentoGranel">Abastecimento granel</label>
+                                <select class="custom-select select-enum" id="abastecimentoGranel">
+                                    <option disabled selected>Selecione uma opção</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="abastecimentoManual">Abastecimento manual</label>
+                                <select class="custom-select select-enum" id="abastecimentoManual">
+                                    <option disabled selected>Selecione uma opção</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="abastecimentoVacuo">Abastecimento vácuo</label>
+                                <select class="custom-select select-enum" id="abastecimentoVacuo">
+                                    <option disabled selected>Selecione uma opção</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="envaseMeioAmbiente">
+                        <div class="row" style="margin-top: 10px;">
+                            <div class="col-md-6">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" name="ExecucaoLoteAcompanhada" class="custom-control-input" id="meioAmbienteAcompanhamento">
+                                    <label class="custom-control-label" for="meioAmbienteAcompanhamento">Houve acompanhamento durante a execução do lote?</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="aumentoResiduos">
+                                    <label class="custom-control-label" for="aumentoResiduos">Aumento da geração de resíduos?</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top: 10px;">
+                            <div class="col-md-6">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="tipoResiduosMapeados">
+                                    <label class="custom-control-label" for="tipoResiduosMapeados">Tipo de resíduos gerados já estão mapeados?</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="aumentoConsumoAguaLimpezaEnvase">
+                                    <label class="custom-control-label" for="aumentoConsumoAguaLimpezaEnvase">Aumento do consumo de água para limpeza?</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top: 20px;">
+                            <div class="col-md-6">
+                                <label for="acondicionamentoRetornavel">Acondicionamento dos materiais de embalagem retornável</label>
+                                <select class="custom-select select-enum" id="acondicionamentoRetornavel">
+                                    <option disabled selected>Selecione uma opção</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="acondicionamentoReciclavel">Acondicionamento reciclável</label>
+                                <select class="custom-select select-enum" id="acondicionamentoReciclavel">
+                                    <option disabled selected>Selecione uma opção</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -820,78 +906,6 @@
                             <select class="custom-select select-enum" name="ReprovadoMotivo" id="meioAmbienteMotivo">
                                 <option disabled selected>Selecione uma opção</option>
                             </select>
-                        </div>
-                    </div>
-                    <div class="row" style="margin-top: 10px;">
-                        <div class="col-md-6">
-                            <label for="abastecimentoVacuo">Abastecimento vácuo</label>
-                            <select class="custom-select select-enum" id="abastecimentoVacuo">
-                                <option disabled selected>Selecione uma opção</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="abastecimentoGranel">Abastecimento granel</label>
-                            <select class="custom-select select-enum" id="abastecimentoGranel">
-                                <option disabled selected>Selecione uma opção</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row" style="margin-top: 10px;">
-                        <div class="col-md-6">
-                            <label for="abastecimentoManual">Abastecimento manual</label>
-                            <select class="custom-select select-enum" id="abastecimentoManual">
-                                <option disabled selected>Selecione uma opção</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="acondicionamentoRetornavel">Acondicionamento dos materiais de embalagem retornável</label>
-                            <select class="custom-select select-enum" id="acondicionamentoRetornavel">
-                                <option disabled selected>Selecione uma opção</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row" style="margin-top: 10px;">
-                        <div class="col-md-6">
-                            <label for="acondicionamentoReciclavel">Acondicionamento reciclável</label>
-                            <select class="custom-select select-enum" id="acondicionamentoReciclavel">
-                                <option disabled selected>Selecione uma opção</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row" style="margin-top: 10px;">
-                        <div class="col-md-6">
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="tipoResiduosMapeados">
-                                <label class="custom-control-label" for="tipoResiduosMapeados">Tipo de resíduos gerados já estão mapeados?</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="aumentoConsumoAguaLimpeza">
-                                <label class="custom-control-label" for="aumentoConsumoAguaLimpeza">Aumento do consumo de água para limpeza?</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row" style="margin-top: 10px;">
-                        <div class="col-md-6">
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="aumentoConsumoEnergia">
-                                <label class="custom-control-label" for="aumentoConsumoEnergia">Aumento de consumo de energia?</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="aumentoConsumoAguaFabricacao">
-                                <label class="custom-control-label" for="aumentoConsumoAguaFabricacao">Aumento de consumo de água para fabricação?</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row" style="margin-top: 10px;">
-                        <div class="col-md-6">
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="aumentoResiduos">
-                                <label class="custom-control-label" for="aumentoResiduos">Aumento da geração de resíduos?</label>
-                            </div>
                         </div>
                     </div>
                 </div>
