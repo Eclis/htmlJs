@@ -3490,7 +3490,10 @@ function scrollToElement(ele) {
     $(window).scrollTop(ele.offset().top);
 }
 
+
+
 $(document).ready(function () {
+
     $.when(
         CarregarCategoriaProjeto(),
         CarregarFabricas(),

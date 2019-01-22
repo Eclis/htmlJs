@@ -5,6 +5,23 @@
 
 <script type="text/javascript">
 
+function removerClique( ) {
+
+    var frame = document.getElementById('meuFrame').contentWindow.document;
+    var b = frame.getElementsByClassName('ms-List-surface')
+
+    var itens;
+    for (i = 0; i < b.length; i++) {
+        var novo = b.item(i).getElementsByClassName('ms-List-page');
+        for (j = 0; j < novo.length; j++) {
+            var spann = novo.item(j).getElementsByClassName('ms-TooltipHost');
+            for (k = 0; k < spann.length; k++) {
+                spann.item(k).remove();
+            }
+        }
+    }
+}
+
 function editarLista(){
     var $frame = document.getElementById("meuFrame");
     var $document = $(document.getElementById("meuFrame").contentDocument);
@@ -30,7 +47,6 @@ function criarNovo() {
     });
 }
 
-
 function threadNovo( maxValue){
     var me = this;
     var novoLength = document.getElementById('meuFrame').contentWindow.document.getElementsByName('Novo').length;
@@ -45,6 +61,7 @@ function threadNovo( maxValue){
         setTimeout(function () { me.threadNovo( maxValue); }, 500);
     } else {
         criarNovo();
+        maxValue = addListener(maxValue);
         setTimeout(function () { me.threadNovo( maxValue); }, 500);
     }
 }
@@ -63,11 +80,59 @@ function threadEditar( maxValue){
         setTimeout(function () { me.threadEditar( maxValue); }, 400);
     } else {
         editarLista();
+        maxValue = addListener(maxValue);
         setTimeout(function () { me.threadEditar( maxValue); }, 400);
+    }
+}
+
+function threadRemoveLink( maxValue){
+    var me = this;
+    var editarLength = document.getElementById('meuFrame').contentWindow.document.getElementsByClassName('ms-List-surface').length;
+
+    if (editarLength != 0 ){
+        if ( editarLength != 1){
+            editarLength = 0;
+        }
+    }
+
+     if (editarLength == 0){
+        setTimeout(function () { me.threadRemoveLink( maxValue); }, 800);
+    } else {
+        removerClique();
+        setTimeout(function () { me.threadRemoveLink( maxValue); }, 800);
     }
 }
 
 threadNovo(1);
 threadEditar(1);
+threadRemoveLink(1);
+
+function interceptClickEvent(e) {
+
+    var ola = e.target.getAttribute("class");
+    if(ola == null){
+        e.stopPropagation();
+    } else if(ola.indexOf('s-Button') < 0){
+        e.stopPropagation();
+    }
+}
+
+
+function addListener(maxValue) {
+
+    if(maxValue == 1){
+        var $document = $(document.getElementById("meuFrame").contentDocument);
+
+        $document.ready(function () {
+            document.getElementById('meuFrame').contentWindow.document.addEventListener('click', interceptClickEvent, true)
+            document.getElementById('meuFrame').contentWindow.document.addEventListener('dblclick', interceptClickEvent, true)
+        });
+
+        maxValue = 2;
+    }
+    return maxValue;
+}
+
 
 </script>
+
