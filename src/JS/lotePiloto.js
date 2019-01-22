@@ -152,7 +152,7 @@ function ValidarAgendamentosAgendamento() {
         LimparValidacao('text', 'input#agendamentoCentroCusto', '');
     }
 
-    if ($('select#grauComplexidade').children('option:selected').val() === 'Selecione uma opção') {
+    if (!$('select#grauComplexidade').children('option:selected').val() || $('select#grauComplexidade').children('option:selected').val() === 'Selecione uma opção') {
         errorAgendamentosAgendamento++;
         NotificarErroValidacao('select', 'select#grauComplexidade', '', '');
     }
