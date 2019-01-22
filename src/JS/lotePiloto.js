@@ -1302,6 +1302,79 @@ function AtualizarAgendamento(id) {
     });
 }
 
+function CarregarStatusAgendamentoPorCodigoAgendamento(id) {
+    var $promise = $.Deferred();
+
+    $().SPServices({
+        operation: 'GetListItems',
+        listName: 'Agendamentos',
+        CAMLQuery: '<Query><Where><Eq><FieldRef Name="ID" /><Value Type="Number">' + id + '</Value></Eq></Where></Query>',
+        CAMLViewFields: '<ViewFields><FieldRef Name="Status" /></ViewFields>',
+        completefunc: function (Data, Status) {
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
+                });
+
+                return;
+            }
+
+            var $registro = $(Data.responseText).find('z\\:row:first');
+
+            if (!$registro.length) {
+                $promise.reject({
+                    errorCode: '0x99999998',
+                    errorText: 'Registro não encontrado'
+                });
+
+                return;
+            }
+
+            $promise.resolve($registro.get(0).attributes.ows_Status.value);
+        }
+    });
+
+    return $promise;
+}
+
+function ReprovarAgendamentoPorCodigoAgendamento(id) {
+    var $promise = $.Deferred();
+
+    $().SPServices({
+        operation: "UpdateListItems",
+        batchCmd: "Update",
+        listName: "Agendamentos",
+        ID: id,
+        valuepairs: [['Status', REPROVADO]],
+        completefunc: function (xData, Status) {
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
+                });
+
+                return;
+            }
+
+            var $response = $(xData.responseText);
+            var errorCode = $response.find('ErrorCode').text();
+
+            if (errorCode == '0x00000000') {
+                $('select#status').val(REPROVADO);
+                $promise.resolve();
+            } else {
+                $promise.reject({
+                    errorCode: errorCode,
+                    errorText: $response.find('ErrorText').text()
+                });
+            }
+        }
+    });
+
+    return $promise;
+}
+
 function AtualizarResponsavelAgendamento(codigoAgendamento, responsavel, usuario) {
     if (aprovacoes[responsavel.nome] == null) {
         return InserirResponsavelAgendamento(codigoAgendamento, responsavel, usuario);
@@ -1316,14 +1389,6 @@ function AtualizarResponsavelAgendamento(codigoAgendamento, responsavel, usuario
                 campos.push([index, aprovacao[index]]);
             }
         });
-
-        var resultado = aprovacao.Resultado;
-
-        switch(resultado) {
-            case REPROVADO:
-                $('select#status').val(REPROVADO);
-                break;
-        }
 
         $().SPServices({
             operation: "UpdateListItems",
@@ -1346,9 +1411,29 @@ function AtualizarResponsavelAgendamento(codigoAgendamento, responsavel, usuario
                 var errorCode = $response.find('ErrorCode').text();
 
                 if (errorCode == '0x00000000') {
-                    $promise.resolve({
-                        record: $response.find('z\\:row:first')
-                    });
+                    var $record = $response.find('z\\:row:first');
+
+                    if ($('select#status').val() == REGISTRO_DE_ANALISE && aprovacao.Resultado == 'Reprovado') {
+                        CarregarStatusAgendamentoPorCodigoAgendamento($('input[name="ID"]').val()).then(function (status) {
+                            if (status == REGISTRO_DE_ANALISE) {
+                                ReprovarAgendamentoPorCodigoAgendamento($('input[name="ID"]').val()).then(function () {
+                                    $promise.resolve({
+                                        record: $record
+                                    });
+                                }).fail(function (error) {
+                                    $promise.reject(error);
+                                });
+                            } else {
+                                $promise.resolve({
+                                    record: $record
+                                });
+                            }
+                        });
+                    } else {
+                        $promise.resolve({
+                            record: $record
+                        });
+                    }
                 } else {
                     $promise.reject({
                         errorCode: errorCode,
@@ -1550,6 +1635,10 @@ function FiltrarNomeUsuarioPorPessoaId(pessoaId) {
 }
 
 function FiltrarIdPorPessoaId(pessoaId) {
+    if (pessoaId.indexOf(';#') == -1) {
+        return pessoaId;
+    }
+
     return pessoaId.slice(0, pessoaId.indexOf(';#'));
 }
 
@@ -1562,11 +1651,11 @@ function PreencherAbaAnalises(responsavel) {
 
     var $abaAnalise = $('#' + responsavel.abaAnaliseId);
 
-    $abaAnalise.find('[name="ExecucaoLoteAcompanhada"]').prop('checked', aprovacao.ExecucaoLoteAcompanhada == "1").change();
-    $abaAnalise.find('[name="Pessoa"]').val(FiltrarNomeUsuarioPorPessoaId(aprovacao.Pessoa)).change();
-    $abaAnalise.find('[name="Resultado"]').val(aprovacao.Resultado).change();
-    $abaAnalise.find('[name="ObservacoesAnalise"]').val(aprovacao.Observacoes).change();
-    if (aprovacao.ReprovadoMotivo != null) $abaAnalise.find('[name="ReprovadoMotivo"]').val(aprovacao.ReprovadoMotivo).change();
+    $abaAnalise.find('[name="ExecucaoLoteAcompanhada"]').prop('checked', aprovacao.ExecucaoLoteAcompanhada == "1");
+    $abaAnalise.find('[name="Pessoa"]').val(FiltrarNomeUsuarioPorPessoaId(aprovacao.Pessoa));
+    $abaAnalise.find('[name="Resultado"]').val(aprovacao.Resultado);
+    $abaAnalise.find('[name="ObservacoesAnalise"]').val(aprovacao.Observacoes);
+    if (aprovacao.ReprovadoMotivo != null) $abaAnalise.find('[name="ReprovadoMotivo"]').val(aprovacao.ReprovadoMotivo);
 
     $abaAnalise.find('[name=Pessoa]').attr('disabled', true);
     $abaAnalise.find('[name=ExecucaoLoteAcompanhada]').attr('disabled', true);
@@ -2631,9 +2720,8 @@ function ModificarCamposPorFormState(formState) {
 
     Object.keys(aprovacoes).forEach(function (index) {
         var responsavel = GetResponsavelPorNome(index);
-        var aprovacao = aprovacoes[index];
 
-        if (responsavel.abaAnaliseId != null && CarregarUsuarioAtual().id == FiltrarIdPorPessoaId(aprovacao.Pessoa)) {
+        if (responsavel.abaAnaliseId != null) {
             var $abaAnalise = $('#' + responsavel.abaAnaliseId);
             $abaAnalise.find('[name=Pessoa]').attr('disabled', true);
             $abaAnalise.find('[name=ExecucaoLoteAcompanhada]').attr('disabled', true);
@@ -2760,12 +2848,13 @@ function ModificarCamposPorFormState(formState) {
                 var responsavel = GetResponsavelPorNome(index);
                 var aprovacao = aprovacoes[index];
 
-                if (responsavel.abaAnaliseId != null && CarregarUsuarioAtual().id == FiltrarIdPorPessoaId(aprovacao.Pessoa)) {
+                if (responsavel.abaAnaliseId != null &&
+                        CarregarUsuarioAtual().id == FiltrarIdPorPessoaId(aprovacao.Pessoa) &&
+                        ['Pendente', 'Rascunho'].indexOf(aprovacao.Resultado) != -1) {
                     var $abaAnalise = $('#' + responsavel.abaAnaliseId);
                     $abaAnalise.find('[name=ExecucaoLoteAcompanhada]').attr('disabled', false);
                     $abaAnalise.find('[name=Resultado]').attr('disabled', false);
                     $abaAnalise.find('[name=ObservacoesAnalise]').attr('disabled', false);
-                    $abaAnalise.find('[name=ReprovadoMotivo]').attr('disabled', false);
                 }
             });
 
@@ -2812,9 +2901,7 @@ function ModificarFormState(formState) {
     ModificarBotoesPorFormState(formState);
     ModificarCamposPorFormState(formState);
     ModificarAbasPorFormState(formState);
-
 }
-
 
 function ModificarAbasPorFormState(formState) {
     $('#pills-analises-tab').addClass('disabled');
@@ -2841,6 +2928,7 @@ function ModificarAbasPorFormState(formState) {
             break;
         case REGISTRO_DE_ANALISE:
         case EM_REGISTRO_DE_ANALISE:
+        case REPROVADO:
             $('#pills-analises-tab').removeClass('disabled');
             break;
     }
@@ -3199,14 +3287,14 @@ function RegistrarBindings() {
     espelharCheckBox('#acRespInofDE', '#acRespInofDEAcomp');
     espelharCheckBox('#acRespFabrica', '#acRespFabricaAcomp');
 
-    $('[name="ReprovadoMotivo"]').change(function () {
+    $('[name="Resultado"]').change(function () {
         var $this = $(this);
         var $tab = $this.parents('.tab-pane[role="tabpanel"]');
-        var $
-        var $reprovadoMotivo = $tab.find('[name="ReprovadoMotivo"]');
 
-        if($reprovadoMotivo.val() == 'Reprovado') {
-
+        if ($this.val() == 'Reprovado') {
+            $tab.find('[name="ReprovadoMotivo"]').prop('disabled', false);
+        } else {
+            $tab.find('[name="ReprovadoMotivo"]').prop('disabled', true);
         }
     });
 }
