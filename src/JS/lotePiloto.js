@@ -17,7 +17,7 @@ var EM_NAO_EXECUCAO = 'emNaoExecucao';
 var EM_REGISTRO_DE_ANALISE = 'emRegistroDeAnalise';
 
 var state;
-var aprovacoes = null;
+var aprovacoes = {};
 
 function ValidarAgendamentosGeral() {
     var errorAgendamentosGeral = 0;
@@ -152,7 +152,7 @@ function ValidarAgendamentosAgendamento() {
         LimparValidacao('text', 'input#agendamentoCentroCusto', '');
     }
 
-    if ($('select#grauComplexidade').children('option:selected').val() === 'Selecione uma opção') {
+    if (!$('select#grauComplexidade').children('option:selected').val() || $('select#grauComplexidade').children('option:selected').val() === 'Selecione uma opção') {
         errorAgendamentosAgendamento++;
         NotificarErroValidacao('select', 'select#grauComplexidade', '', '');
     }
@@ -1287,7 +1287,13 @@ function AtualizarAgendamento(id) {
         let promises = [];
 
         $.each(responsaveis, function (i, responsavel) {
-            promises.push(AtualizarResponsavelAgendamento(response.record.attr('ows_CodigoAgendamento'), responsavel));
+            var usuarioDoPeoplePicker = PegarUsuarioDoPeoplePicker(responsavel.peoplePickerId);
+
+            if (usuarioDoPeoplePicker) {
+                promises.push(CarregarUsuarioPorLoginName(usuarioDoPeoplePicker.loginName).then(function (usuario) {
+                    return AtualizarResponsavelAgendamento(response.record.attr('ows_CodigoAgendamento'), responsavel, usuario);
+                }));
+            }
         });
 
         return $.when.apply($, promises).then(function () {
@@ -1296,28 +1302,51 @@ function AtualizarAgendamento(id) {
     });
 }
 
-function AtualizarResponsavelAgendamento(codigoAgendamento, responsavel) {
+function CarregarStatusAgendamentoPorCodigoAgendamento(id) {
     var $promise = $.Deferred();
-    var campos = [];
-    var aprovacao = aprovacoes[responsavel.nome];
 
-    if (aprovacao == null) {
-        return InserirResponsavelAgendamento(codigoAgendamento, responsavel);
-    }
+    $().SPServices({
+        operation: 'GetListItems',
+        listName: 'Agendamentos',
+        CAMLQuery: '<Query><Where><Eq><FieldRef Name="ID" /><Value Type="Number">' + id + '</Value></Eq></Where></Query>',
+        CAMLViewFields: '<ViewFields><FieldRef Name="Status" /></ViewFields>',
+        completefunc: function (Data, Status) {
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
+                });
 
-    Object.keys(aprovacao).forEach(function (index) {
-        if (aprovacao[index] != null) {
-            campos.push([index, aprovacao[index]]);
+                return;
+            }
+
+            var $registro = $(Data.responseText).find('z\\:row:first');
+
+            if (!$registro.length) {
+                $promise.reject({
+                    errorCode: '0x99999998',
+                    errorText: 'Registro não encontrado'
+                });
+
+                return;
+            }
+
+            $promise.resolve($registro.get(0).attributes.ows_Status.value);
         }
     });
 
+    return $promise;
+}
+
+function ReprovarAgendamentoPorCodigoAgendamento(id) {
+    var $promise = $.Deferred();
+
     $().SPServices({
         operation: "UpdateListItems",
-        async: false,
         batchCmd: "Update",
-        listName: "Agendamentos - Responsáveis",
-        ID: aprovacao.ID,
-        valuepairs: campos,
+        listName: "Agendamentos",
+        ID: id,
+        valuepairs: [['Status', REPROVADO]],
         completefunc: function (xData, Status) {
             if (Status != 'success') {
                 $promise.reject({
@@ -1332,9 +1361,8 @@ function AtualizarResponsavelAgendamento(codigoAgendamento, responsavel) {
             var errorCode = $response.find('ErrorCode').text();
 
             if (errorCode == '0x00000000') {
-                $promise.resolve({
-                    record: $response.find('z\\:row:first')
-                });
+                $('select#status').val(REPROVADO);
+                $promise.resolve();
             } else {
                 $promise.reject({
                     errorCode: errorCode,
@@ -1345,6 +1373,78 @@ function AtualizarResponsavelAgendamento(codigoAgendamento, responsavel) {
     });
 
     return $promise;
+}
+
+function AtualizarResponsavelAgendamento(codigoAgendamento, responsavel, usuario) {
+    if (aprovacoes[responsavel.nome] == null) {
+        return InserirResponsavelAgendamento(codigoAgendamento, responsavel, usuario);
+    }
+
+    return AtualizarAprovacaoEmMemoria(responsavel).then(function (aprovacao) {
+        var $promise = $.Deferred();
+        var campos = [];
+
+        Object.keys(aprovacao).forEach(function (index) {
+            if (aprovacao[index] != null) {
+                campos.push([index, aprovacao[index]]);
+            }
+        });
+
+        $().SPServices({
+            operation: "UpdateListItems",
+            async: false,
+            batchCmd: "Update",
+            listName: "Agendamentos - Responsáveis",
+            ID: aprovacao.ID,
+            valuepairs: campos,
+            completefunc: function (xData, Status) {
+                if (Status != 'success') {
+                    $promise.reject({
+                        errorCode: '0x99999999',
+                        errorText: 'Erro Remoto'
+                    });
+
+                    return;
+                }
+
+                var $response = $(xData.responseText);
+                var errorCode = $response.find('ErrorCode').text();
+
+                if (errorCode == '0x00000000') {
+                    var $record = $response.find('z\\:row:first');
+
+                    if ($('select#status').val() == REGISTRO_DE_ANALISE && aprovacao.Resultado == 'Reprovado') {
+                        CarregarStatusAgendamentoPorCodigoAgendamento($('input[name="ID"]').val()).then(function (status) {
+                            if (status == REGISTRO_DE_ANALISE) {
+                                ReprovarAgendamentoPorCodigoAgendamento($('input[name="ID"]').val()).then(function () {
+                                    $promise.resolve({
+                                        record: $record
+                                    });
+                                }).fail(function (error) {
+                                    $promise.reject(error);
+                                });
+                            } else {
+                                $promise.resolve({
+                                    record: $record
+                                });
+                            }
+                        });
+                    } else {
+                        $promise.resolve({
+                            record: $record
+                        });
+                    }
+                } else {
+                    $promise.reject({
+                        errorCode: errorCode,
+                        errorText: $response.find('ErrorText').text()
+                    });
+                }
+            }
+        });
+
+        return $promise;
+    });
 }
 
 function CalcularCamposCalculaveis() {
@@ -1424,7 +1524,7 @@ function CarregarAgendamento(id) {
                 }
             });
 
-            CarregarSelects(selectsACarregar);
+            PreencherSelectsConsiderandoDependencia(selectsACarregar);
             ModificarFormState($('select#status').val());
 
             CarregarAgendamentoResponsaveis(atributos.ows_CodigoAgendamento.value).then(function () {
@@ -1486,11 +1586,13 @@ function CarregarAgendamentoResponsaveis(agendamento) {
                     ReprovadoMotivo: this.attributes.ows_ReprovadoMotivo != undefined ? this.attributes.ows_ReprovadoMotivo.value : null,
                 };
 
-                var usuarioNome = this.attributes.ows_Pessoa.value.slice(this.attributes.ows_Pessoa.value.indexOf(';#') + ';#'.length);
+                var usuarioNome = FiltrarNomeUsuarioPorPessoaId(this.attributes.ows_Pessoa.value);
 
                 promessas.push(CarregarUsuarioPorLoginName(usuarioNome).then(function (usuario) {
                     PreencherPeoplePicker(responsavel.peoplePickerId, usuario);
                 }));
+
+                promessas.push(PreencherAbaAnalises(responsavel));
             });
 
             $.when($, promessas).then(function () {
@@ -1504,7 +1606,65 @@ function CarregarAgendamentoResponsaveis(agendamento) {
     return $promise;
 }
 
-function CarregarSelects(selectsACarregar) {
+function AtualizarAprovacaoEmMemoria(responsavel) {
+    aprovacoes[responsavel.nome].Pessoa = null;
+
+    if (responsavel.abaAnaliseId) {
+        var $tab = $('#' + responsavel.abaAnaliseId);
+        aprovacoes[responsavel.nome].ExecucaoLoteAcompanhada = $tab.find('[name=ExecucaoLoteAcompanhada]').prop('checked') ? '1' : '0';
+        aprovacoes[responsavel.nome].Resultado = $tab.find('[name=Resultado]').val();
+        aprovacoes[responsavel.nome].Observacoes = $tab.find('[name=ObservacoesAnalise]').val();
+        aprovacoes[responsavel.nome].ReprovadoMotivo = $tab.find('[name=ReprovadoMotivo]').val();
+    }
+
+    var usuarioDoPeoplePicker = PegarUsuarioDoPeoplePicker(responsavel.peoplePickerId);
+
+    if (!usuarioDoPeoplePicker) {
+        return $.when(aprovacoes[responsavel.nome]);
+    }
+
+    return CarregarUsuarioPorLoginName(usuarioDoPeoplePicker.loginName).then(function (usuario) {
+        aprovacoes[responsavel.nome].Pessoa = usuario.id;
+
+        return aprovacoes[responsavel.nome];
+    });
+}
+
+function FiltrarNomeUsuarioPorPessoaId(pessoaId) {
+    return pessoaId.slice(pessoaId.indexOf(';#') + ';#'.length);
+}
+
+function FiltrarIdPorPessoaId(pessoaId) {
+    if (pessoaId.indexOf(';#') == -1) {
+        return pessoaId;
+    }
+
+    return pessoaId.slice(0, pessoaId.indexOf(';#'));
+}
+
+function PreencherAbaAnalises(responsavel) {
+    var aprovacao = aprovacoes[responsavel.nome];
+
+    if (responsavel.abaAnaliseId == null) {
+        return;
+    }
+
+    var $abaAnalise = $('#' + responsavel.abaAnaliseId);
+
+    $abaAnalise.find('[name="ExecucaoLoteAcompanhada"]').prop('checked', aprovacao.ExecucaoLoteAcompanhada == "1");
+    $abaAnalise.find('[name="Pessoa"]').val(FiltrarNomeUsuarioPorPessoaId(aprovacao.Pessoa));
+    $abaAnalise.find('[name="Resultado"]').val(aprovacao.Resultado);
+    $abaAnalise.find('[name="ObservacoesAnalise"]').val(aprovacao.Observacoes);
+    if (aprovacao.ReprovadoMotivo != null) $abaAnalise.find('[name="ReprovadoMotivo"]').val(aprovacao.ReprovadoMotivo);
+
+    $abaAnalise.find('[name=Pessoa]').attr('disabled', true);
+    $abaAnalise.find('[name=ExecucaoLoteAcompanhada]').attr('disabled', true);
+    $abaAnalise.find('[name=Resultado]').attr('disabled', true);
+    $abaAnalise.find('[name=ObservacoesAnalise]').attr('disabled', true);
+    $abaAnalise.find('[name=ReprovadoMotivo]').attr('disabled', true);
+}
+
+function PreencherSelectsConsiderandoDependencia(selectsACarregar) {
     var sorter = new Toposort();
 
     Object.keys(selectsACarregar).forEach(function (index) {
@@ -1516,8 +1676,6 @@ function CarregarSelects(selectsACarregar) {
         select.elemento.val(select.valor);
         select.elemento.change();
     });
-    CarregarListaResultadoAnalise();
-    CarregarListaMotivoAnalise();
 }
 
 function CarregarCategoriaProjeto() {
@@ -1852,9 +2010,9 @@ function CarregarListaStatus() {
 
 function CarregarListaResultadoAnalise() {
     if ($('select[name=GrauComplexidade] :selected').val() == 2) {
-        CarregarListaResultadoAnaliseComSimilaridade();
+        return CarregarListaResultadoAnaliseComSimilaridade();
     } else {
-        CarregarListaResultadoAnaliseSemSimilaridade();
+        return CarregarListaResultadoAnaliseSemSimilaridade();
     }
 }
 
@@ -1874,7 +2032,8 @@ function CarregarListaResultadoAnaliseComSimilaridade() {
                 return;
             }
 
-            var $resultado = $('select[name=resultado]');
+            var $resultado = $('select[name=Resultado]');
+
             $(Data.responseXML).find('Field[DisplayName="Resultado"] CHOICE').each(function () {
                 $resultado.append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
             });
@@ -1902,7 +2061,8 @@ function CarregarListaMotivoAnalise() {
                 return;
             }
 
-            var $resultado = $('select[name=motivoAnalise]');
+            var $resultado = $('select[name=ReprovadoMotivo]');
+
             $(Data.responseXML).find('Field[DisplayName="Motivo Reprovação"] CHOICE').each(function () {
                 $resultado.append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
             });
@@ -1930,7 +2090,7 @@ function CarregarListaResultadoAnaliseSemSimilaridade() {
                 return;
             }
 
-            var $resultado = $('select[name=resultado]');
+            var $resultado = $('select[name=Resultado]');
             $(Data.responseXML).find('Field[DisplayName="Resultado"] CHOICE').each(function () {
                 if (this.innerHTML == 'Aprovado por Similaridade') {
                     return true;
@@ -1962,7 +2122,9 @@ function CarregarListaTiposLotes() {
             }
 
             $(Data.responseXML).find('Field[DisplayName="Tipo de Lote"] CHOICE').each(function () {
-                $('select#tipoDeLote').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+                if (this.innerHTML != "Picking") {
+                    $('select#tipoDeLote').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+                }
             });
 
             $promise.resolve();
@@ -2153,7 +2315,13 @@ function InserirAgendamento() {
             let promises = [];
 
             $.each(responsaveis, function (i, responsavel) {
-                promises.push(InserirResponsavelAgendamento(response.record.attr('ows_CodigoAgendamento'), responsavel));
+                var usuarioDoPeoplePicker = PegarUsuarioDoPeoplePicker(responsavel.peoplePickerId);
+
+                if (usuarioDoPeoplePicker) {
+                    promises.push(CarregarUsuarioPorLoginName(usuarioDoPeoplePicker.loginName).then(function (usuario) {
+                        return InserirResponsavelAgendamento(response.record.attr('ows_CodigoAgendamento'), responsavel, usuario);
+                    }));
+                }
             });
 
             return $.when.apply($, promises).then(function () {
@@ -2164,29 +2332,29 @@ function InserirAgendamento() {
 }
 
 var SetoresResponsaveis = [
-    {tipoDeLote: 'Brinde', peoplePickerId: 'peoplePickerAbaRespRespDLPCL', nome: 'DL/PCL - Responsável'},
-    {tipoDeLote: 'Brinde', peoplePickerId: 'peoplePickerAbaRespRespQualidade', nome: 'Qualidade - Responsável'},
-    {tipoDeLote: 'Brinde', peoplePickerId: 'peoplePickerAbaRespGerQualidade', nome: 'Qualidade - Gerente'},
-    {tipoDeLote: 'Envase', peoplePickerId: 'peoplePickerAbaRespRespDLPCL', nome: 'DL/PCL - Responsável'},
-    {tipoDeLote: 'Envase', peoplePickerId: 'peoplePickerAbaRespRespEngEnvase', nome: 'Eng. Envase - Responsável'} ,
-    {tipoDeLote: 'Envase', peoplePickerId: 'peoplePickerAbaRespGerEngEnvase', nome: 'Eng. Envase - Gerente'},
-    {tipoDeLote: 'Envase', peoplePickerId: 'peoplePickerAbaRespRespInovDE', nome: 'Inovação DE - Responsável'},
-    {tipoDeLote: 'Envase', peoplePickerId: 'peoplePickerAbaRespGerInovDE', nome: 'Inovação DE - Gerente'},
-    {tipoDeLote: 'Envase', peoplePickerId: 'peoplePickerAbaRespRespQualidade', nome: 'Qualidade - Responsável'},
-    {tipoDeLote: 'Envase', peoplePickerId: 'peoplePickerAbaRespGerQualidade', nome: 'Qualidade - Gerente'},
-    {tipoDeLote: 'Envase', peoplePickerId: 'peoplePickerAbaRespCoordProgFabrica', nome: 'Fábrica - Coord. Programação'},
-    {tipoDeLote: 'Envase', peoplePickerId: 'peoplePickerAbaRespCoordManFabrica', nome: 'Fábrica - Coord. de Manufatura'},
-    {tipoDeLote: 'Envase', peoplePickerId: 'peoplePickerAbaRespGerFabrica', nome: 'Fábrica - Gerente'},
-    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespRespDLPCL', nome: 'DL/PCL - Responsável'},
-    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespRespEngFabricacao', nome: 'Eng. Fabricação - Responsável'},
-    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespGerEngFabricacao', nome: 'Eng. Fabricação - Gerente'},
-    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespRespInovDF', nome: 'Inovação DF - Responsável'},
-    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespGerInovDF', nome: 'Inovação DF - Gerente'},
-    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespRespQualidade', nome: 'Qualidade - Responsável'},
-    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespGerQualidade', nome: 'Qualidade - Gerente'},
-    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespCoordProgFabrica', nome: 'Fábrica - Coord. Programação'},
-    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespCoordManFabrica', nome: 'Fábrica - Coord. de Manufatura'},
-    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespGerFabrica', nome: 'Fábrica - Gerente'},
+    {tipoDeLote: 'Brinde',     peoplePickerId: 'peoplePickerAbaRespRespDLPCL',         nome: 'DL/PCL - Responsável',           abaAnaliseId: null},
+    {tipoDeLote: 'Brinde',     peoplePickerId: 'peoplePickerAbaRespRespQualidade',     nome: 'Qualidade - Responsável',        abaAnaliseId: 'tab-qualidade-resp'},
+    {tipoDeLote: 'Brinde',     peoplePickerId: 'peoplePickerAbaRespGerQualidade',      nome: 'Qualidade - Gerente',            abaAnaliseId: 'tab-analise-qualidade-ger'},
+    {tipoDeLote: 'Envase',     peoplePickerId: 'peoplePickerAbaRespRespDLPCL',         nome: 'DL/PCL - Responsável',           abaAnaliseId: null},
+    {tipoDeLote: 'Envase',     peoplePickerId: 'peoplePickerAbaRespRespEngEnvase',     nome: 'Eng. Envase - Responsável',      abaAnaliseId: 'tab-eng-envase-resp'},
+    {tipoDeLote: 'Envase',     peoplePickerId: 'peoplePickerAbaRespGerEngEnvase',      nome: 'Eng. Envase - Gerente',          abaAnaliseId: null},
+    {tipoDeLote: 'Envase',     peoplePickerId: 'peoplePickerAbaRespRespInovDE',        nome: 'Inovação DE - Responsável',      abaAnaliseId: 'tab-inov-de-resp'},
+    {tipoDeLote: 'Envase',     peoplePickerId: 'peoplePickerAbaRespGerInovDE',         nome: 'Inovação DE - Gerente',          abaAnaliseId: null},
+    {tipoDeLote: 'Envase',     peoplePickerId: 'peoplePickerAbaRespRespQualidade',     nome: 'Qualidade - Responsável',        abaAnaliseId: 'tab-qualidade-resp'},
+    {tipoDeLote: 'Envase',     peoplePickerId: 'peoplePickerAbaRespGerQualidade',      nome: 'Qualidade - Gerente',            abaAnaliseId: 'tab-analise-qualidade-ger'},
+    {tipoDeLote: 'Envase',     peoplePickerId: 'peoplePickerAbaRespCoordProgFabrica',  nome: 'Fábrica - Coord. Programação',   abaAnaliseId: null},
+    {tipoDeLote: 'Envase',     peoplePickerId: 'peoplePickerAbaRespCoordManFabrica',   nome: 'Fábrica - Coord. de Manufatura', abaAnaliseId: 'tab-fabrica-resp'},
+    {tipoDeLote: 'Envase',     peoplePickerId: 'peoplePickerAbaRespGerFabrica',        nome: 'Fábrica - Gerente',              abaAnaliseId: null},
+    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespRespDLPCL',         nome: 'DL/PCL - Responsável',           abaAnaliseId: null},
+    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespRespEngFabricacao', nome: 'Eng. Fabricação - Responsável',  abaAnaliseId: 'tab-eng-fabricacao-resp'},
+    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespGerEngFabricacao',  nome: 'Eng. Fabricação - Gerente',      abaAnaliseId: null},
+    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespRespInovDF',        nome: 'Inovação DF - Responsável',      abaAnaliseId: 'tab-inov-df-resp'},
+    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespGerInovDF',         nome: 'Inovação DF - Gerente',          abaAnaliseId: null},
+    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespRespQualidade',     nome: 'Qualidade - Responsável',        abaAnaliseId: 'tab-qualidade-resp'},
+    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespGerQualidade',      nome: 'Qualidade - Gerente',            abaAnaliseId: 'tab-analise-qualidade-ger'},
+    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespCoordProgFabrica',  nome: 'Fábrica - Coord. Programação',   abaAnaliseId: null},
+    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespCoordManFabrica',   nome: 'Fábrica - Coord. de Manufatura', abaAnaliseId: 'tab-fabrica-resp'},
+    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespGerFabrica',        nome: 'Fábrica - Gerente',              abaAnaliseId: null},
 ];
 
 function GetResponsavelPorNome(nome) {
@@ -2221,54 +2389,46 @@ function PegarUsuarioDoPeoplePicker(peoplePickerId) {
     };
 }
 
-function InserirResponsavelAgendamento(codigoAgendamento, responsavel) {
-    var usuarioDoPeoplePicker = PegarUsuarioDoPeoplePicker(responsavel.peoplePickerId);
+function InserirResponsavelAgendamento(codigoAgendamento, responsavel, usuario) {
+    var $promise = $.Deferred();
 
-    if (!usuarioDoPeoplePicker) {
-        return $.when(false);
-    }
+    $().SPServices({
+        operation: "UpdateListItems",
+        batchCmd: "New",
+        listName: "Agendamentos - Responsáveis",
+        valuepairs: [
+            ['CodigoAgendamento', codigoAgendamento],
+            ['Title', codigoAgendamento + ' - ' + responsavel.nome],
+            ['TipoResponsavel', responsavel.nome],
+            ['Pessoa', usuario.id]
+        ],
+        completefunc: function (xData, Status) {
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
+                });
 
-    return CarregarUsuarioPorLoginName(usuarioDoPeoplePicker.loginName).then(function (usuario) {
-        var $promise = $.Deferred();
-
-        $().SPServices({
-            operation: "UpdateListItems",
-            batchCmd: "New",
-            listName: "Agendamentos - Responsáveis",
-            valuepairs: [
-                ['CodigoAgendamento', codigoAgendamento],
-                ['Title', codigoAgendamento + ' - ' + responsavel.nome],
-                ['TipoResponsavel', responsavel.nome],
-                ['Pessoa', usuario.id]
-            ],
-            completefunc: function (xData, Status) {
-                if (Status != 'success') {
-                    $promise.reject({
-                        errorCode: '0x99999999',
-                        errorText: 'Erro Remoto'
-                    });
-
-                    return;
-                }
-
-                var $response = $(xData.responseText);
-                var errorCode = $response.find('ErrorCode').text();
-
-                if (errorCode == '0x00000000') {
-                    $promise.resolve({
-                        record: $response.find('z\\:row:first')
-                    });
-                } else {
-                    $promise.reject({
-                        errorCode: errorCode,
-                        errorText: $response.find('ErrorText').text()
-                    });
-                }
+                return;
             }
-        });
 
-        return $promise;
+            var $response = $(xData.responseText);
+            var errorCode = $response.find('ErrorCode').text();
+
+            if (errorCode == '0x00000000') {
+                $promise.resolve({
+                    record: $response.find('z\\:row:first')
+                });
+            } else {
+                $promise.reject({
+                    errorCode: errorCode,
+                    errorText: $response.find('ErrorText').text()
+                });
+            }
+        }
     });
+
+    return $promise;
 }
 
 function InstanciarDateTimePicker() {
@@ -2399,6 +2559,7 @@ function ModificarBotoesPorFormState(formState) {
             if (VerificarGrupoDlPclOuPlantaPiloto()) {
                 $btnSalvar.show();
                 $btnAgendar.show();
+                $btnAbandonar.show();
             }
             break;
         case AGENDADO:
@@ -2509,12 +2670,6 @@ function ModificarCamposPorFormState(formState) {
     var $qualidadeResponsavelPPGer = $('#peoplePickerAbaRespGerQualidade_TopSpan_EditorInput');
     var $meioAmbienteResponsavelAcompanhamento = $('[name=MeioAmbienteAcompanhamento]');
     var $meioAmbienteResponsavelPPResp = $('#peoplePickerAbaAcRespMeioAmbiente_TopSpan_EditorInput');
-    var $qualidadeRespAcompanhamento = $('#qualidadeRespAcompanhamento');
-    var $qualidadeRespPessoa = $('#qualidadeRespPessoa');
-    var $qualidadeRespResultado = $('#qualidadeRespResultado');
-    var $qualidadeRespObservacoes = $('#qualidadeRespObservacoes');
-    var $txtAttTabAnaliseQualidade = $('#txtAtt-tab-analise-qualidade');
-    var $qualidadeRespMotivo = $('#qualidadeRespMotivo');
 
     $TipoLote.attr('disabled', true);
     $Fabrica.attr('disabled', true);
@@ -2562,12 +2717,19 @@ function ModificarCamposPorFormState(formState) {
     $qualidadeResponsavelPPGer.attr('disabled', true);
     $meioAmbienteResponsavelAcompanhamento.attr('disabled', true);
     $meioAmbienteResponsavelPPResp.attr('disabled', true);
-    $qualidadeRespAcompanhamento.attr('disabled', true);
-    $qualidadeRespPessoa.attr('disabled', true);
-    $qualidadeRespResultado.attr('disabled', true);
-    $qualidadeRespObservacoes.attr('disabled', true);
-    $txtAttTabAnaliseQualidade.attr('disabled', true);
-    $qualidadeRespMotivo.attr('disabled', true);
+
+    Object.keys(aprovacoes).forEach(function (index) {
+        var responsavel = GetResponsavelPorNome(index);
+
+        if (responsavel.abaAnaliseId != null) {
+            var $abaAnalise = $('#' + responsavel.abaAnaliseId);
+            $abaAnalise.find('[name=Pessoa]').attr('disabled', true);
+            $abaAnalise.find('[name=ExecucaoLoteAcompanhada]').attr('disabled', true);
+            $abaAnalise.find('[name=Resultado]').attr('disabled', true);
+            $abaAnalise.find('[name=ObservacoesAnalise]').attr('disabled', true);
+            $abaAnalise.find('[name=ReprovadoMotivo]').attr('disabled', true);
+        }
+    });
 
     switch (formState) {
         case EM_CRIACAO:
@@ -2682,19 +2844,26 @@ function ModificarCamposPorFormState(formState) {
             $('[name=NaoExecutadoComentarios]').attr('disabled', false);
             break;
         case EM_REGISTRO_DE_ANALISE:
-            $qualidadeRespAcompanhamento.attr('disabled', false);
-            $qualidadeRespPessoa.attr('disabled', false);
-            $qualidadeRespResultado.attr('disabled', false);
-            $qualidadeRespObservacoes.attr('disabled', false);
-            $txtAttTabAnaliseQualidade.attr('disabled', false);
+            Object.keys(aprovacoes).forEach(function (index) {
+                var responsavel = GetResponsavelPorNome(index);
+                var aprovacao = aprovacoes[index];
+
+                if (responsavel.abaAnaliseId != null &&
+                        CarregarUsuarioAtual().id == FiltrarIdPorPessoaId(aprovacao.Pessoa) &&
+                        ['Pendente', 'Rascunho'].indexOf(aprovacao.Resultado) != -1) {
+                    var $abaAnalise = $('#' + responsavel.abaAnaliseId);
+                    $abaAnalise.find('[name=ExecucaoLoteAcompanhada]').attr('disabled', false);
+                    $abaAnalise.find('[name=Resultado]').attr('disabled', false);
+                    $abaAnalise.find('[name=ObservacoesAnalise]').attr('disabled', false);
+                }
+            });
+
             break;
     }
 }
 
 function ModificarStatusPorFormState(formState) {
     var $status = $('select#status');
-    //TODO
-    var $qualidadeGerResultado = $('select#qualidadeRespResultado');
 
     switch (formState) {
         case AGENDADO:
@@ -2716,7 +2885,13 @@ function ModificarStatusPorFormState(formState) {
             $status.val(REPROVADO);
             break;
         case EM_CRIACAO:
-            $status.val("")
+            $status.val("");
+            break;
+        case RASCUNHO:
+            $status.val(RASCUNHO);
+            break;
+        case RASCUNHO_EM_EDICAO:
+            $status.val(RASCUNHO);
             break;
     }
 }
@@ -2726,9 +2901,7 @@ function ModificarFormState(formState) {
     ModificarBotoesPorFormState(formState);
     ModificarCamposPorFormState(formState);
     ModificarAbasPorFormState(formState);
-
 }
-
 
 function ModificarAbasPorFormState(formState) {
     $('#pills-analises-tab').addClass('disabled');
@@ -2754,12 +2927,25 @@ function ModificarAbasPorFormState(formState) {
         case EM_CRIACAO:
             break;
         case REGISTRO_DE_ANALISE:
+        case EM_REGISTRO_DE_ANALISE:
+        case REPROVADO:
             $('#pills-analises-tab').removeClass('disabled');
             break;
     }
 }
 
 function ModificarAbasPorTipoDeLote(tipoDeLote) {
+    $('#pills-tab-qualidade-resp').hide();
+    $('#pills-tab-eng-envase-resp').hide();
+    $('#pills-tab-eng-fabricacao-resp').hide();
+    $('#pills-tab-inov-df-resp').hide();
+    $('#pills-tab-inov-de-resp').hide();
+    $('#pills-tab-fabrica-resp').hide();
+    $('#pills-analise-qualidade-ger').hide();
+
+    $('#envaseMeioAmbiente').hide();
+    $('#fabricacaoMeioAmbiente').hide();
+
     switch (tipoDeLote) {
         case 'Brinde':
             $("#pills-responsaveis-tab").removeClass("disabled");
@@ -2783,12 +2969,12 @@ function ModificarAbasPorTipoDeLote(tipoDeLote) {
             $("#pills-fabrica-acomp-tab").show();
             $("#pills-meioambiente-acomp-tab").show();
 
-            $('input[type=checkbox]#acRespEngEnvaseAcomp').prop('checked',false);
-            $('input[type=checkbox]#acRespEngfabricacaoAcomp').prop('checked',false);
-            $('input[type=checkbox]#acRespInovDFAcomp').prop('checked',false);
-            $('input[type=checkbox]#acRespInovDEAcomp').prop('checked',false);
-            $('input[type=checkbox]#acRespFabricaAcomp').prop('checked',false);
-            $('input[type=checkbox]#acRespMeioAmbienteAcomp').prop('checked',false);
+            $('input[type=checkbox]#acRespEngEnvaseAcomp').prop('checked', false);
+            $('input[type=checkbox]#acRespEngfabricacaoAcomp').prop('checked', false);
+            $('input[type=checkbox]#acRespInovDFAcomp').prop('checked', false);
+            $('input[type=checkbox]#acRespInovDEAcomp').prop('checked', false);
+            $('input[type=checkbox]#acRespFabricaAcomp').prop('checked', false);
+            $('input[type=checkbox]#acRespMeioAmbienteAcomp').prop('checked', false);
 
             $('#AbaAcRespsEngEnvase').hide();
             $('#AbaAcRespsEngFabricacao').hide();
@@ -2797,6 +2983,9 @@ function ModificarAbasPorTipoDeLote(tipoDeLote) {
             $('#AbaAcRespsFabrica').hide();
             $('#AbaAcRespsMeioAmbiente').hide();
 
+            $('#pills-tab-qualidade-resp').show();
+            $('#pills-tab-qualidade-resp').tab('show');
+            $('#pills-analise-qualidade-ger').show();
             break;
         case 'Envase':
             $("#pills-responsaveis-tab").removeClass("disabled");
@@ -2834,6 +3023,13 @@ function ModificarAbasPorTipoDeLote(tipoDeLote) {
             $('#AbaAcRespsFabrica').hide();
             $('#AbaAcRespsMeioAmbiente').hide();
 
+            $('#pills-tab-qualidade-resp').show();
+            $("#pills-tab-qualidade-resp").tab('show');
+            $('#pills-tab-eng-envase-resp').show();
+            $('#pills-tab-inov-de-resp').show();
+            $('#pills-tab-analise-qualidade-ger').show();
+            $('#pills-tab-fabrica-resp').show();
+            $('#envaseMeioAmbiente').show();
             break;
         case 'Fabricação':
             $("#pills-responsaveis-tab").removeClass("disabled");
@@ -2871,42 +3067,12 @@ function ModificarAbasPorTipoDeLote(tipoDeLote) {
             $('#AbaAcRespsFabrica').hide();
             $('#AbaAcRespsMeioAmbiente').hide();
 
-            break;
-        case 'Picking':
-            $("#pills-responsaveis-tab").addClass("disabled");
-            $("#pills-acompanhamento-tab").addClass("disabled");
-
-            $("#pills-dlpcl-tab").hide();
-            $("#pills-eng-envase-tab").hide();
-            $("#pills-eng-fabricacao-tab").hide();
-            $("#pills-inov-df-tab").hide();
-            $("#pills-inov-de-tab").hide();
-            $("#pills-qualidade-tab").hide();
-            $("#pills-fabrica-tab").hide();
-
-            $("#pills-dlpcl-acomp-tab").hide();
-            $("#pills-eng-envase-acomp-tab").hide();
-            $("#pills-eng-fabricacao-acomp-tab").hide();
-            $("#pills-inov-df-acomp-tab").hide();
-            $("#pills-inov-de-acomp-tab").hide();
-            $("#pills-qualidade-acomp-tab").hide();
-            $("#pills-fabrica-acomp-tab").hide();
-            $("#pills-meioambiente-acomp-tab").hide();
-
-            $('input[type=checkbox]#acRespEngEnvaseAcomp').prop('checked',false);
-            $('input[type=checkbox]#acRespEngfabricacaoAcomp').prop('checked',false);
-            $('input[type=checkbox]#acRespInovDFAcomp').prop('checked',false);
-            $('input[type=checkbox]#acRespInovDEAcomp').prop('checked',false);
-            $('input[type=checkbox]#acRespFabricaAcomp').prop('checked',false);
-            $('input[type=checkbox]#acRespMeioAmbienteAcomp').prop('checked',false);
-
-            $('#AbaAcRespsEngEnvase').hide();
-            $('#AbaAcRespsEngFabricacao').hide();
-            $('#AbaAcRespsInovDF').hide();
-            $('#AbaAcRespsInovDE').hide();
-            $('#AbaAcRespsFabrica').hide();
-            $('#AbaAcRespsMeioAmbiente').hide();
-
+            $('#pills-tab-eng-fabricacao-resp').show();
+            $('#pills-tab-eng-fabricacao-resp').tab('show');
+            $('#pills-tab-inov-df-resp').show();
+            $('#pills-tab-fabrica-resp').show();
+            $('#pills-tab-analise-qualidade-ger').show();
+            $('#fabricacaoMeioAmbiente').show();
             break;
         default:
             $("#pills-responsaveis-tab").addClass("disabled");
@@ -2942,6 +3108,17 @@ function ModificarAbasPorTipoDeLote(tipoDeLote) {
             $('#AbaAcRespsInovDE').hide();
             $('#AbaAcRespsFabrica').hide();
             $('#AbaAcRespsMeioAmbiente').hide();
+
+            $('#pills-tab-qualidade-resp').hide();
+            $('#pills-tab-eng-envase-resp').hide();
+            $('#pills-tab-eng-fabricacao-resp').hide();
+            $('#pills-tab-inov-df-resp').hide();
+            $('#pills-tab-inov-de-resp').hide();
+            $('#pills-tab-fabrica-resp').hide();
+            $('#pills-tab-analise-qualidade-ger').hide();
+
+            $('#envaseMeioAmbiente').hide();
+            $('#fabricaMeioAmbiente').hide();
 
             break;
     }
@@ -3082,8 +3259,14 @@ function RegistrarBindings() {
     $acRespMeioAmbienteAcomp.change(function () {
         if ($acRespMeioAmbienteAcomp.prop('checked')) {
             $("#AbaAcRespsMeioAmbiente").show();
+            if ($tipoLote.val() != 'Brinde') {
+                $("#pills-tab-meio-ambiente-resp").removeClass('d-md-none');
+            }
         }
         else {
+            if ($tipoLote.val() != 'Brinde') {
+                $("#pills-tab-meio-ambiente-resp").addClass('d-md-none');
+            }
             $("#AbaAcRespsMeioAmbiente").hide();
         }
     });
@@ -3113,6 +3296,17 @@ function RegistrarBindings() {
     espelharCheckBox('#acRespInofDF', '#acRespInofDFAcomp');
     espelharCheckBox('#acRespInofDE', '#acRespInofDEAcomp');
     espelharCheckBox('#acRespFabrica', '#acRespFabricaAcomp');
+
+    $('[name="Resultado"]').change(function () {
+        var $this = $(this);
+        var $tab = $this.parents('.tab-pane[role="tabpanel"]');
+
+        if ($this.val() == 'Reprovado') {
+            $tab.find('[name="ReprovadoMotivo"]').prop('disabled', false);
+        } else {
+            $tab.find('[name="ReprovadoMotivo"]').prop('disabled', true);
+        }
+    });
 }
 
 function espelharCheckBox(checkA, checkB) {
@@ -3148,7 +3342,7 @@ function ResetarAgendamento() {
 
 function SalvarAgendamento() {
     var id = $('input[name="ID"]').val();
-    
+
     if (id) {
         return AtualizarAgendamento(id).then(function (response) {
             return CarregarAgendamento(response.record.attr('ows_ID'));
@@ -3303,7 +3497,7 @@ function RegistrarBotoes() {
     });
 
     $('.btn-reagendar').click(function () {
-        ModificarFormState(RASCUNHO);
+        ModificarFormState(RASCUNHO_EM_EDICAO);
     });
 }
 
@@ -3504,7 +3698,9 @@ $(document).ready(function () {
         CarregarListaTiposLotes(),
         CarregarMotivoCancelamento(),
         CarregarMotivoNaoExecutado(),
-        InitializeAllPeoplePickers()
+        InitializeAllPeoplePickers(),
+        CarregarListaResultadoAnalise(),
+        CarregarListaMotivoAnalise()
     ).then(function () {
         InstanciarDateTimePicker();
         RegistrarBindings();
