@@ -2845,6 +2845,37 @@ function ModificarCamposPorFormState(formState) {
             $('[name=NaoExecutadoComentarios]').attr('disabled', false);
             break;
         case EM_REGISTRO_DE_ANALISE:
+            $().SPServices({
+                operation: "GetGroupCollectionFromUser",
+                userLoginName: $().SPServices.SPGetCurrentUser(),
+                async: false,
+                completefunc: function (xData, Status) {
+                    var $xml = $(xData.responseXML);
+                    if (usuarioPertenceAoGrupo($xml, listDemaisGrupos[0])) {
+                        $envaseResponsavelAcompanhamento.attr('disabled', false);
+                        $envaseResponsavelPPResp.attr('disabled', false);
+                        $envaseResponsavelPPGer.attr('disabled', false);
+                        $engFabResponsavelAcompanhamento.attr('disabled', false);
+                        $engFabResponsavelPPResp.attr('disabled', false);
+                        $engFabResponsavelPPGer.attr('disabled', false);
+                        $inovDfResponsavelAcompanhamento.attr('disabled', false);
+                        $inovDfResponsavelPPResp.attr('disabled', false);
+                        $inovDfResponsavelPPGer.attr('disabled', false);
+                        $inovDeResponsavelAcompanhamento.attr('disabled', false);
+                        $inovDeResponsavelPPResp.attr('disabled', false);
+                        $inovDeResponsavelPPGer.attr('disabled', false);
+                        $fabricaResponsavelAcompanhamento.attr('disabled', false);
+                        $fabricaResponsavelPPCoordProg.attr('disabled', false);
+                        $fabricaResponsavelPPCoordMan.attr('disabled', false);
+                        $fabricaResponsavelPPGer.attr('disabled', false);
+                        $qualidadeResponsavelAcompanhamento.attr('disabled', false);
+                        $qualidadeResponsavelPPResp.attr('disabled', false);
+                        $qualidadeResponsavelPPGer.attr('disabled', false);
+                        $meioAmbienteResponsavelAcompanhamento.attr('disabled', false);
+                        $meioAmbienteResponsavelPPResp.attr('disabled', false);
+                    }
+                }
+            });
             var mostrarAbaQualidadeGerente = true;
             Object.keys(aprovacoes).forEach(function (index) {
                 var responsavel = GetResponsavelPorNome(index);
