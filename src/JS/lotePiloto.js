@@ -2518,8 +2518,6 @@ function VerificarGrupoRespOuAcomp() {
     return result;
 }
 
-
-
 function ModificarBotoesPorFormState(formState) {
     var $btnAgendar = $('.btn-agendar');
     var $btnExecutado = $('.btn-executado');
@@ -2719,6 +2717,8 @@ function ModificarCamposPorFormState(formState) {
     $meioAmbienteResponsavelAcompanhamento.attr('disabled', true);
     $meioAmbienteResponsavelPPResp.attr('disabled', true);
 
+    $('#pills-analise-qualidade-ger').addClass('disabled');
+
     Object.keys(aprovacoes).forEach(function (index) {
         var responsavel = GetResponsavelPorNome(index);
 
@@ -2845,6 +2845,7 @@ function ModificarCamposPorFormState(formState) {
             $('[name=NaoExecutadoComentarios]').attr('disabled', false);
             break;
         case EM_REGISTRO_DE_ANALISE:
+            var mostrarAbaQualidadeGerente = true;
             Object.keys(aprovacoes).forEach(function (index) {
                 var responsavel = GetResponsavelPorNome(index);
                 var aprovacao = aprovacoes[index];
@@ -2856,8 +2857,13 @@ function ModificarCamposPorFormState(formState) {
                     $abaAnalise.find('[name=ExecucaoLoteAcompanhada]').attr('disabled', false);
                     $abaAnalise.find('[name=Resultado]').attr('disabled', false);
                     $abaAnalise.find('[name=ObservacoesAnalise]').attr('disabled', false);
+                    if (mostrarAbaQualidadeGerente && !$abaAnalise.find('[name=Resultado] :selected').val().startsWith('Aprovado')) {
+                        mostrarAbaQualidadeGerente = false;
+                    }
                 }
             });
+            
+            if (mostrarAbaQualidadeGerente) $('#pills-analise-qualidade-ger').removeClass('disabled');
 
             break;
     }
@@ -2936,8 +2942,12 @@ function ModificarAbasPorFormState(formState) {
             break;
         case REGISTRO_DE_ANALISE:
         case EM_REGISTRO_DE_ANALISE:
-        case REPROVADO:
             $('#pills-analises-tab').removeClass('disabled');
+            break;
+        case REPROVADO:
+        case APROVADO:
+            $('#pills-analises-tab').removeClass('disabled');
+            $('#pills-analise-qualidade-ger').removeClass('disabled');
             break;
     }
 }
