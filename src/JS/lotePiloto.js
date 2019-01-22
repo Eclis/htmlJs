@@ -2893,6 +2893,13 @@ function ModificarStatusPorFormState(formState) {
         case RASCUNHO_EM_EDICAO:
             $status.val(RASCUNHO);
             break;
+        case EM_REGISTRO_DE_ANALISE:
+            if ($("#qualidadeGerResultado :selected").val().startsWith('Aprovado')) {
+                $status.val(APROVADO);
+            } else {
+                $status.val(REGISTRO_DE_ANALISE);
+            }
+            break;
     }
 }
 
@@ -3027,8 +3034,8 @@ function ModificarAbasPorTipoDeLote(tipoDeLote) {
             $("#pills-tab-qualidade-resp").tab('show');
             $('#pills-tab-eng-envase-resp').show();
             $('#pills-tab-inov-de-resp').show();
-            $('#pills-tab-analise-qualidade-ger').show();
             $('#pills-tab-fabrica-resp').show();
+            $('#pills-analise-qualidade-ger').show();
             $('#envaseMeioAmbiente').show();
             break;
         case 'Fabricação':
@@ -3071,7 +3078,7 @@ function ModificarAbasPorTipoDeLote(tipoDeLote) {
             $('#pills-tab-eng-fabricacao-resp').tab('show');
             $('#pills-tab-inov-df-resp').show();
             $('#pills-tab-fabrica-resp').show();
-            $('#pills-tab-analise-qualidade-ger').show();
+            $('#pills-analise-qualidade-ger').show();
             $('#fabricacaoMeioAmbiente').show();
             break;
         default:
