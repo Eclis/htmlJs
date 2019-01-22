@@ -2033,7 +2033,9 @@ function CarregarListaTiposLotes() {
             }
 
             $(Data.responseXML).find('Field[DisplayName="Tipo de Lote"] CHOICE').each(function () {
-                $('select#tipoDeLote').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+                if (this.innerHTML != "Picking") {
+                    $('select#tipoDeLote').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+                }
             });
 
             $promise.resolve();
@@ -3240,7 +3242,7 @@ function ResetarAgendamento() {
 
 function SalvarAgendamento() {
     var id = $('input[name="ID"]').val();
-    
+
     if (id) {
         return AtualizarAgendamento(id).then(function (response) {
             return CarregarAgendamento(response.record.attr('ows_ID'));
