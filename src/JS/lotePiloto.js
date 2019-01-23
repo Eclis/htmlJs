@@ -3194,8 +3194,9 @@ function ModificarAbasPorTipoDeLote(tipoDeLote) {
             $('#AbaAcRespsFabrica').hide();
             $('#AbaAcRespsMeioAmbiente').hide();
 
+            $('#pills-tab-qualidade-resp').show();
+            $("#pills-tab-qualidade-resp").tab('show');
             $('#pills-tab-eng-fabricacao-resp').show();
-            $('#pills-tab-eng-fabricacao-resp').tab('show');
             $('#pills-tab-inov-df-resp').show();
             $('#pills-tab-fabrica-resp').show();
             $('#pills-analise-qualidade-ger').show();
