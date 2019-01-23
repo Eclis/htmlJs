@@ -2968,7 +2968,7 @@ function ModificarCamposPorFormState(formState) {
                     }
                 }
             });
-            
+
             if (mostrarAbaQualidadeGerente) $('#pills-analise-qualidade-ger').removeClass('disabled');
 
             break;
@@ -3719,16 +3719,12 @@ function verificarErros() {
         produtoFormula,
         produtoQuantidade,
         motivo,
-        produtoEnvioAmostras,
-        produtoResponsavelAmostra,
-        produtoQuantidadeAmostra,
         agendamentoCentroCusto,
         grauComplexidade,
         agendamentoDataInicioProgramado,
         agendamentoDuracaoHoras,
         agendamentoDuracaoMinutos,
-        agendamentoFim,
-        agendamentoObservacoes,
+        agendamentoFim
     };
 
     var erro = 0;
@@ -3738,8 +3734,8 @@ function verificarErros() {
         var $atributo =  $('#'+itens);
         var $classe = $atributo.attr('class');
 
-        if($classe.indexOf('tom-selec') > 0){
-            if( $atributo.children('option:selected').val()  === 'Selecione uma opção') {
+        if ($classe.indexOf('tom-selec') > 0) {
+            if ( $atributo.children('option:selected').val()  === 'Selecione uma opção') {
                 var $tabItem = $atributo.parents('div.tab-pane');
                 var tabId = $tabItem.attr('id');
                 var $tabContent = $tabItem.parents('div.tab-content');
@@ -3750,7 +3746,7 @@ function verificarErros() {
                 break;
             }
         } else {
-            if ($atributo.val().length == 0 ){
+            if ($atributo.val().length == 0 ) {
                 var $tabItem = $atributo.parents('div.tab-pane');
                 var tabId = $tabItem.attr('id');
                 var $tabContent = $tabItem.parents('div.tab-content');
@@ -3763,18 +3759,30 @@ function verificarErros() {
         }
     }
 
-    var $camposPeople = {
-        peoplePickerAbaRespGerQualidade_TopSpan,
-        peoplePickerAbaRespRespQualidade_TopSpan
-    };
-
-    var people;
+    var camposPeople = [
+        'peoplePickerAbaRespGerQualidade_TopSpan',
+        'peoplePickerAbaRespRespQualidade_TopSpan',
+        'peoplePickerAbaRespRespDLPCL_TopSpan',
+        'peoplePickerAbaRespRespEngEnvase_TopSpan',
+        'peoplePickerAbaRespGerEngEnvase_TopSpan',
+        'peoplePickerAbaRespRespEngFabricacao_TopSpan',
+        'peoplePickerAbaRespGerEngFabricacao_TopSpan',
+        'peoplePickerAbaRespRespInovDF_TopSpan',
+        'peoplePickerAbaRespGerInovDF_TopSpan',
+        'peoplePickerAbaRespRespInovDE_TopSpan',
+        'peoplePickerAbaRespGerInovDE_TopSpan',
+        'peoplePickerAbaRespRespQualidade_TopSpan',
+        'peoplePickerAbaRespGerQualidade_TopSpan',
+        'peoplePickerAbaRespCoordProgFabrica_TopSpan',
+        'peoplePickerAbaRespCoordManFabrica_TopSpan',
+        'peoplePickerAbaRespGerFabrica_TopSpan'
+    ];
 
     if (erro == 0) {
-        for ( people in $camposPeople) {
-            var $atributo =  $('#'+people);
+        for (var i = 0; i < camposPeople.length; i++) {
+            var $atributo =  $('#'+camposPeople[i]);
 
-            if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespRespQualidade_TopSpan.HasResolvedUsers()) {
+            if (SPClientPeoplePicker.SPClientPeoplePickerDict[camposPeople[i]].HasInputError || !SPClientPeoplePicker.SPClientPeoplePickerDict[camposPeople[i]].HasResolvedUsers()) {
                 var $tabItem = $atributo.parents('div.tab-pane');
                 var $tabPai = $tabItem.parents('div.tab-pane');
                 var tabId = $tabItem.attr('id');
@@ -3785,21 +3793,6 @@ function verificarErros() {
                 var $linkPai = $tabContentPai.parent().find('ul.nav.nav-tabs li a[href="#' + tabPaiId + '"]');
                 $linkPai.tab('show');
                 $link.tab('show');
-
-                $atributo.focus();
-                break;
-            } else if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespRespQualidade_TopSpan.HasInputError) {
-                var $tabItem = $atributo.parents('div.tab-pane');
-                var $tabPai = $tabItem.parents('div.tab-pane');
-                var tabId = $tabItem.attr('id');
-                var tabPaiId = $tabPai.attr('id');
-                var $tabContent = $tabItem.parents('div.tab-content');
-                var $tabContentPai = $tabPai.parents('div.tab-content');
-                var $link = $tabContent.parent().find('ul.nav.nav-tabs li a[href="#' + tabId + '"]');
-                var $linkPai = $tabContentPai.parent().find('ul.nav.nav-tabs li a[href="#' + tabPaiId + '"]');
-                $linkPai.tab('show');
-                $link.tab('show');
-
                 $atributo.focus();
                 break;
             }
