@@ -2878,11 +2878,15 @@ function ModificarCamposPorFormState(formState) {
                         $envaseResponsavelAcompanhamento.attr('disabled', false);
                         $envaseResponsavelPPResp.attr('disabled', false);
                         $envaseResponsavelPPGer.attr('disabled', false);
+                        $LinhaEquipamento.attr('disabled', false);
+                        $Observacoes.attr('disabled', false);
                     }
                     if (usuarioPertenceAoGrupo($xml, engFabricacao)) {
                         $engFabResponsavelAcompanhamento.attr('disabled', false);
                         $engFabResponsavelPPResp.attr('disabled', false);
                         $engFabResponsavelPPGer.attr('disabled', false);
+                        $LinhaEquipamento.attr('disabled', false);
+                        $Observacoes.attr('disabled', false);
                     }
 
                     if (usuarioPertenceAoGrupo($xml, inovDf)) {
