@@ -2963,7 +2963,7 @@ function ModificarCamposPorFormState(formState) {
                     $abaAnalise.find('[name=ExecucaoLoteAcompanhada]').attr('disabled', false);
                     $abaAnalise.find('[name=Resultado]').attr('disabled', false);
                     $abaAnalise.find('[name=ObservacoesAnalise]').attr('disabled', false);
-                    if (mostrarAbaQualidadeGerente && !$abaAnalise.find('[name=Resultado] :selected').val().startsWith('Aprovado')) {
+                    if (mostrarAbaQualidadeGerente && index != 'Qualidade - Gerente' && !$abaAnalise.find('[name=Resultado] :selected').val().startsWith('Aprovado')) {
                         mostrarAbaQualidadeGerente = false;
                     }
                 }
