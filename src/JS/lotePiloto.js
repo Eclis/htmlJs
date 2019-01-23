@@ -1525,6 +1525,7 @@ function CarregarAgendamento(id) {
             });
 
             PreencherSelectsConsiderandoDependencia(selectsACarregar);
+            CarregarListaResultadoAnalise();
             ModificarFormState($('select#status').val());
 
             CarregarAgendamentoResponsaveis(atributos.ows_CodigoAgendamento.value).then(function () {
@@ -2010,7 +2011,7 @@ function CarregarListaStatus() {
 }
 
 function CarregarListaResultadoAnalise() {
-    if ($('select[name=GrauComplexidade] :selected').val() == 2) {
+    if ($('select[name=GrauComplexidade] :selected').val().startsWith("2")) {
         return CarregarListaResultadoAnaliseComSimilaridade();
     } else {
         return CarregarListaResultadoAnaliseSemSimilaridade();
@@ -4116,7 +4117,6 @@ $(document).ready(function () {
         CarregarMotivoCancelamento(),
         CarregarMotivoNaoExecutado(),
         InitializeAllPeoplePickers(),
-        CarregarListaResultadoAnalise(),
         CarregarListaMotivoAnalise()
     ).then(function () {
         InstanciarDateTimePicker();
