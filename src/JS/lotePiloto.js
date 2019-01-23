@@ -2672,6 +2672,7 @@ function ModificarCamposPorFormState(formState) {
     var $motivoComentarios = $('[name=CanceladoComentarios]');
     var $motivoNaoExecutado = $('[name=NaoExecutadoMotivo]');
     var $motivoNaoExecutadoComentarios = $('[name=NaoExecutadoComentarios]');
+
     var $dlpclResponsavelPP = $('#peoplePickerAbaRespRespDLPCL_TopSpan_EditorInput');
     var $envaseResponsavelAcompanhamento = $('[name=EngenhariaEnvaseAcompanhamento]');
     var $envaseResponsavelPPResp = $('#peoplePickerAbaRespRespEngEnvase_TopSpan_EditorInput');
@@ -2694,6 +2695,23 @@ function ModificarCamposPorFormState(formState) {
     var $qualidadeResponsavelPPGer = $('#peoplePickerAbaRespGerQualidade_TopSpan_EditorInput');
     var $meioAmbienteResponsavelAcompanhamento = $('[name=MeioAmbienteAcompanhamento]');
     var $meioAmbienteResponsavelPPResp = $('#peoplePickerAbaAcRespMeioAmbiente_TopSpan_EditorInput');
+
+    var $envaseAcompAcompanhamento = $('#acRespEngEnvaseAcomp');
+    var $envaseAcompPPResp = $('#peoplePickerAbaAcRespEngEnvase_TopSpan_EditorInput');
+    var $envaseAcompPPGer = $('#peoplePickerAbaAcGerEngEnvase_TopSpan_EditorInput');
+    var $engFabAcompAcompanhamento = $('#acRespEngfabricacaoAcomp');
+    var $engFabAcompPPResp = $('#peoplePickerAbaAcRespEngFabricacao_TopSpan_EditorInput');
+    var $engFabAcompPPGer = $('#peoplePickerAbaAcGerEngFabricacao_TopSpan_EditorInput');
+    var $inovDfAcompAcompanhamento = $('#acRespInovDFAcomp');
+    var $inovDfAcompPPResp = $('#peoplePickerAbaAcRespInovDF_TopSpan_EditorInput');
+    var $inovDfAcompPPGer = $('#peoplePickerAbaAcGerInovDF_TopSpan_EditorInput');
+    var $inovDeAcompAcompanhamento = $('#acRespInovDEAcomp');
+    var $inovDeAcompPPResp = $('#peoplePickerAbaAcRespInovDE_TopSpan_EditorInput');
+    var $inovDeAcompPPGer = $('#peoplePickerAbaAcGerInovDE_TopSpan_EditorInput');
+    var $fabricaAcompAcompanhamento = $('#acRespFabricaAcomp');
+    var $fabricaAcompPPCoordProg = $('#peoplePickerAbaAcCoordProgFabrica_TopSpan_EditorInput');
+    var $fabricaAcompPPCoordMan = $('#peoplePickerAbaAcCoordManFabrica_TopSpan_EditorInput');
+    var $fabricaAcompPPGer = $('#peoplePickerAbaAcGerFabrica_TopSpan_EditorInput');
 
     $TipoLote.attr('disabled', true);
     $Fabrica.attr('disabled', true);
@@ -2741,6 +2759,22 @@ function ModificarCamposPorFormState(formState) {
     $qualidadeResponsavelPPGer.attr('disabled', true);
     $meioAmbienteResponsavelAcompanhamento.attr('disabled', true);
     $meioAmbienteResponsavelPPResp.attr('disabled', true);
+    $envaseAcompAcompanhamento.attr('disabled', true);
+    $envaseAcompPPResp.attr('disabled', true);
+    $envaseAcompPPGer.attr('disabled', true);
+    $engFabAcompAcompanhamento.attr('disabled', true);
+    $engFabAcompPPResp.attr('disabled', true);
+    $engFabAcompPPGer.attr('disabled', true);
+    $inovDfAcompAcompanhamento.attr('disabled', true);
+    $inovDfAcompPPResp.attr('disabled', true);
+    $inovDfAcompPPGer.attr('disabled', true);
+    $inovDeAcompAcompanhamento.attr('disabled', true);
+    $inovDeAcompPPResp.attr('disabled', true);
+    $inovDeAcompPPGer.attr('disabled', true);
+    $fabricaAcompAcompanhamento.attr('disabled', true);
+    $fabricaAcompPPCoordProg.attr('disabled', true);
+    $fabricaAcompPPCoordMan.attr('disabled', true);
+    $fabricaAcompPPGer.attr('disabled', true);
 
     $('#pills-analise-qualidade-ger').addClass('disabled');
 
@@ -2803,6 +2837,22 @@ function ModificarCamposPorFormState(formState) {
             $qualidadeResponsavelPPGer.attr('disabled', false);
             $meioAmbienteResponsavelAcompanhamento.attr('disabled', false);
             $meioAmbienteResponsavelPPResp.attr('disabled', false);
+            $envaseAcompAcompanhamento.attr('disabled', false);
+            $envaseAcompPPResp.attr('disabled', false);
+            $envaseAcompPPGer.attr('disabled', false);
+            $engFabAcompAcompanhamento.attr('disabled', false);
+            $engFabAcompPPResp.attr('disabled', false);
+            $engFabAcompPPGer.attr('disabled', false);
+            $inovDfAcompAcompanhamento.attr('disabled', false);
+            $inovDfAcompPPResp.attr('disabled', false);
+            $inovDfAcompPPGer.attr('disabled', false);
+            $inovDeAcompAcompanhamento.attr('disabled', false);
+            $inovDeAcompPPResp.attr('disabled', false);
+            $inovDeAcompPPGer.attr('disabled', false);
+            $fabricaAcompAcompanhamento.attr('disabled', false);
+            $fabricaAcompPPCoordProg.attr('disabled', false);
+            $fabricaAcompPPCoordMan.attr('disabled', false);
+            $fabricaAcompPPGer.attr('disabled', false);
             break;
         case RESP_ACOMP_AGENDADO_EM_EDICAO:
             $().SPServices({
@@ -3036,6 +3086,7 @@ function ModificarAbasPorTipoDeLote(tipoDeLote) {
 
             $("#pills-dlpcl-acomp-tab").hide();
             $("#pills-eng-envase-acomp-tab").show();
+            $("#pills-eng-envase-acomp-tab").tab('show');
             $("#pills-eng-fabricacao-acomp-tab").show();
             $("#pills-inov-df-acomp-tab").show();
             $("#pills-inov-de-acomp-tab").show();
@@ -3077,6 +3128,7 @@ function ModificarAbasPorTipoDeLote(tipoDeLote) {
             $("#pills-dlpcl-acomp-tab").hide();
             $("#pills-eng-envase-acomp-tab").hide();
             $("#pills-eng-fabricacao-acomp-tab").show();
+            $("#pills-eng-fabricacao-acomp-tab").tab('show');
             $("#pills-inov-df-acomp-tab").hide();
             $("#pills-inov-de-acomp-tab").hide();
             $("#pills-qualidade-acomp-tab").hide();
@@ -3120,6 +3172,7 @@ function ModificarAbasPorTipoDeLote(tipoDeLote) {
 
             $("#pills-dlpcl-acomp-tab").hide();
             $("#pills-eng-envase-acomp-tab").show();
+            $("#pills-eng-envase-acomp-tab").tab("show");
             $("#pills-eng-fabricacao-acomp-tab").hide();
             $("#pills-inov-df-acomp-tab").hide();
             $("#pills-inov-de-acomp-tab").show();
