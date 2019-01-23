@@ -1248,6 +1248,11 @@ function AtualizarAgendamento(id) {
         }
     });
 
+    var $registroAnalisesInicio = $('[name=RegistroAnalisesInicio]');
+    if (!$registroAnalisesInicio.val() && state == REGISTRO_DE_ANALISE) {
+        campos.push([$registroAnalisesInicio.attr('name'), moment(new Date(), 'DD/MM/YYYY HH:mm').format('YYYY-MM-DDTHH:mm:ss[-00:00]')]);
+    }
+
     $().SPServices({
         operation: "UpdateListItems",
         async: false,
