@@ -2333,6 +2333,7 @@ function InserirAgendamento() {
 }
 
 var SetoresResponsaveis = [
+    // Responsáveis
     {tipoDeLote: 'Brinde',     peoplePickerId: 'peoplePickerAbaRespRespDLPCL',         nome: 'DL/PCL - Responsável',           abaAnaliseId: null},
     {tipoDeLote: 'Brinde',     peoplePickerId: 'peoplePickerAbaRespRespQualidade',     nome: 'Qualidade - Responsável',        abaAnaliseId: 'tab-qualidade-resp'},
     {tipoDeLote: 'Brinde',     peoplePickerId: 'peoplePickerAbaRespGerQualidade',      nome: 'Qualidade - Gerente',            abaAnaliseId: 'tab-analise-qualidade-ger'},
@@ -2356,6 +2357,27 @@ var SetoresResponsaveis = [
     {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespCoordProgFabrica',  nome: 'Fábrica - Coord. Programação',   abaAnaliseId: null},
     {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespCoordManFabrica',   nome: 'Fábrica - Coord. de Manufatura', abaAnaliseId: 'tab-fabrica-resp'},
     {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaRespGerFabrica',        nome: 'Fábrica - Gerente',              abaAnaliseId: null},
+    // Acompanhamento
+    {tipoDeLote: 'Brinde',     peoplePickerId: 'peoplePickerAbaAcRespEngEnvase',       nome: 'Eng. Envase - Responsável',      abaAnaliseId: null},
+    {tipoDeLote: 'Brinde',     peoplePickerId: 'peoplePickerAbaAcGerEngEnvase',        nome: 'Eng. Envase - Gerente',          abaAnaliseId: null},
+    {tipoDeLote: 'Brinde',     peoplePickerId: 'peoplePickerAbaAcRespEngEnvase',       nome: 'Eng. Fabricação - Responsável',  abaAnaliseId: null},
+    {tipoDeLote: 'Brinde',     peoplePickerId: 'peoplePickerAbaAcGerEngEnvase',        nome: 'Eng. Fabricação - Gerente',      abaAnaliseId: null},
+    {tipoDeLote: 'Brinde',     peoplePickerId: 'peoplePickerAbaAcRespInovDF',          nome: 'Inovação DF - Responsável',      abaAnaliseId: null},
+    {tipoDeLote: 'Brinde',     peoplePickerId: 'peoplePickerAbaAcGerInovDF',           nome: 'Inovação DF - Gerente',          abaAnaliseId: null},
+    {tipoDeLote: 'Brinde',     peoplePickerId: 'peoplePickerAbaAcRespInovDE',          nome: 'Inovação DE - Responsável',      abaAnaliseId: null},
+    {tipoDeLote: 'Brinde',     peoplePickerId: 'peoplePickerAbaAcGerInovDE',           nome: 'Inovação DE - Gerente',          abaAnaliseId: null},
+    {tipoDeLote: 'Brinde',     peoplePickerId: 'peoplePickerAbaAcCoordProgFabrica',    nome: 'Fábrica - Coord. Programação',   abaAnaliseId: null},
+    {tipoDeLote: 'Brinde',     peoplePickerId: 'peoplePickerAbaAcCoordManFabrica',     nome: 'Fábrica - Coord. de Manufatura', abaAnaliseId: null},
+    {tipoDeLote: 'Brinde',     peoplePickerId: 'peoplePickerAbaAcGerFabrica',          nome: 'Fábrica - Gerente',              abaAnaliseId: null},
+    {tipoDeLote: 'Brinde',     peoplePickerId: 'peoplePickerAbaAcRespMeioAmbiente',    nome: 'Meio Ambiente - Responsável',    abaAnaliseId: null},
+    {tipoDeLote: 'Envase',     peoplePickerId: 'peoplePickerAbaAcRespEngEnvase',       nome: 'Eng. Fabricação - Responsável',  abaAnaliseId: null},
+    {tipoDeLote: 'Envase',     peoplePickerId: 'peoplePickerAbaAcGerEngEnvase',        nome: 'Eng. Fabricação - Gerente',      abaAnaliseId: null},
+    {tipoDeLote: 'Envase',     peoplePickerId: 'peoplePickerAbaAcRespMeioAmbiente',    nome: 'Meio Ambiente - Responsável',    abaAnaliseId: null},
+    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaAcRespEngEnvase',       nome: 'Eng. Envase - Responsável',      abaAnaliseId: null},
+    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaAcGerEngEnvase',        nome: 'Eng. Envase - Gerente',          abaAnaliseId: null},
+    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaAcRespInovDE',          nome: 'Inovação DE - Responsável',      abaAnaliseId: null},
+    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaAcGerInovDE',           nome: 'Inovação DE - Gerente',          abaAnaliseId: null},
+    {tipoDeLote: 'Fabricação', peoplePickerId: 'peoplePickerAbaAcRespMeioAmbiente',    nome: 'Meio Ambiente - Responsável',    abaAnaliseId: null},
 ];
 
 function GetResponsavelPorNome(nome) {
