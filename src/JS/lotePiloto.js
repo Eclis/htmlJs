@@ -1981,7 +1981,8 @@ function CarregarListaStatus() {
 }
 
 function CarregarListaResultadoAnalise() {
-    if ($('select[name=GrauComplexidade] :selected').val().startsWith("2")) {
+    var valorResultado = $('select[name=GrauComplexidade] :selected').val();
+    if (valorResultado && valorResultado.startsWith("2")) {
         return CarregarListaResultadoAnaliseComSimilaridade();
     } else {
         return CarregarListaResultadoAnaliseSemSimilaridade();
