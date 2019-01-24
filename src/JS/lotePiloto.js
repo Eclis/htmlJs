@@ -2582,7 +2582,7 @@ function ModificarBotoesPorFormState(formState) {
                     var inovDe = listDemaisGrupos[4];
                     var inovDf = listDemaisGrupos[5];
                     var qualidade = listDemaisGrupos[7];
-                    var tipoLote = $("select#tipoDeLote");
+                    var tipoLote = $("select#tipoDeLote").val();
 
                     if (tipoLote == 'Brinde' && usuarioPertenceAoGrupo($xml, qualidade)) {
                         $btnExecutado.show();
