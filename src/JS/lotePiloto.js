@@ -1174,6 +1174,7 @@ function AddAttachments(listName, itemId, controlName) {
                     "Content-Length": fileData.byteLength
                 },
                 success: function (data) {
+                    carregarBotoesAnexo();
                     carregarPainelAnexo();
                     controlName.value = '';
                 },
@@ -1556,7 +1557,7 @@ function ProcurarAprovacaoPorAbaAnaliseId(abaAnaliseId) {
     var chaves = Object.keys(aprovacoes);
 
     for (var i = 0; i < chaves.length; i ++) {
-        if (aprovacoes[chaves[i]].abaAnaliseId == abaAnaliseId) {
+        if (aprovacoes[chaves[i]]._abaAnaliseId == abaAnaliseId) {
             return aprovacoes[chaves[i]];
         }
     }
@@ -1610,8 +1611,7 @@ function CarregarAgendamentoResponsaveis(agendamento) {
                     Observacoes: this.attributes.ows_Observacoes != undefined ? this.attributes.ows_Observacoes.value : null,
                     SimilarCodigoAgendamento: this.attributes.ows_SimilarCodigoAgendamento != undefined ? this.attributes.ows_SimilarCodigoAgendamento.value : null,
                     ReprovadoMotivo: this.attributes.ows_ReprovadoMotivo != undefined ? this.attributes.ows_ReprovadoMotivo.value : null,
-                    _abaAnaliseId: responsavel.abaAnaliseId,
-                    abaAnaliseId: responsavel.abaAnaliseId
+                    _abaAnaliseId: responsavel.abaAnaliseId
                 };
 
                 var usuarioNome = FiltrarNomeUsuarioPorPessoaId(this.attributes.ows_Pessoa.value);
@@ -3054,6 +3054,9 @@ function ModificarFormState(formState) {
     ModificarBotoesPorFormState(formState);
     ModificarCamposPorFormState(formState);
     ModificarAbasPorFormState(formState);
+
+    carregarBotoesAnexo();
+    carregarPainelAnexo();
 }
 
 function ModificarAbasPorFormState(formState) {
@@ -3601,6 +3604,7 @@ function RegistrarBotoes() {
         SalvarAgendamento().then(function () {
             var id = $('input[name="ID"]').val();
             window.history.pushState('Object', '', '/sites/DEV_LotePiloto/SiteAssets/main.aspx?action=edit&loteid=' + id);
+            bloquearBotoesAbaAnexo();
             alert("Agendamento Salvo");
         }).fail(function (response) {
             alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
@@ -3646,6 +3650,7 @@ function RegistrarBotoes() {
             ModificarFormState(AGENDAMENTO_EM_EDICAO);
         } else if(status == REGISTRO_DE_ANALISE) {
             ModificarFormState(EM_REGISTRO_DE_ANALISE);
+            liberarBotoesAbaAnexo();
         }
     });
 
@@ -3962,6 +3967,47 @@ function carregarBotoesAnexo(){
 }
 
 
+
+function bloquearBotoesAbaAnexo(){
+
+    var qualidResp = document.getElementById('txtAtt-tab-analise-qualidade');
+    var qualidGer = document.getElementById('txtAtt-tab-analise-qualidade-ger');
+    var envaseR = document.getElementById('txtAtt-tab-analise-envase');
+    var fabricacao = document.getElementById('txtAtt-tab-analise-fabricacao');
+    var fabrica = document.getElementById('txtAtt-tab-analise-fabrica');
+    var inovde = document.getElementById('txtAtt-tab-analise-inovDe');
+    var inovdfResp = document.getElementById('txtAtt-tab-analise-inovDf');
+    var meioAmbiente = document.getElementById('txtAtt-tab-analise-inovDf');
+    qualidResp.disabled = true;
+    qualidGer.disabled = true;
+    envaseR.disabled = true;
+    fabricacao.disabled = true;
+    fabrica.disabled = true;
+    inovde.disabled = true;
+    inovdfResp.disabled = true;
+    meioAmbiente.disabled = true;
+}
+
+function liberarBotoesAbaAnexo(){
+
+    var qualidResp = document.getElementById('txtAtt-tab-analise-qualidade');
+    var qualidGer = document.getElementById('txtAtt-tab-analise-qualidade-ger');
+    var envaseR = document.getElementById('txtAtt-tab-analise-envase');
+    var fabricacao = document.getElementById('txtAtt-tab-analise-fabricacao');
+    var fabrica = document.getElementById('txtAtt-tab-analise-fabrica');
+    var inovde = document.getElementById('txtAtt-tab-analise-inovDe');
+    var inovdfResp = document.getElementById('txtAtt-tab-analise-inovDf');
+    var meioAmbiente = document.getElementById('txtAtt-tab-analise-inovDf');
+    qualidResp.disabled = false;
+    qualidGer.disabled = false;
+    envaseR.disabled = false;
+    fabricacao.disabled = false;
+    fabrica.disabled = false;
+    inovde.disabled = false;
+    inovdfResp.disabled = false;
+    meioAmbiente.disabled = false;
+}
+
 function carregarPainelAnexo(){
 
     var tabAnexoVisible = ProcurarAprovacaoPorAbaAnaliseId($('#txtAtt-tab-analise-qualidade').closest('div.tab-pane').attr('id'));
@@ -4113,6 +4159,7 @@ $(document).ready(function () {
         setTimeout(function () {
             carregarBotoesAnexo();
             carregarPainelAnexo();
+            bloquearBotoesAbaAnexo();
         }, 3000);
     });
 });
