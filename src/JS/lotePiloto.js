@@ -1990,11 +1990,16 @@ function CarregarListaResultadoAnalise() {
 
 function CarregarListaResultadoAnaliseComSimilaridade() {
     var $promise = $.Deferred();
+    var $resultado = $('select[name=Resultado]');
 
     $().SPServices({
         operation: 'GetList',
         listName: 'Agendamentos - Responsáveis',
         completefunc: function (Data, Status) {
+            $resultado.find('option')
+                .remove()
+                .end();
+
             if (Status != 'success') {
                 $promise.reject({
                     errorCode: '0x99999999',
@@ -2003,8 +2008,6 @@ function CarregarListaResultadoAnaliseComSimilaridade() {
 
                 return;
             }
-
-            var $resultado = $('select[name=Resultado]');
 
             $(Data.responseXML).find('Field[DisplayName="Resultado"] CHOICE').each(function () {
                 $resultado.append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
@@ -2048,11 +2051,16 @@ function CarregarListaMotivoAnalise() {
 
 function CarregarListaResultadoAnaliseSemSimilaridade() {
     var $promise = $.Deferred();
+    var $resultado = $('select[name=Resultado]');
 
     $().SPServices({
         operation: 'GetList',
         listName: 'Agendamentos - Responsáveis',
         completefunc: function (Data, Status) {
+            $resultado.find('option')
+                .remove()
+                .end();
+
             if (Status != 'success') {
                 $promise.reject({
                     errorCode: '0x99999999',
@@ -2062,7 +2070,6 @@ function CarregarListaResultadoAnaliseSemSimilaridade() {
                 return;
             }
 
-            var $resultado = $('select[name=Resultado]');
             $(Data.responseXML).find('Field[DisplayName="Resultado"] CHOICE').each(function () {
                 if (this.innerHTML == 'Aprovado por Similaridade') {
                     return true;
