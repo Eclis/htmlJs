@@ -2570,13 +2570,47 @@ function ModificarBotoesPorFormState(formState) {
                 $btnEditar.show();
             }
 
-            if (VerificarGrupoRespOuAcomp()) {
-                if (!$btnEditar.is(':visible')) {
-                    $btnEditarRespOuAcomp.show();
+            $().SPServices({
+                operation: "GetGroupCollectionFromUser",
+                userLoginName: $().SPServices.SPGetCurrentUser(),
+                async: false,
+                completefunc: function (xData, Status) {
+                    var $xml = $(xData.responseXML);
+                    var envase = listDemaisGrupos[1];
+                    var engFabricacao = listDemaisGrupos[2];
+                    var fabrica = listDemaisGrupos[3];
+                    var inovDe = listDemaisGrupos[4];
+                    var inovDf = listDemaisGrupos[5];
+                    var qualidade = listDemaisGrupos[7];
+                    var tipoLote = $("select#tipoDeLote");
+
+                    if (tipoLote == 'Brinde' && usuarioPertenceAoGrupo($xml, qualidade)) {
+                        $btnExecutado.show();
+                        $btnNaoExecutado.show();
+                        if (!$btnEditar.is(':visible')) {
+                            $btnEditarRespOuAcomp.show();
+                        }
+                    } else if (tipoLote == 'Envase' && ((usuarioPertenceAoGrupo($xml, envase))
+                                                    || usuarioPertenceAoGrupo($xml, inovDe)
+                                                    || usuarioPertenceAoGrupo($xml, qualidade)
+                                                    || usuarioPertenceAoGrupo($xml, fabrica))) {
+                        $btnExecutado.show();
+                        $btnNaoExecutado.show();
+                        if (!$btnEditar.is(':visible')) {
+                            $btnEditarRespOuAcomp.show();
+                        }
+                    } else if (tipoLote == 'Fabricação'&& ((usuarioPertenceAoGrupo($xml, engFabricacao))
+                                                    || usuarioPertenceAoGrupo($xml, inovDf)
+                                                    || usuarioPertenceAoGrupo($xml, qualidade)
+                                                    || usuarioPertenceAoGrupo($xml, fabrica))) {
+                        $btnExecutado.show();
+                        $btnNaoExecutado.show();
+                        if (!$btnEditar.is(':visible')) {
+                            $btnEditarRespOuAcomp.show();
+                        }
+                    }
                 }
-                $btnNaoExecutado.show();
-                $btnExecutado.show();
-            }
+            });
             break;
         case AGENDAMENTO_EM_EDICAO:
             if (VerificarGrupoDlPclOuPlantaPiloto()) {
