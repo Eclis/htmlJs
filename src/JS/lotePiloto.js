@@ -1391,7 +1391,7 @@ function AtualizarResponsavelAgendamento(codigoAgendamento, responsavel, usuario
         var campos = [];
 
         Object.keys(aprovacao).forEach(function (index) {
-            if (aprovacao[index] != null) {
+            if (aprovacao[index] != null && !index.startsWith('_')) {
                 campos.push([index, aprovacao[index]]);
             }
         });
@@ -1593,7 +1593,7 @@ function CarregarAgendamentoResponsaveis(agendamento) {
                     Observacoes: this.attributes.ows_Observacoes != undefined ? this.attributes.ows_Observacoes.value : null,
                     SimilarCodigoAgendamento: this.attributes.ows_SimilarCodigoAgendamento != undefined ? this.attributes.ows_SimilarCodigoAgendamento.value : null,
                     ReprovadoMotivo: this.attributes.ows_ReprovadoMotivo != undefined ? this.attributes.ows_ReprovadoMotivo.value : null,
-                    abaAnaliseId: responsavel.abaAnaliseId,
+                    _abaAnaliseId: responsavel.abaAnaliseId,
                 };
 
                 var usuarioNome = FiltrarNomeUsuarioPorPessoaId(this.attributes.ows_Pessoa.value);
@@ -2304,7 +2304,6 @@ function InserirAgendamento() {
 }
 
 var SetoresResponsaveis = [
-    // Responsáveis
     {tipoDeLote: 'Brinde',     nome: 'DL/PCL - Responsável',           peoplePickerId: 'peoplePickerAbaRespRespDLPCL',         abaAnaliseId: null},
     {tipoDeLote: 'Brinde',     nome: 'Qualidade - Responsável',        peoplePickerId: 'peoplePickerAbaRespRespQualidade',     abaAnaliseId: 'tab-qualidade-resp'},
     {tipoDeLote: 'Brinde',     nome: 'Qualidade - Gerente',            peoplePickerId: 'peoplePickerAbaRespGerQualidade',      abaAnaliseId: 'tab-analise-qualidade-ger'},
@@ -2330,28 +2329,27 @@ var SetoresResponsaveis = [
     {tipoDeLote: 'Fabricação', nome: 'Fábrica - Gerente',              peoplePickerId: 'peoplePickerAbaRespGerFabrica',        abaAnaliseId: null},
 ];
 
-[
-    // Acompanhamento
-    {tipoDeLote: 'Brinde',     nome: 'Eng. Envase - Responsável',      peoplePickerId: 'peoplePickerAbaAcRespEngEnvase',       abaAnaliseId: null},
-    {tipoDeLote: 'Brinde',     nome: 'Eng. Envase - Gerente',          peoplePickerId: 'peoplePickerAbaAcGerEngEnvase',        abaAnaliseId: null},
-    {tipoDeLote: 'Brinde',     nome: 'Eng. Fabricação - Responsável',  peoplePickerId: 'peoplePickerAbaAcRespEngEnvase',       abaAnaliseId: null},
-    {tipoDeLote: 'Brinde',     nome: 'Eng. Fabricação - Gerente',      peoplePickerId: 'peoplePickerAbaAcGerEngEnvase',        abaAnaliseId: null},
-    {tipoDeLote: 'Brinde',     nome: 'Inovação DF - Responsável',      peoplePickerId: 'peoplePickerAbaAcRespInovDF',          abaAnaliseId: null},
-    {tipoDeLote: 'Brinde',     nome: 'Inovação DF - Gerente',          peoplePickerId: 'peoplePickerAbaAcGerInovDF',           abaAnaliseId: null},
-    {tipoDeLote: 'Brinde',     nome: 'Inovação DE - Responsável',      peoplePickerId: 'peoplePickerAbaAcRespInovDE',          abaAnaliseId: null},
-    {tipoDeLote: 'Brinde',     nome: 'Inovação DE - Gerente',          peoplePickerId: 'peoplePickerAbaAcGerInovDE',           abaAnaliseId: null},
-    {tipoDeLote: 'Brinde',     nome: 'Fábrica - Coord. Programação',   peoplePickerId: 'peoplePickerAbaAcCoordProgFabrica',    abaAnaliseId: null},
-    {tipoDeLote: 'Brinde',     nome: 'Fábrica - Coord. de Manufatura', peoplePickerId: 'peoplePickerAbaAcCoordManFabrica',     abaAnaliseId: null},
-    {tipoDeLote: 'Brinde',     nome: 'Fábrica - Gerente',              peoplePickerId: 'peoplePickerAbaAcGerFabrica',          abaAnaliseId: null},
-    {tipoDeLote: 'Brinde',     nome: 'Meio Ambiente - Responsável',    peoplePickerId: 'peoplePickerAbaAcRespMeioAmbiente',    abaAnaliseId: null},
-    {tipoDeLote: 'Envase',     nome: 'Eng. Fabricação - Responsável',  peoplePickerId: 'peoplePickerAbaAcRespEngEnvase',       abaAnaliseId: null},
-    {tipoDeLote: 'Envase',     nome: 'Eng. Fabricação - Gerente',      peoplePickerId: 'peoplePickerAbaAcGerEngEnvase',        abaAnaliseId: null},
-    {tipoDeLote: 'Envase',     nome: 'Meio Ambiente - Responsável',    peoplePickerId: 'peoplePickerAbaAcRespMeioAmbiente',    abaAnaliseId: null},
-    {tipoDeLote: 'Fabricação', nome: 'Eng. Envase - Responsável',      peoplePickerId: 'peoplePickerAbaAcRespEngEnvase',       abaAnaliseId: null},
-    {tipoDeLote: 'Fabricação', nome: 'Eng. Envase - Gerente',          peoplePickerId: 'peoplePickerAbaAcGerEngEnvase',        abaAnaliseId: null},
-    {tipoDeLote: 'Fabricação', nome: 'Inovação DE - Responsável',      peoplePickerId: 'peoplePickerAbaAcRespInovDE',          abaAnaliseId: null},
-    {tipoDeLote: 'Fabricação', nome: 'Inovação DE - Gerente',          peoplePickerId: 'peoplePickerAbaAcGerInovDE',           abaAnaliseId: null},
-    {tipoDeLote: 'Fabricação', nome: 'Meio Ambiente - Responsável',    peoplePickerId: 'peoplePickerAbaAcRespMeioAmbiente',    abaAnaliseId: null},
+var SetoresAcompanhamentos = [
+    {tipoDeLote: 'Brinde',     nome: 'Eng. Envase - Responsável',      peoplePickerId: 'peoplePickerAbaAcRespEngEnvase'},
+    {tipoDeLote: 'Brinde',     nome: 'Eng. Envase - Gerente',          peoplePickerId: 'peoplePickerAbaAcGerEngEnvase'},
+    {tipoDeLote: 'Brinde',     nome: 'Eng. Fabricação - Responsável',  peoplePickerId: 'peoplePickerAbaAcRespEngEnvase'},
+    {tipoDeLote: 'Brinde',     nome: 'Eng. Fabricação - Gerente',      peoplePickerId: 'peoplePickerAbaAcGerEngEnvase'},
+    {tipoDeLote: 'Brinde',     nome: 'Inovação DF - Responsável',      peoplePickerId: 'peoplePickerAbaAcRespInovDF'},
+    {tipoDeLote: 'Brinde',     nome: 'Inovação DF - Gerente',          peoplePickerId: 'peoplePickerAbaAcGerInovDF'},
+    {tipoDeLote: 'Brinde',     nome: 'Inovação DE - Responsável',      peoplePickerId: 'peoplePickerAbaAcRespInovDE'},
+    {tipoDeLote: 'Brinde',     nome: 'Inovação DE - Gerente',          peoplePickerId: 'peoplePickerAbaAcGerInovDE'},
+    {tipoDeLote: 'Brinde',     nome: 'Fábrica - Coord. Programação',   peoplePickerId: 'peoplePickerAbaAcCoordProgFabrica'},
+    {tipoDeLote: 'Brinde',     nome: 'Fábrica - Coord. de Manufatura', peoplePickerId: 'peoplePickerAbaAcCoordManFabrica'},
+    {tipoDeLote: 'Brinde',     nome: 'Fábrica - Gerente',              peoplePickerId: 'peoplePickerAbaAcGerFabrica'},
+    {tipoDeLote: 'Brinde',     nome: 'Meio Ambiente - Responsável',    peoplePickerId: 'peoplePickerAbaAcRespMeioAmbiente'},
+    {tipoDeLote: 'Envase',     nome: 'Eng. Fabricação - Responsável',  peoplePickerId: 'peoplePickerAbaAcRespEngEnvase'},
+    {tipoDeLote: 'Envase',     nome: 'Eng. Fabricação - Gerente',      peoplePickerId: 'peoplePickerAbaAcGerEngEnvase'},
+    {tipoDeLote: 'Envase',     nome: 'Meio Ambiente - Responsável',    peoplePickerId: 'peoplePickerAbaAcRespMeioAmbiente'},
+    {tipoDeLote: 'Fabricação', nome: 'Eng. Envase - Responsável',      peoplePickerId: 'peoplePickerAbaAcRespEngEnvase'},
+    {tipoDeLote: 'Fabricação', nome: 'Eng. Envase - Gerente',          peoplePickerId: 'peoplePickerAbaAcGerEngEnvase'},
+    {tipoDeLote: 'Fabricação', nome: 'Inovação DE - Responsável',      peoplePickerId: 'peoplePickerAbaAcRespInovDE'},
+    {tipoDeLote: 'Fabricação', nome: 'Inovação DE - Gerente',          peoplePickerId: 'peoplePickerAbaAcGerInovDE'},
+    {tipoDeLote: 'Fabricação', nome: 'Meio Ambiente - Responsável',    peoplePickerId: 'peoplePickerAbaAcRespMeioAmbiente'},
 ];
 
 function GetResponsavelPorNome(nome) {
@@ -3846,7 +3844,7 @@ function InicializarHistorico() {
         });
 
     Object.keys(aprovacoes).forEach(function (i) {
-        if (aprovacoes[i].abaAnaliseId != null) {
+        if (aprovacoes[i]._abaAnaliseId != null) {
             $tabs.append('<li class="nav-item"><a class="nav-link" data-toggle="pill" role="tab">' + i + '</a></li>')
                 .click(function () {
                     CarregarHistoricoPorAgendamentoResponsavel(aprovacoes[i].ID);
