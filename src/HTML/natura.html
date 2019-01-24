@@ -523,6 +523,12 @@
             </div>
         </div>
         <div class="tab-pane fade" id="pills-analises" style="background-color: rgb(242, 242, 242); padding: 10px; margin-bottom: 10px;" role="tabpanel">
+            <div class="row" style="margin: 10px 0px 10px 0px;">
+                <div class="col-md-6">
+                    <label for="agendamentoFim">Início do registro das análises</label>
+                    <input type="text" class="form-control date-time-picker" id="analiseInicio" name="RegistroAnalisesInicio" readonly />
+                </div>
+            </div>
             <ul class="nav nav-tabs" role="tablist">
                 <li class="nav-item">
                     <a id="pills-tab-qualidade-resp" class="nav-link active" data-toggle="pill" href="#tab-qualidade-resp" role="tab">Qualidade</a>
@@ -951,6 +957,7 @@
             </div>
         </div>
         <div class="tab-pane fade" id="pills-historico" style="background-color: rgb(242, 242, 242); padding: 10px; margin-bottom: 10px;" role="tabpanel">
+            <div id="historico"></div>
             <table id="data-table" width="100%"></table>
         </div>
         <div class="tab-pane fade" id="pills-justificativa" style="background-color: rgb(242, 242, 242); padding: 10px; margin-bottom: 10px;" role="tabpanel">
