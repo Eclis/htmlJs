@@ -2983,7 +2983,7 @@ function ModificarCamposPorFormState(formState) {
                     }
                 }
             });
-            
+
             if (mostrarAbaQualidadeGerente) $('#pills-analise-qualidade-ger').removeClass('disabled');
 
             break;
@@ -3735,27 +3735,30 @@ function verificarErros() {
         produtoFormula,
         produtoQuantidade,
         motivo,
-        produtoEnvioAmostras,
-        produtoResponsavelAmostra,
-        produtoQuantidadeAmostra,
         agendamentoCentroCusto,
         grauComplexidade,
         agendamentoDataInicioProgramado,
         agendamentoDuracaoHoras,
         agendamentoDuracaoMinutos,
-        agendamentoFim,
-        agendamentoObservacoes,
+        agendamentoFim
     };
 
     var erro = 0;
+
+    function isDateLessThanCurrent() {
+        var SelectedDate = new Date($('input#agendamentoDataInicioProgramado').val().substring(6, 10), $('input#agendamentoDataInicioProgramado').val().substring(3, 5) - 1, $('input#agendamentoDataInicioProgramado').val().substring(0, 2));
+        var CurrentDateTime = new Date();
+        var CurrentDate = new Date(CurrentDateTime.getFullYear(), CurrentDateTime.getMonth(), CurrentDateTime.getDate());
+        return CurrentDate > SelectedDate;
+    }
 
     var itens;
     for (itens in $campos) {
         var $atributo =  $('#'+itens);
         var $classe = $atributo.attr('class');
 
-        if($classe.indexOf('tom-selec') > 0){
-            if( $atributo.children('option:selected').val()  === 'Selecione uma opção') {
+        if ($classe.indexOf('tom-selec') > 0) {
+            if ($atributo.children('option:selected').val() === 'Selecione uma opção') {
                 var $tabItem = $atributo.parents('div.tab-pane');
                 var tabId = $tabItem.attr('id');
                 var $tabContent = $tabItem.parents('div.tab-content');
@@ -3765,32 +3768,27 @@ function verificarErros() {
                 erro = 1;
                 break;
             }
-        } else {
-            if ($atributo.val().length == 0 ){
-                var $tabItem = $atributo.parents('div.tab-pane');
-                var tabId = $tabItem.attr('id');
-                var $tabContent = $tabItem.parents('div.tab-content');
-                var $link = $tabContent.parent().find('ul.nav.nav-tabs li a[href="#' + tabId + '"]');
-                $link.tab('show');
-                $atributo.focus();
-                erro = 1;
-                break;
-            }
+        } else if ($atributo.val().length == 0 || itens === 'agendamentoDataInicioProgramado' && isDateLessThanCurrent()) {
+            var $tabItem = $atributo.parents('div.tab-pane');
+            var tabId = $tabItem.attr('id');
+            var $tabContent = $tabItem.parents('div.tab-content');
+            var $link = $tabContent.parent().find('ul.nav.nav-tabs li a[href="#' + tabId + '"]');
+            $link.tab('show');
+            $atributo.focus();
+            erro = 1;
+            break;
         }
     }
 
-    var $camposPeople = {
-        peoplePickerAbaRespGerQualidade_TopSpan,
-        peoplePickerAbaRespRespQualidade_TopSpan
-    };
-
-    var people;
+    var $tipoLote = $("select#tipoDeLote");
+    var listaPeoplePicker = GetResponsaveisPorTipoDeLote($tipoLote.val());
 
     if (erro == 0) {
-        for ( people in $camposPeople) {
-            var $atributo =  $('#'+people);
+        for (var i = 0; i < listaPeoplePicker.length; i++) {
+            var pickerTopSpan = PegarPeoplePickerPorId(listaPeoplePicker[i].peoplePickerId).TopLevelElementId;
+            var $atributo = $('#'+pickerTopSpan);
 
-            if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespRespQualidade_TopSpan.HasResolvedUsers()) {
+            if (SPClientPeoplePicker.SPClientPeoplePickerDict[pickerTopSpan].HasInputError || !SPClientPeoplePicker.SPClientPeoplePickerDict[pickerTopSpan].HasResolvedUsers()) {
                 var $tabItem = $atributo.parents('div.tab-pane');
                 var $tabPai = $tabItem.parents('div.tab-pane');
                 var tabId = $tabItem.attr('id');
@@ -3801,21 +3799,6 @@ function verificarErros() {
                 var $linkPai = $tabContentPai.parent().find('ul.nav.nav-tabs li a[href="#' + tabPaiId + '"]');
                 $linkPai.tab('show');
                 $link.tab('show');
-
-                $atributo.focus();
-                break;
-            } else if (SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaRespRespQualidade_TopSpan.HasInputError) {
-                var $tabItem = $atributo.parents('div.tab-pane');
-                var $tabPai = $tabItem.parents('div.tab-pane');
-                var tabId = $tabItem.attr('id');
-                var tabPaiId = $tabPai.attr('id');
-                var $tabContent = $tabItem.parents('div.tab-content');
-                var $tabContentPai = $tabPai.parents('div.tab-content');
-                var $link = $tabContent.parent().find('ul.nav.nav-tabs li a[href="#' + tabId + '"]');
-                var $linkPai = $tabContentPai.parent().find('ul.nav.nav-tabs li a[href="#' + tabPaiId + '"]');
-                $linkPai.tab('show');
-                $link.tab('show');
-
                 $atributo.focus();
                 break;
             }
