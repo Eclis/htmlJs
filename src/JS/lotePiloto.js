@@ -2521,28 +2521,6 @@ function GetResponsavelPorNomeETipoDeLote(nome, tipoDeLote) {
     return null;
 }
 
-function GetAcompanhantesPorNome(nome) {
-    return $.grep(SetoresAcompanhantes, function (acompanhante) {
-        return acompanhante.nome == nome;
-    }).pop();
-}
-
-function GetAcompanhantesPorTipoDeLote(tipoDeLote) {
-    return $.grep(SetoresAcompanhantes, function (acompanhante) {
-        return acompanhante.tipoDeLote == tipoDeLote;
-    });
-}
-
-function GetAcompanhantePorNomeETipoDeLote(nome, tipoDeLote) {
-    for (var i = 0; i < SetoresAcompanhantes.length; i ++) {
-        if (SetoresAcompanhantes[i].nome == nome && SetoresAcompanhantes[i].tipoDeLote == tipoDeLote) {
-            return SetoresAcompanhantes[i];
-        }
-    }
-
-    return null;
-}
-
 function PegarPeoplePickerPorId(peoplePickerId) {
     var peoplePickerName = $('#' + peoplePickerId + ' .sp-peoplepicker-topLevel').attr('id');
 
