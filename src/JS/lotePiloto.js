@@ -672,7 +672,7 @@ function ValidarAgendamentosAcompanhamentosBrinde() {
 
 
     //Eng. Fabricação
-    if ($("input[type=checkbox]#acRespEngfabricacaoAcomp").prop('checked')) {
+    if ($("input[type=checkbox]#acRespEngFabricacaoAcomp").prop('checked')) {
         //Engenharia Fabricação - Responsável
         if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcRespEngFabricacao_TopSpan.HasResolvedUsers()) {
             errorAgendamentosAcompanhamentosBrinde++;
@@ -842,7 +842,7 @@ function ValidarAgendamentosAcompanhamentosEnvase() {
     var errorAgendamentosAcompanhamentosEnvase = 0;
 
     //Eng. Fabricação
-    if ($("input[type=checkbox]#acRespEngfabricacaoAcomp").prop('checked')) {
+    if ($("input[type=checkbox]#acRespEngFabricacaoAcomp").prop('checked')) {
         //Engenharia Fabricação - Responsável
         if (!SPClientPeoplePicker.SPClientPeoplePickerDict.peoplePickerAbaAcRespEngFabricacao_TopSpan.HasResolvedUsers()) {
             errorAgendamentosAcompanhamentosEnvase++;
@@ -2859,7 +2859,7 @@ function ModificarCamposPorFormState(formState) {
     var $envaseAcompAcompanhamento = $('#acRespEngEnvaseAcomp');
     var $envaseAcompPPResp = $('#peoplePickerAbaAcRespEngEnvase_TopSpan_EditorInput');
     var $envaseAcompPPGer = $('#peoplePickerAbaAcGerEngEnvase_TopSpan_EditorInput');
-    var $engFabAcompAcompanhamento = $('#acRespEngfabricacaoAcomp');
+    var $engFabAcompAcompanhamento = $('#acRespEngFabricacaoAcomp');
     var $engFabAcompPPResp = $('#peoplePickerAbaAcRespEngFabricacao_TopSpan_EditorInput');
     var $engFabAcompPPGer = $('#peoplePickerAbaAcGerEngFabricacao_TopSpan_EditorInput');
     var $inovDfAcompAcompanhamento = $('#acRespInovDFAcomp');
@@ -2872,6 +2872,8 @@ function ModificarCamposPorFormState(formState) {
     var $fabricaAcompPPCoordProg = $('#peoplePickerAbaAcCoordProgFabrica_TopSpan_EditorInput');
     var $fabricaAcompPPCoordMan = $('#peoplePickerAbaAcCoordManFabrica_TopSpan_EditorInput');
     var $fabricaAcompPPGer = $('#peoplePickerAbaAcGerFabrica_TopSpan_EditorInput');
+    var $meioAmbienteAcompAcompanhamento = $('#acRespMeioAmbienteAcomp');
+    var $meioAmbienteAcompPPResp = $('#peoplePickerAbaAcRespMeioAmbiente_TopSpan_EditorInput');
 
     $TipoLote.attr('disabled', true);
     $Fabrica.attr('disabled', true);
@@ -2935,6 +2937,8 @@ function ModificarCamposPorFormState(formState) {
     $fabricaAcompPPCoordProg.attr('disabled', true);
     $fabricaAcompPPCoordMan.attr('disabled', true);
     $fabricaAcompPPGer.attr('disabled', true);
+    $meioAmbienteAcompAcompanhamento.attr('disabled', true);
+    $meioAmbienteAcompPPResp.attr('disabled', true);
 
     $('#pills-analise-qualidade-ger').addClass('disabled');
 
@@ -3023,6 +3027,8 @@ function ModificarCamposPorFormState(formState) {
             $fabricaAcompPPCoordProg.attr('disabled', false);
             $fabricaAcompPPCoordMan.attr('disabled', false);
             $fabricaAcompPPGer.attr('disabled', false);
+            $meioAmbienteAcompAcompanhamento.attr('disabled', false);
+            $meioAmbienteAcompPPResp.attr('disabled', false);
             break;
         case RESP_ACOMP_AGENDADO_EM_EDICAO:
             $().SPServices({
@@ -3285,20 +3291,6 @@ function ModificarAbasPorTipoDeLote(tipoDeLote) {
             $("#pills-fabrica-acomp-tab").show();
             $("#pills-meioambiente-acomp-tab").show();
 
-            $('input[type=checkbox]#acRespEngEnvaseAcomp').prop('checked', false);
-            $('input[type=checkbox]#acRespEngfabricacaoAcomp').prop('checked', false);
-            $('input[type=checkbox]#acRespInovDFAcomp').prop('checked', false);
-            $('input[type=checkbox]#acRespInovDEAcomp').prop('checked', false);
-            $('input[type=checkbox]#acRespFabricaAcomp').prop('checked', false);
-            $('input[type=checkbox]#acRespMeioAmbienteAcomp').prop('checked', false);
-
-            $('#AbaAcRespsEngEnvase').hide();
-            $('#AbaAcRespsEngFabricacao').hide();
-            $('#AbaAcRespsInovDF').hide();
-            $('#AbaAcRespsInovDE').hide();
-            $('#AbaAcRespsFabrica').hide();
-            $('#AbaAcRespsMeioAmbiente').hide();
-
             $('#pills-analise-qualidade-ger').show();
             $('#brindeMeioAmbiente').show();
             break;
@@ -3324,20 +3316,6 @@ function ModificarAbasPorTipoDeLote(tipoDeLote) {
             $("#pills-qualidade-acomp-tab").hide();
             $("#pills-fabrica-acomp-tab").hide();
             $("#pills-meioambiente-acomp-tab").show();
-
-            $('input[type=checkbox]#acRespEngEnvaseAcomp').prop('checked',false);
-            $('input[type=checkbox]#acRespEngfabricacaoAcomp').prop('checked',false);
-            $('input[type=checkbox]#acRespInovDFAcomp').prop('checked',false);
-            $('input[type=checkbox]#acRespInovDEAcomp').prop('checked',false);
-            $('input[type=checkbox]#acRespFabricaAcomp').prop('checked',false);
-            $('input[type=checkbox]#acRespMeioAmbienteAcomp').prop('checked',false);
-
-            $('#AbaAcRespsEngEnvase').hide();
-            $('#AbaAcRespsEngFabricacao').hide();
-            $('#AbaAcRespsInovDF').hide();
-            $('#AbaAcRespsInovDE').hide();
-            $('#AbaAcRespsFabrica').hide();
-            $('#AbaAcRespsMeioAmbiente').hide();
 
             $('#pills-analise-qualidade-ger').show();
             $('#envaseMeioAmbiente').show();
@@ -3365,20 +3343,6 @@ function ModificarAbasPorTipoDeLote(tipoDeLote) {
             $("#pills-fabrica-acomp-tab").hide();
             $("#pills-meioambiente-acomp-tab").show();
 
-            $('input[type=checkbox]#acRespEngEnvaseAcomp').prop('checked',false);
-            $('input[type=checkbox]#acRespEngfabricacaoAcomp').prop('checked',false);
-            $('input[type=checkbox]#acRespInovDFAcomp').prop('checked',false);
-            $('input[type=checkbox]#acRespInovDEAcomp').prop('checked',false);
-            $('input[type=checkbox]#acRespFabricaAcomp').prop('checked',false);
-            $('input[type=checkbox]#acRespMeioAmbienteAcomp').prop('checked',false);
-
-            $('#AbaAcRespsEngEnvase').hide();
-            $('#AbaAcRespsEngFabricacao').hide();
-            $('#AbaAcRespsInovDF').hide();
-            $('#AbaAcRespsInovDE').hide();
-            $('#AbaAcRespsFabrica').hide();
-            $('#AbaAcRespsMeioAmbiente').hide();
-
             $('#pills-analise-qualidade-ger').show();
             $('#fabricacaoMeioAmbiente').show();
             break;
@@ -3402,20 +3366,6 @@ function ModificarAbasPorTipoDeLote(tipoDeLote) {
             $("#pills-qualidade-acomp-tab").hide();
             $("#pills-fabrica-acomp-tab").hide();
             $("#pills-meioambiente-acomp-tab").hide();
-
-            $('input[type=checkbox]#acRespEngEnvaseAcomp').prop('checked',false);
-            $('input[type=checkbox]#acRespEngfabricacaoAcomp').prop('checked',false);
-            $('input[type=checkbox]#acRespInovDFAcomp').prop('checked',false);
-            $('input[type=checkbox]#acRespInovDEAcomp').prop('checked',false);
-            $('input[type=checkbox]#acRespFabricaAcomp').prop('checked',false);
-            $('input[type=checkbox]#acRespMeioAmbienteAcomp').prop('checked',false);
-
-            $('#AbaAcRespsEngEnvase').hide();
-            $('#AbaAcRespsEngFabricacao').hide();
-            $('#AbaAcRespsInovDF').hide();
-            $('#AbaAcRespsInovDE').hide();
-            $('#AbaAcRespsFabrica').hide();
-            $('#AbaAcRespsMeioAmbiente').hide();
 
             $('#envaseMeioAmbiente').hide();
             $('#fabricaMeioAmbiente').hide();
@@ -3500,7 +3450,7 @@ function RegistrarBindings() {
     var $linhaEquipamento = $("select#linhaEquipamento");
 
     var $acRespEngEnvaseAcomp = $("input[type=checkbox]#acRespEngEnvaseAcomp");
-    var $acRespEngfabricacaoAcomp = $("input[type=checkbox]#acRespEngfabricacaoAcomp");
+    var $acRespEngFabricacaoAcomp = $("input[type=checkbox]#acRespEngFabricacaoAcomp");
     var $acRespInovDFAcomp = $("input[type=checkbox]#acRespInovDFAcomp");
     var $acRespInovDEAcomp = $("input[type=checkbox]#acRespInovDEAcomp");
     var $acRespFabricaAcomp = $("input[type=checkbox]#acRespFabricaAcomp");
@@ -3520,8 +3470,8 @@ function RegistrarBindings() {
         }
     });
 
-    $acRespEngfabricacaoAcomp.change(function () {
-        if ($acRespEngfabricacaoAcomp.prop('checked')) {
+    $acRespEngFabricacaoAcomp.change(function () {
+        if ($acRespEngFabricacaoAcomp.prop('checked')) {
             $("#AbaAcRespsEngFabricacao").show();
         }
         else {
@@ -3559,13 +3509,7 @@ function RegistrarBindings() {
     $acRespMeioAmbienteAcomp.change(function () {
         if ($acRespMeioAmbienteAcomp.prop('checked')) {
             $("#AbaAcRespsMeioAmbiente").show();
-            // if ($tipoLote.val() != 'Brinde') {
-            //     $("#pills-tab-meio-ambiente-resp").removeClass('d-md-none');
-            // }
         } else {
-            // if ($tipoLote.val() != 'Brinde') {
-            //     $("#pills-tab-meio-ambiente-resp").addClass('d-md-none');
-            // }
             $("#AbaAcRespsMeioAmbiente").hide();
         }
     });
@@ -3591,7 +3535,7 @@ function RegistrarBindings() {
 
     espelharCheckBox('#acRespQualidade', '#acRespQualidadeAcomp');
     espelharCheckBox('#acRespEngEnvase', '#acRespEngEnvaseAcomp');
-    espelharCheckBox('#acRespEngfabricacao', '#acRespEngfabricacaoAcomp');
+    espelharCheckBox('#acRespEngfabricacao', '#acRespEngFabricacaoAcomp');
     espelharCheckBox('#acRespInofDF', '#acRespInofDFAcomp');
     espelharCheckBox('#acRespInofDE', '#acRespInofDEAcomp');
     espelharCheckBox('#acRespFabrica', '#acRespFabricaAcomp');
@@ -3609,12 +3553,20 @@ function RegistrarBindings() {
 }
 
 function espelharCheckBox(checkA, checkB) {
-    $(checkA).change(function () {
+    $(checkA).change(function (event, isReflexo) {
         $(checkB).prop('checked', this.checked);
+
+        if (isReflexo == undefined) {
+            $(checkB).trigger('change', [true]);
+        }
     });
 
-    $(checkB).change(function () {
+    $(checkB).change(function (event, isReflexo) {
         $(checkA).prop('checked', this.checked);
+
+        if (isReflexo == undefined) {
+            $(checkA).trigger('change', [true]);
+        }
     });
 }
 
