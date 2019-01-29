@@ -3980,12 +3980,10 @@ function InicializarHistorico() {
         });
 
     Object.keys(aprovacoes).forEach(function (i) {
-        if (aprovacoes[i]._abaAnaliseId != null) {
-            $tabs.append('<li class="nav-item"><a class="nav-link" data-toggle="pill" role="tab">' + i + '</a></li>')
-                .click(function () {
-                    CarregarHistoricoPorAgendamentoResponsavel(aprovacoes[i].ID);
-                });
-        }
+        $tabs.append('<li class="nav-item"><a class="nav-link" data-toggle="pill" role="tab">' + i + '</a></li>')
+            .click(function () {
+                CarregarHistoricoPorAgendamentoResponsavel(aprovacoes[i].ID);
+            });
     });
 
     $historicoIframe = $('<iframe width="100%" height="500"></iframe>');
