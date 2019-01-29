@@ -49,10 +49,19 @@ sp.setup({
         folder.files.add('agendamentos_beta.html', contents, true);
     });
 
+    readFile('dist/calendar.html', function (err, contents) {
+        folder.files.add('calendar.html', contents, true);
+    });
+
     readFile('dist/lotePiloto.js', function (err, contents) {
         jsFolder.files.add('lotePiloto.js', contents, true);
     });
+
     readFile('dist/agendamentos.js', function (err, contents) {
         jsFolder.files.add('agendamentos.js', contents, true);
+    });
+
+    readFile('dist/SPfullcalendar.js', function (err, contents) {
+        jsFolder.files.add('SPfullcalendar.js', contents, true);
     });
 })();
