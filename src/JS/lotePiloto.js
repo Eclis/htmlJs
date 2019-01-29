@@ -4048,7 +4048,7 @@ function carregarBotoesAnexo(){
     inovdfResp.addEventListener('change', event => AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(inovdfResp).closest('div.tab-pane').attr('id')).ID
         , inovdfResp));
 
-    var meioAmbiente = document.getElementById('txtAtt-tab-analise-inovDf');
+    var meioAmbiente = document.getElementById('txtAtt-tab-analise-meio-ambiente');
     meioAmbiente.addEventListener('change', event => AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(meioAmbiente).closest('div.tab-pane').attr('id')).ID
         , meioAmbiente));
 }
@@ -4064,7 +4064,7 @@ function bloquearBotoesAbaAnexo(){
     var fabrica = document.getElementById('txtAtt-tab-analise-fabrica');
     var inovde = document.getElementById('txtAtt-tab-analise-inovDe');
     var inovdfResp = document.getElementById('txtAtt-tab-analise-inovDf');
-    var meioAmbiente = document.getElementById('txtAtt-tab-analise-inovDf');
+    var meioAmbiente = document.getElementById('txtAtt-tab-analise-meio-ambiente');
     qualidResp.disabled = true;
     qualidGer.disabled = true;
     envaseR.disabled = true;
@@ -4084,7 +4084,7 @@ function liberarBotoesAbaAnexo(){
     var fabrica = document.getElementById('txtAtt-tab-analise-fabrica');
     var inovde = document.getElementById('txtAtt-tab-analise-inovDe');
     var inovdfResp = document.getElementById('txtAtt-tab-analise-inovDf');
-    var meioAmbiente = document.getElementById('txtAtt-tab-analise-inovDf');
+    var meioAmbiente = document.getElementById('txtAtt-tab-analise-meio-ambiente');
     qualidResp.disabled = false;
     qualidGer.disabled = false;
     envaseR.disabled = false;
