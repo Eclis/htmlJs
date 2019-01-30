@@ -3973,17 +3973,22 @@ class Propriedade {
 
 function InicializarHistorico() {
     var $tabs = $('<ul class="nav nav-tabs" role="tablist"></ul>');
+    var $liAgendamento = $('<li class="nav-item"><a class="nav-link active" data-toggle="pill" role="tab">Agendamento</a></li>');
 
-    $tabs.append('<li class="nav-item"><a class="nav-link active" data-toggle="pill" role="tab">Agendamento</a></li>')
-        .click(function () {
-            CarregarHistoricoPorAgendamento($('#inputId').val());
-        });
+    $liAgendamento.click(function () {
+        CarregarHistoricoPorAgendamento($('#inputId').val());
+    });
+
+    $tabs.append($liAgendamento);
 
     Object.keys(aprovacoes).forEach(function (i) {
-        $tabs.append('<li class="nav-item"><a class="nav-link" data-toggle="pill" role="tab">' + i + '</a></li>')
-            .click(function () {
-                CarregarHistoricoPorAgendamentoResponsavel(aprovacoes[i].ID);
-            });
+        var $liResponsavel = $('<li class="nav-item"><a class="nav-link" data-toggle="pill" role="tab">' + aprovacoes[i].TipoResponsavel + '</a></li>');
+
+        $liResponsavel.click(function () {
+            CarregarHistoricoPorAgendamentoResponsavel(aprovacoes[i].ID);
+        });
+
+        $tabs.append($liResponsavel);
     });
 
     $historicoIframe = $('<iframe width="100%" height="500"></iframe>');
