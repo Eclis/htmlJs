@@ -3311,7 +3311,7 @@ function ModificarAbasPorTipoDeLote(tipoDeLote) {
             $("#pills-eng-envase-acomp-tab").hide();
             $("#pills-eng-fabricacao-acomp-tab").show();
             $("#pills-eng-fabricacao-acomp-tab").tab('show');
-            $("#pills-inov-df-acomp-tab").hide();
+            $("#pills-inov-df-acomp-tab").show();
             $("#pills-inov-de-acomp-tab").hide();
             $("#pills-qualidade-acomp-tab").hide();
             $("#pills-fabrica-acomp-tab").hide();
