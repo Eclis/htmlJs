@@ -3536,8 +3536,8 @@ function RegistrarBindings() {
     espelharCheckBox('#acRespQualidade', '#acRespQualidadeAcomp');
     espelharCheckBox('#acRespEngEnvase', '#acRespEngEnvaseAcomp');
     espelharCheckBox('#acRespEngfabricacao', '#acRespEngFabricacaoAcomp');
-    espelharCheckBox('#acRespInofDF', '#acRespInofDFAcomp');
-    espelharCheckBox('#acRespInofDE', '#acRespInofDEAcomp');
+    espelharCheckBox('#acRespInofDF', '#acRespInovDFAcomp');
+    espelharCheckBox('#acRespInofDE', '#acRespInovDEAcomp');
     espelharCheckBox('#acRespFabrica', '#acRespFabricaAcomp');
 
     $('[name="Resultado"]').change(function () {
