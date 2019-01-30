@@ -1968,7 +1968,11 @@ function CarregarLinhasEquipamentosById(linhaEquipamentoId) {
             }
 
             $(Data.responseXML).SPFilterNode("z:row").each(function () {
-                $labelQuantidadePecas.text("Quantidade (peças) de " + AtributoNumber($(this).attr("ows_CapacidadeMin")) + " até " + AtributoNumber($(this).attr("ows_CapacidadeMax")))
+                if ($("select#tipoDeLote").val() == 'Fabricação') {
+                    $labelQuantidadePecas.text("Quantidade (kg) de " + AtributoNumber($(this).attr("ows_CapacidadeMin")) + " até " + AtributoNumber($(this).attr("ows_CapacidadeMax")));
+                } else {
+                    $labelQuantidadePecas.text("Quantidade (peças) de " + AtributoNumber($(this).attr("ows_CapacidadeMin")) + " até " + AtributoNumber($(this).attr("ows_CapacidadeMax")));
+                }
             });
 
             $promise.resolve();
