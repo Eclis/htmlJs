@@ -3696,7 +3696,12 @@ function RegistrarBotoes() {
             var id = $('input[name="ID"]').val();
             window.history.pushState('Object', '', '/sites/DEV_LotePiloto/SiteAssets/main.aspx?action=edit&loteid=' + id);
             bloquearBotoesAbaAnexo();
-            alert("Agendamento Salvo");
+
+            if (id) {
+                alert('Alterações salvas');
+            } else {
+                alert('Agendamento salvo');
+            }
         }).fail(function (response) {
             alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
         });
