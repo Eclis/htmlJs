@@ -1534,18 +1534,20 @@ function CarregarAgendamento(id) {
             });
 
             PreencherSelectsConsiderandoDependencia(selectsACarregar);
-            CarregarListaResultadoAnalise();
-            ModificarFormState($('select#status').val());
 
-            CarregarAgendamentoResponsaveis(atributos.ows_CodigoAgendamento.value).then(function () {
-                InicializarHistorico();
-                CarregarHistoricoPorAgendamento(atributos.ows_ID.value);
+            CarregarListaResultadoAnalise().then(function () {
+                ModificarFormState($('select#status').val());
 
-                carregarPainelAnexo();
-
-                $promise.resolve();
-            }).fail(function (response) {
-                $promise.reject(response);
+                return $.when(true);
+            }).then(function () {
+                return CarregarAgendamentoResponsaveis(atributos.ows_CodigoAgendamento.value).then(function () {
+                    InicializarHistorico();
+                    CarregarHistoricoPorAgendamento(atributos.ows_ID.value);
+                    carregarPainelAnexo();
+                    $promise.resolve();
+                }).fail(function (response) {
+                    $promise.reject(response);
+                });
             });
         }
     });
@@ -2073,6 +2075,7 @@ function CarregarListaStatus() {
 
 function CarregarListaResultadoAnalise() {
     var valorResultado = $('select[name=GrauComplexidade] :selected').val();
+
     if (valorResultado && valorResultado.startsWith("2")) {
         return CarregarListaResultadoAnaliseComSimilaridade();
     } else {
