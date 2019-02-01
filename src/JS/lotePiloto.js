@@ -1252,7 +1252,7 @@ function AtualizarAgendamento(id) {
         }
     });
 
-    var $registroAnalisesInicio = $('[name=RegistroAnalisesInicio]');
+    var $registroAnalisesInicio = $('[name=registroanalisesinicio]');
     if (!$registroAnalisesInicio.val() && state == REGISTRO_DE_ANALISE) {
         campos.push([$registroAnalisesInicio.attr('name'), moment(new Date(), 'DD/MM/YYYY HH:mm').format('YYYY-MM-DDTHH:mm:ss[-00:00]')]);
     }
@@ -1291,7 +1291,7 @@ function AtualizarAgendamento(id) {
     });
 
     return $promise.then(function (response) {
-        let $TipoLote = $('[name=TipoLote]');
+        let $TipoLote = $('[name=tipolote]');
         let promises = [];
         let responsaveis = GetResponsaveisPorTipoDeLote($TipoLote.val());
 
@@ -1423,9 +1423,9 @@ function AtualizarResponsavelAgendamento(codigoAgendamento, responsavel, usuario
                     var $record = $response.find('z\\:row:first');
 
                     if ($('select#status').val() == REGISTRO_DE_ANALISE && aprovacao.Resultado == 'Reprovado') {
-                        CarregarStatusAgendamentoPorCodigoAgendamento($('input[name="ID"]').val()).then(function (status) {
+                        CarregarStatusAgendamentoPorCodigoAgendamento($('input[name="id"]').val()).then(function (status) {
                             if (status == REGISTRO_DE_ANALISE) {
-                                ReprovarAgendamentoPorCodigoAgendamento($('input[name="ID"]').val()).then(function () {
+                                ReprovarAgendamentoPorCodigoAgendamento($('input[name="id"]').val()).then(function () {
                                     $promise.resolve({
                                         record: $record
                                     });
@@ -1457,9 +1457,9 @@ function AtualizarResponsavelAgendamento(codigoAgendamento, responsavel, usuario
 }
 
 function CalcularCamposCalculaveis() {
-    var $titulo = $('input[name=Title]');
-    var $codigoProduto = $('input[name=CodigoProduto]');
-    var $projeto = $('input[name=Projeto]');
+    var $titulo = $('input[name=title]');
+    var $codigoProduto = $('input[name=codigoproduto]');
+    var $projeto = $('input[name=projeto]');
 
     $titulo.val($codigoProduto.val() + ' - ' + $projeto.val());
 }
@@ -1501,7 +1501,7 @@ function CarregarAgendamento(id) {
                     this.value = this.value.slice('datetime;#'.length);
                 }
 
-                var $elemento = $('#main [name=' + this.name.substr(4) + ' i]');
+                var $elemento = $('#main [name=' + this.name.substr(4).toLowerCase() + ']');
 
                 if ($elemento.is('[type=checkbox]')) {
                     $elemento.prop('checked', this.value == "1");
@@ -1658,35 +1658,35 @@ function AtualizarAprovacaoEmMemoria(responsavel) {
 
     if (responsavel.abaAnaliseId) {
         var $abaAnalise = $('#' + responsavel.abaAnaliseId);
-        aprovacoes[responsavel.nome].ExecucaoLoteAcompanhada = $abaAnalise.find('[name=ExecucaoLoteAcompanhada]').prop('checked') ? '1' : '0';
-        aprovacoes[responsavel.nome].Resultado = $abaAnalise.find('[name=Resultado]').val();
-        aprovacoes[responsavel.nome].Observacoes = $abaAnalise.find('[name=ObservacoesAnalise]').val();
-        aprovacoes[responsavel.nome].ReprovadoMotivo = $abaAnalise.find('[name=ReprovadoMotivo]').val();
+        aprovacoes[responsavel.nome].ExecucaoLoteAcompanhada = $abaAnalise.find('[name=execucaoloteacompanhada]').prop('checked') ? '1' : '0';
+        aprovacoes[responsavel.nome].Resultado = $abaAnalise.find('[name=resultado]').val();
+        aprovacoes[responsavel.nome].Observacoes = $abaAnalise.find('[name=observacoesanalise]').val();
+        aprovacoes[responsavel.nome].ReprovadoMotivo = $abaAnalise.find('[name=reprovadomotivo]').val();
 
         if (responsavel.nome == 'Meio Ambiente - Responsável') {
-            switch ($('[name=TipoLote]').val()) {
+            switch ($('[name=tipolote]').val()) {
                 case 'Brinde':
                     var $brinde = $('#brindeMeioAmbiente');
-                    aprovacoes[responsavel.nome].ExecucaoLoteAcompanhada = $brinde.find('[name=ExecucaoLoteAcompanhada]').prop('checked') ? '1' : '0';
+                    aprovacoes[responsavel.nome].ExecucaoLoteAcompanhada = $brinde.find('[name=execucaoloteacompanhada]').prop('checked') ? '1' : '0';
                     break;
                 case 'Envase':
                     var $envase = $('#envaseMeioAmbiente');
-                    aprovacoes[responsavel.nome].ExecucaoLoteAcompanhada = $envase.find('[name=ExecucaoLoteAcompanhada]').prop('checked') ? '1' : '0';
-                    aprovacoes[responsavel.nome].MeioAmbienteAumentoGeracaoResidu = $envase.find('[name=MeioAmbienteAumentoGeracaoResidu]').prop('checked') ? '1' : '0';
-                    aprovacoes[responsavel.nome].MeioAmbienteTipoResiduosGeradosJ = $envase.find('[name=MeioAmbienteTipoResiduosGeradosJ]').prop('checked') ? '1' : '0';
-                    aprovacoes[responsavel.nome].MeioAmbienteAumentoConsumoAguaLi = $envase.find('[name=MeioAmbienteAumentoConsumoAguaLi]').prop('checked') ? '1' : '0';
-                    aprovacoes[responsavel.nome].MeioAmbienteAcondicionamentoMate = $envase.find('[name=MeioAmbienteAcondicionamentoMate]').val();
-                    aprovacoes[responsavel.nome].MeioAmbienteAcondicionamentoReci = $envase.find('[name=MeioAmbienteAcondicionamentoReci]').val();
+                    aprovacoes[responsavel.nome].ExecucaoLoteAcompanhada = $envase.find('[name=execucaoloteacompanhada]').prop('checked') ? '1' : '0';
+                    aprovacoes[responsavel.nome].MeioAmbienteAumentoGeracaoResidu = $envase.find('[name=meioambienteaumentogeracaoresidu]').prop('checked') ? '1' : '0';
+                    aprovacoes[responsavel.nome].MeioAmbienteTipoResiduosGeradosJ = $envase.find('[name=meioambientetiporesiduosgeradosj]').prop('checked') ? '1' : '0';
+                    aprovacoes[responsavel.nome].MeioAmbienteAumentoConsumoAguaLi = $envase.find('[name=meioambienteaumentoconsumoaguali]').prop('checked') ? '1' : '0';
+                    aprovacoes[responsavel.nome].MeioAmbienteAcondicionamentoMate = $envase.find('[name=meioambienteacondicionamentomate]').val();
+                    aprovacoes[responsavel.nome].MeioAmbienteAcondicionamentoReci = $envase.find('[name=meioambienteacondicionamentoreci]').val();
                     break;
                 case 'Fabricação':
                     var $fabricacao = $('#fabricacaoMeioAmbiente');
-                    aprovacoes[responsavel.nome].ExecucaoLoteAcompanhada = $fabricacao.find('[name=ExecucaoLoteAcompanhada]').prop('checked') ? '1' : '0';
-                    aprovacoes[responsavel.nome].MeioAmbienteAumentoConsumoAguaLi = $fabricacao.find('[name=MeioAmbienteAumentoConsumoAguaLi]').prop('checked') ? '1' : '0';
-                    aprovacoes[responsavel.nome].MeioAmbienteAumentoConsumoEnergi = $fabricacao.find('[name=MeioAmbienteAumentoConsumoEnergi]').val();
-                    aprovacoes[responsavel.nome].MeioAmbienteAumentoConsumoAguaFa = $fabricacao.find('[name=MeioAmbienteAumentoConsumoAguaFa]').val();
-                    aprovacoes[responsavel.nome].MeioAmbienteAbastecimentoGranel = $fabricacao.find('[name=MeioAmbienteAbastecimentoGranel]').val();
-                    aprovacoes[responsavel.nome].MeioAmbienteAbastecimentoManual = $fabricacao.find('[name=MeioAmbienteAbastecimentoManual]').val();
-                    aprovacoes[responsavel.nome].MeioAmbienteAbastecimentoVacuo = $fabricacao.find('[name=MeioAmbienteAbastecimentoVacuo]').val();
+                    aprovacoes[responsavel.nome].ExecucaoLoteAcompanhada = $fabricacao.find('[name=execucaoloteacompanhada]').prop('checked') ? '1' : '0';
+                    aprovacoes[responsavel.nome].MeioAmbienteAumentoConsumoAguaLi = $fabricacao.find('[name=meioambienteaumentoconsumoaguali]').prop('checked') ? '1' : '0';
+                    aprovacoes[responsavel.nome].MeioAmbienteAumentoConsumoEnergi = $fabricacao.find('[name=meioambienteaumentoconsumoenergi]').val();
+                    aprovacoes[responsavel.nome].MeioAmbienteAumentoConsumoAguaFa = $fabricacao.find('[name=meioambienteaumentoconsumoaguafa]').val();
+                    aprovacoes[responsavel.nome].MeioAmbienteAbastecimentoGranel = $fabricacao.find('[name=meioambienteabastecimentogranel]').val();
+                    aprovacoes[responsavel.nome].MeioAmbienteAbastecimentoManual = $fabricacao.find('[name=meioambienteabastecimentomanual]').val();
+                    aprovacoes[responsavel.nome].MeioAmbienteAbastecimentoVacuo = $fabricacao.find('[name=meioambienteabastecimentovacuo]').val();
                     break;
             }
         }
@@ -1725,37 +1725,37 @@ function PreencherAbaAnalises(responsavel) {
     }
 
     var $abaAnalise = $('#' + responsavel.abaAnaliseId);
-    $abaAnalise.find('[name="ExecucaoLoteAcompanhada"]').prop('checked', aprovacao.ExecucaoLoteAcompanhada == '1');
-    $abaAnalise.find('[name="Pessoa"]').val(FiltrarNomeUsuarioPorPessoaId(aprovacao.Pessoa));
-    $abaAnalise.find('[name="Resultado"]').val(aprovacao.Resultado);
-    $abaAnalise.find('[name="ObservacoesAnalise"]').val(aprovacao.Observacoes);
-    if (aprovacao.ReprovadoMotivo != null) $abaAnalise.find('[name="ReprovadoMotivo"]').val(aprovacao.ReprovadoMotivo);
-    if (aprovacao.MeioAmbienteAbastecimentoVacuo != null) $abaAnalise.find('[name="MeioAmbienteAbastecimentoVacuo"]').val(aprovacao.MeioAmbienteAbastecimentoVacuo);
-    if (aprovacao.MeioAmbienteAbastecimentoGranel != null) $abaAnalise.find('[name="MeioAmbienteAbastecimentoGranel"]').val(aprovacao.MeioAmbienteAbastecimentoGranel);
-    if (aprovacao.MeioAmbienteAbastecimentoManual != null) $abaAnalise.find('[name="MeioAmbienteAbastecimentoManual"]').val(aprovacao.MeioAmbienteAbastecimentoManual);
-    if (aprovacao.MeioAmbienteAcondicionamentoMate != null) $abaAnalise.find('[name="MeioAmbienteAcondicionamentoMate"]').val(aprovacao.MeioAmbienteAcondicionamentoMate);
-    if (aprovacao.MeioAmbienteAcondicionamentoReci != null) $abaAnalise.find('[name="MeioAmbienteAcondicionamentoReci"]').val(aprovacao.MeioAmbienteAcondicionamentoReci);
-    if (aprovacao.MeioAmbienteAumentoGeracaoResidu != null) $abaAnalise.find('[name="MeioAmbienteAumentoGeracaoResidu"]').prop('checked', aprovacao.MeioAmbienteAumentoGeracaoResidu == '1');
-    if (aprovacao.MeioAmbienteTipoResiduosGeradosJ != null) $abaAnalise.find('[name="MeioAmbienteTipoResiduosGeradosJ"]').prop('checked', aprovacao.MeioAmbienteTipoResiduosGeradosJ == '1');
-    if (aprovacao.MeioAmbienteAumentoConsumoAguaLi != null) $abaAnalise.find('[name="MeioAmbienteAumentoConsumoAguaLi"]').prop('checked', aprovacao.MeioAmbienteAumentoConsumoAguaLi == '1');
-    if (aprovacao.MeioAmbienteAumentoConsumoEnergi != null) $abaAnalise.find('[name="MeioAmbienteAumentoConsumoEnergi"]').val(aprovacao.MeioAmbienteAumentoConsumoEnergi);
-    if (aprovacao.MeioAmbienteAumentoConsumoAguaFa != null) $abaAnalise.find('[name="MeioAmbienteAumentoConsumoAguaFa"]').val(aprovacao.MeioAmbienteAumentoConsumoAguaFa);
+    $abaAnalise.find('[name="execucaoloteacompanhada"]').prop('checked', aprovacao.ExecucaoLoteAcompanhada == '1');
+    $abaAnalise.find('[name="pessoa"]').val(FiltrarNomeUsuarioPorPessoaId(aprovacao.Pessoa));
+    $abaAnalise.find('[name="resultado"]').val(aprovacao.Resultado);
+    $abaAnalise.find('[name="observacoesanalise"]').val(aprovacao.Observacoes);
+    if (aprovacao.ReprovadoMotivo != null) $abaAnalise.find('[name="reprovadomotivo"]').val(aprovacao.ReprovadoMotivo);
+    if (aprovacao.MeioAmbienteAbastecimentoVacuo != null) $abaAnalise.find('[name="meioambienteabastecimentovacuo"]').val(aprovacao.MeioAmbienteAbastecimentoVacuo);
+    if (aprovacao.MeioAmbienteAbastecimentoGranel != null) $abaAnalise.find('[name="meioambienteabastecimentogranel"]').val(aprovacao.MeioAmbienteAbastecimentoGranel);
+    if (aprovacao.MeioAmbienteAbastecimentoManual != null) $abaAnalise.find('[name="meioambienteabastecimentomanual"]').val(aprovacao.MeioAmbienteAbastecimentoManual);
+    if (aprovacao.MeioAmbienteAcondicionamentoMate != null) $abaAnalise.find('[name="meioambienteacondicionamentomate"]').val(aprovacao.MeioAmbienteAcondicionamentoMate);
+    if (aprovacao.MeioAmbienteAcondicionamentoReci != null) $abaAnalise.find('[name="meioambienteacondicionamentoreci"]').val(aprovacao.MeioAmbienteAcondicionamentoReci);
+    if (aprovacao.MeioAmbienteAumentoGeracaoResidu != null) $abaAnalise.find('[name="meioambienteaumentogeracaoresidu"]').prop('checked', aprovacao.MeioAmbienteAumentoGeracaoResidu == '1');
+    if (aprovacao.MeioAmbienteTipoResiduosGeradosJ != null) $abaAnalise.find('[name="meioambientetiporesiduosgeradosj"]').prop('checked', aprovacao.MeioAmbienteTipoResiduosGeradosJ == '1');
+    if (aprovacao.MeioAmbienteAumentoConsumoAguaLi != null) $abaAnalise.find('[name="meioambienteaumentoconsumoaguali"]').prop('checked', aprovacao.MeioAmbienteAumentoConsumoAguaLi == '1');
+    if (aprovacao.MeioAmbienteAumentoConsumoEnergi != null) $abaAnalise.find('[name="meioambienteaumentoconsumoenergi"]').val(aprovacao.MeioAmbienteAumentoConsumoEnergi);
+    if (aprovacao.MeioAmbienteAumentoConsumoAguaFa != null) $abaAnalise.find('[name="meioambienteaumentoconsumoaguafa"]').val(aprovacao.MeioAmbienteAumentoConsumoAguaFa);
 
-    $abaAnalise.find('[name=Pessoa]').attr('disabled', true);
-    $abaAnalise.find('[name=ExecucaoLoteAcompanhada]').attr('disabled', true);
-    $abaAnalise.find('[name=Resultado]').attr('disabled', true);
-    $abaAnalise.find('[name=ObservacoesAnalise]').attr('disabled', true);
-    $abaAnalise.find('[name=ReprovadoMotivo]').attr('disabled', true);
-    $abaAnalise.find('[name="MeioAmbienteAbastecimentoVacuo"]').attr('disabled', true);
-    $abaAnalise.find('[name="MeioAmbienteAbastecimentoGranel"]').attr('disabled', true);
-    $abaAnalise.find('[name="MeioAmbienteAbastecimentoManual"]').attr('disabled', true);
-    $abaAnalise.find('[name="MeioAmbienteAcondicionamentoMate"]').attr('disabled', true);
-    $abaAnalise.find('[name="MeioAmbienteAcondicionamentoReci"]').attr('disabled', true);
-    $abaAnalise.find('[name="MeioAmbienteAumentoGeracaoResidu"]').attr('disabled', true);
-    $abaAnalise.find('[name="MeioAmbienteTipoResiduosGeradosJ"]').attr('disabled', true);
-    $abaAnalise.find('[name="MeioAmbienteAumentoConsumoAguaLi"]').attr('disabled', true);
-    $abaAnalise.find('[name="MeioAmbienteAumentoConsumoEnergi"]').attr('disabled', true);
-    $abaAnalise.find('[name="MeioAmbienteAumentoConsumoAguaFa"]').attr('disabled', true);
+    $abaAnalise.find('[name=pessoa]').attr('disabled', true);
+    $abaAnalise.find('[name=execucaoloteacompanhada]').attr('disabled', true);
+    $abaAnalise.find('[name=resultado]').attr('disabled', true);
+    $abaAnalise.find('[name=observacoesanalise]').attr('disabled', true);
+    $abaAnalise.find('[name=reprovadomotivo]').attr('disabled', true);
+    $abaAnalise.find('[name="meioambienteabastecimentovacuo"]').attr('disabled', true);
+    $abaAnalise.find('[name="meioambienteabastecimentogranel"]').attr('disabled', true);
+    $abaAnalise.find('[name="meioambienteabastecimentomanual"]').attr('disabled', true);
+    $abaAnalise.find('[name="meioambienteacondicionamentomate"]').attr('disabled', true);
+    $abaAnalise.find('[name="meioambienteacondicionamentoreci"]').attr('disabled', true);
+    $abaAnalise.find('[name="meioambienteaumentogeracaoresidu"]').attr('disabled', true);
+    $abaAnalise.find('[name="meioambientetiporesiduosgeradosj"]').attr('disabled', true);
+    $abaAnalise.find('[name="meioambienteaumentoconsumoaguali"]').attr('disabled', true);
+    $abaAnalise.find('[name="meioambienteaumentoconsumoenergi"]').attr('disabled', true);
+    $abaAnalise.find('[name="meioambienteaumentoconsumoaguafa"]').attr('disabled', true);
 
     $abaAnalise.parent()
         .closest('div.tab-pane[role=tabpanel]')
@@ -1794,7 +1794,7 @@ function CarregarCategoriaProjeto() {
             }
 
             $(Data.responseXML).find('Field[DisplayName="Categoria do projeto"] CHOICE').each(function () {
-                $('select#categoriaDoProjeto').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+                $('select#categoriaDoProjeto').append('<option value="' + $(this).text() + '">' + $(this).text() + '</option>');
             });
 
             $promise.resolve();
@@ -1821,7 +1821,7 @@ function CarregarMotivoCancelamento() {
             }
 
             $(Data.responseXML).find('Field[DisplayName="Motivo de cancelamento"] CHOICE').each(function () {
-                $('select#canceladoMotivo').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+                $('select#canceladoMotivo').append('<option value="' + $(this).text() + '">' + $(this).text() + '</option>');
             });
 
             $promise.resolve();
@@ -1848,7 +1848,7 @@ function CarregarMotivoNaoExecutado() {
             }
 
             $(Data.responseXML).find('Field[DisplayName="Motivo não execução"] CHOICE').each(function () {
-                $('select#naoExecutadoMotivo').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+                $('select#naoExecutadoMotivo').append('<option value="' + $(this).text() + '">' + $(this).text() + '</option>');
             });
 
             $promise.resolve();
@@ -1903,7 +1903,7 @@ function CarregarLinhasDoProduto() {
             }
 
             $(Data.responseXML).find('Field[DisplayName="Linha do produto"] CHOICE').each(function () {
-                $('select#linhaDoProduto').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+                $('select#linhaDoProduto').append('<option value="' + $(this).text() + '">' + $(this).text() + '</option>');
             });
 
             $promise.resolve();
@@ -2007,8 +2007,8 @@ function CarregarListaGrauComplexidade() {
             }
 
             $(Data.responseXML).find('Field[DisplayName="Grau de complexidade"] CHOICE').each(function () {
-                if(this.innerHTML > 0) {
-                    $('select#grauComplexidade').append('<option value="' + this.innerHTML + '">' + mensagem[this.innerHTML] + '</option>');
+                if($(this).text() > 0) {
+                    $('select#grauComplexidade').append('<option value="' + $(this).text() + '">' + mensagem[$(this).text()] + '</option>');
                 }
             });
 
@@ -2036,7 +2036,7 @@ function CarregarListaMotivos() {
             }
 
             $(Data.responseXML).find('Field[DisplayName="Motivo"] CHOICE').each(function () {
-                $('select#motivo').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+                $('select#motivo').append('<option value="' + $(this).text() + '">' + $(this).text() + '</option>');
             });
 
             $promise.resolve();
@@ -2063,7 +2063,7 @@ function CarregarListaStatus() {
             }
 
             $(Data.responseXML).find('Field[DisplayName="Status"] CHOICE').each(function () {
-                $('select#status').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+                $('select#status').append('<option value="' + $(this).text() + '">' + $(this).text() + '</option>');
             });
 
             $promise.resolve();
@@ -2074,7 +2074,7 @@ function CarregarListaStatus() {
 }
 
 function CarregarListaResultadoAnalise() {
-    var valorResultado = $('select[name=GrauComplexidade] :selected').val();
+    var valorResultado = $('select[name=graucomplexidade] :selected').val();
 
     if (valorResultado && valorResultado.startsWith("2")) {
         return CarregarListaResultadoAnaliseComSimilaridade();
@@ -2085,7 +2085,7 @@ function CarregarListaResultadoAnalise() {
 
 function CarregarListaResultadoAnaliseComSimilaridade() {
     var $promise = $.Deferred();
-    var $resultado = $('select[name=Resultado]');
+    var $resultado = $('select[name=resultado]');
 
     $().SPServices({
         operation: 'GetList',
@@ -2105,7 +2105,7 @@ function CarregarListaResultadoAnaliseComSimilaridade() {
             }
 
             $(Data.responseXML).find('Field[DisplayName="Resultado"] CHOICE').each(function () {
-                $resultado.append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+                $resultado.append('<option value="' + $(this).text() + '">' + $(this).text() + '</option>');
             });
 
             $promise.resolve();
@@ -2131,10 +2131,10 @@ function CarregarListaMotivoAnalise() {
                 return;
             }
 
-            var $resultado = $('select[name=ReprovadoMotivo]');
+            var $resultado = $('select[name=reprovadomotivo]');
 
             $(Data.responseXML).find('Field[DisplayName="Motivo Reprovação"] CHOICE').each(function () {
-                $resultado.append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+                $resultado.append('<option value="' + $(this).text() + '">' + $(this).text() + '</option>');
             });
 
             $promise.resolve();
@@ -2161,34 +2161,34 @@ function CarregarListasDeMeioAmbiente() {
             }
 
             var $response = $(Data.responseText);
-            var $MeioAmbienteAbastecimentoGranel = $('select[name=MeioAmbienteAbastecimentoGranel]');
+            var $MeioAmbienteAbastecimentoGranel = $('select[name=meioambienteabastecimentogranel]');
 
             $response.find('Field[DisplayName="Abastecimento granel"] CHOICE').each(function () {
-                $MeioAmbienteAbastecimentoGranel.append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+                $MeioAmbienteAbastecimentoGranel.append('<option value="' + $(this).text() + '">' + $(this).text() + '</option>');
             });
 
-            var $MeioAmbienteAbastecimentoManual = $('select[name=MeioAmbienteAbastecimentoManual]');
+            var $MeioAmbienteAbastecimentoManual = $('select[name=meioambienteabastecimentomanual]');
 
             $response.find('Field[DisplayName="Abastecimento manual"] CHOICE').each(function () {
-                $MeioAmbienteAbastecimentoManual.append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+                $MeioAmbienteAbastecimentoManual.append('<option value="' + $(this).text() + '">' + $(this).text() + '</option>');
             });
 
-            var $MeioAmbienteAbastecimentoVacuo = $('select[name=MeioAmbienteAbastecimentoVacuo]');
+            var $MeioAmbienteAbastecimentoVacuo = $('select[name=meioambienteabastecimentovacuo]');
 
             $response.find('Field[DisplayName="Abastecimento vácuo"] CHOICE').each(function () {
-                $MeioAmbienteAbastecimentoVacuo.append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+                $MeioAmbienteAbastecimentoVacuo.append('<option value="' + $(this).text() + '">' + $(this).text() + '</option>');
             });
 
-            var $MeioAmbienteAcondicionamentoMate = $('select[name=MeioAmbienteAcondicionamentoMate]');
+            var $MeioAmbienteAcondicionamentoMate = $('select[name=meioambienteacondicionamentomate]');
 
             $response.find('Field[DisplayName="Acondicionamento dos materiais de embalagem retornável"] CHOICE').each(function () {
-                $MeioAmbienteAcondicionamentoMate.append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+                $MeioAmbienteAcondicionamentoMate.append('<option value="' + $(this).text() + '">' + $(this).text() + '</option>');
             });
 
-            var $MeioAmbienteAcondicionamentoReci = $('select[name=MeioAmbienteAcondicionamentoReci]');
+            var $MeioAmbienteAcondicionamentoReci = $('select[name=meioambienteacondicionamentoreci]');
 
             $response.find('Field[DisplayName="Acondicionamento reciclável"] CHOICE').each(function () {
-                $MeioAmbienteAcondicionamentoReci.append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+                $MeioAmbienteAcondicionamentoReci.append('<option value="' + $(this).text() + '">' + $(this).text() + '</option>');
             });
 
             $promise.resolve();
@@ -2200,7 +2200,7 @@ function CarregarListasDeMeioAmbiente() {
 
 function CarregarListaResultadoAnaliseSemSimilaridade() {
     var $promise = $.Deferred();
-    var $resultado = $('select[name=Resultado]');
+    var $resultado = $('select[name=resultado]');
 
     $().SPServices({
         operation: 'GetList',
@@ -2220,10 +2220,10 @@ function CarregarListaResultadoAnaliseSemSimilaridade() {
             }
 
             $(Data.responseXML).find('Field[DisplayName="Resultado"] CHOICE').each(function () {
-                if (this.innerHTML == 'Aprovado por Similaridade') {
+                if ($(this).text() == 'Aprovado por Similaridade') {
                     return true;
                 }
-                $resultado.append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+                $resultado.append('<option value="' + $(this).text() + '">' + $(this).text() + '</option>');
             });
 
             $promise.resolve();
@@ -2250,8 +2250,8 @@ function CarregarListaTiposLotes() {
             }
 
             $(Data.responseXML).find('Field[DisplayName="Tipo de Lote"] CHOICE').each(function () {
-                if (this.innerHTML != "Picking") {
-                    $('select#tipoDeLote').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+                if ($(this).text() != "Picking") {
+                    $('select#tipoDeLote').append('<option value="' + $(this).text() + '">' + $(this).text() + '</option>');
                 }
             });
 
@@ -2438,7 +2438,7 @@ function InserirAgendamento() {
 
     return $promise.then(function (response) {
         return GravarCodigoAgendamento(response.record).then(function (response) {
-            let $TipoLote = $('[name=TipoLote]');
+            let $TipoLote = $('[name=tipolote]');
             let promises = [];
             let responsaveis = GetResponsaveisPorTipoDeLote($TipoLote.val());
 
@@ -2629,8 +2629,8 @@ function InstanciarDateTimePicker() {
 }
 
 function ListarDependenciasPorSelect(campo) {
-    if (campo == 'LinhaEquipamento') {
-        return ['TipoLote', 'Fabrica'];
+    if (campo == 'linhaequipamento') {
+        return ['tipolote', 'fabrica'];
     }
 
     return [];
@@ -2815,52 +2815,52 @@ function usuarioPertenceAoGrupo($xml, grupo) {
 }
 
 function ModificarCamposPorFormState(formState) {
-    var $TipoLote = $('[name=TipoLote]');
-    var $Fabrica = $('[name=Fabrica]');
-    var $LinhaEquipamento = $('[name=LinhaEquipamento]');
-    var $CodigoProduto = $('[name=CodigoProduto]');
-    var $LinhaProduto = $('[name=LinhaProduto]');
-    var $DescricaoProduto = $('[name=DescricaoProduto]');
-    var $Projeto = $('[name=Projeto]');
-    var $CategoriaProjeto = $('[name=CategoriaProjeto]');
-    var $Formula = $('[name=Formula]');
-    var $QuantidadePecas = $('[name=QuantidadePecas]');
-    var $Motivo = $('[name=Motivo]');
-    var $EnvioAmostras = $('[name=EnvioAmostras]');
-    var $ResponsavelAmostra = $('[name=ResponsavelAmostra]');
-    var $QuantidadeAmostra = $('[name=QuantidadeAmostra]');
-    var $CentroCusto = $('[name=CentroCusto]');
-    var $GrauComplexidade = $('[name=GrauComplexidade]');
-    var $InicioProgramado = $('[name=InicioProgramado]');
-    var $DuracaoEstimadaHoras = $('[name=DuracaoEstimadaHoras]');
-    var $DuracaoEstimadaMinutos = $('[name=DuracaoEstimadaMinutos]');
-    var $Observacoes = $('[name=Observacoes]');
-    var $motivoCancelamento = $('[name=CanceladoMotivo]');
-    var $motivoComentarios = $('[name=CanceladoComentarios]');
-    var $motivoNaoExecutado = $('[name=NaoExecutadoMotivo]');
-    var $motivoNaoExecutadoComentarios = $('[name=NaoExecutadoComentarios]');
+    var $TipoLote = $('[name="tipolote"]');
+    var $Fabrica = $('[name="fabrica"]');
+    var $LinhaEquipamento = $('[name="linhaequipamento"]');
+    var $CodigoProduto = $('[name="codigoproduto"]');
+    var $LinhaProduto = $('[name="linhaproduto"]');
+    var $DescricaoProduto = $('[name="descricaoproduto"]');
+    var $Projeto = $('[name="projeto"]');
+    var $CategoriaProjeto = $('[name="categoriaprojeto"]');
+    var $Formula = $('[name="formula"]');
+    var $QuantidadePecas = $('[name="quantidadepecas"]');
+    var $Motivo = $('[name="motivo"]');
+    var $EnvioAmostras = $('[name="envioamostras"]');
+    var $ResponsavelAmostra = $('[name=responsavelamostra]');
+    var $QuantidadeAmostra = $('[name=quantidadeamostra]');
+    var $CentroCusto = $('[name=centrocusto]');
+    var $GrauComplexidade = $('[name=graucomplexidade]');
+    var $InicioProgramado = $('[name=inicioprogramado]');
+    var $DuracaoEstimadaHoras = $('[name=duracaoestimadahoras]');
+    var $DuracaoEstimadaMinutos = $('[name=duracaoestimadaminutos]');
+    var $Observacoes = $('[name=observacoes]');
+    var $motivoCancelamento = $('[name=canceladomotivo]');
+    var $motivoComentarios = $('[name=canceladocomentarios]');
+    var $motivoNaoExecutado = $('[name=naoexecutadomotivo]');
+    var $motivoNaoExecutadoComentarios = $('[name=naoexecutadocomentarios]');
 
     var $dlpclResponsavelPP = $('#peoplePickerAbaRespRespDLPCL_TopSpan_EditorInput');
-    var $envaseResponsavelAcompanhamento = $('[name=EngenhariaEnvaseAcompanhamento]');
+    var $envaseResponsavelAcompanhamento = $('[name=engenhariaenvaseacompanhamento]');
     var $envaseResponsavelPPResp = $('#peoplePickerAbaRespRespEngEnvase_TopSpan_EditorInput');
     var $envaseResponsavelPPGer = $('#peoplePickerAbaRespGerEngEnvase_TopSpan_EditorInput');
-    var $engFabResponsavelAcompanhamento = $('[name=EngenhariaFabricacaoAcompanhamen]');
+    var $engFabResponsavelAcompanhamento = $('[name=engenhariafabricacaoacompanhamen]');
     var $engFabResponsavelPPResp = $('#peoplePickerAbaRespRespEngFabricacao_TopSpan_EditorInput');
     var $engFabResponsavelPPGer = $('#peoplePickerAbaRespRespGerFabricacao_TopSpan_EditorInput');
-    var $inovDfResponsavelAcompanhamento = $('[name=InovacaoDfAcompanhamento]');
+    var $inovDfResponsavelAcompanhamento = $('[name=inovacaodfacompanhamento]');
     var $inovDfResponsavelPPResp = $('#peoplePickerAbaRespRespInovDF_TopSpan_EditorInput');
     var $inovDfResponsavelPPGer = $('#peoplePickerAbaRespGerInovDF_TopSpan_EditorInput');
-    var $inovDeResponsavelAcompanhamento = $('[name=InovacaoDeAcompanhamento]');
+    var $inovDeResponsavelAcompanhamento = $('[name=inovacaodeacompanhamento]');
     var $inovDeResponsavelPPResp = $('#peoplePickerAbaRespRespInovDE_TopSpan_EditorInput');
     var $inovDeResponsavelPPGer = $('#peoplePickerAbaRespGerInovDE_TopSpan_EditorInput');
-    var $fabricaResponsavelAcompanhamento = $('[name=FabricaAcompanhamento]');
+    var $fabricaResponsavelAcompanhamento = $('[name=fabricaacompanhamento]');
     var $fabricaResponsavelPPCoordProg = $('#peoplePickerAbaRespCoordProgFabrica_TopSpan_EditorInput');
     var $fabricaResponsavelPPCoordMan = $('#peoplePickerAbaRespCoordManFabrica_TopSpan_EditorInput');
     var $fabricaResponsavelPPGer = $('#peoplePickerAbaRespGerInovDE_TopSpan_EditorInput');
-    var $qualidadeResponsavelAcompanhamento = $('[name=QualidadeAcompanhamento]');
+    var $qualidadeResponsavelAcompanhamento = $('[name=qualidadeacompanhamento]');
     var $qualidadeResponsavelPPResp = $('#peoplePickerAbaRespRespQualidade_TopSpan_EditorInput');
     var $qualidadeResponsavelPPGer = $('#peoplePickerAbaRespGerQualidade_TopSpan_EditorInput');
-    var $meioAmbienteResponsavelAcompanhamento = $('[name=MeioAmbienteAcompanhamento]');
+    var $meioAmbienteResponsavelAcompanhamento = $('[name=meioambienteacompanhamento]');
     var $meioAmbienteResponsavelPPResp = $('#peoplePickerAbaAcRespMeioAmbiente_TopSpan_EditorInput');
 
     var $envaseAcompAcompanhamento = $('#acRespEngEnvaseAcomp');
@@ -2954,21 +2954,21 @@ function ModificarCamposPorFormState(formState) {
 
         if (aprovacao._abaAnaliseId != null) {
             var $abaAnalise = $('#' + aprovacao._abaAnaliseId);
-            $abaAnalise.find('[name=Pessoa]').attr('disabled', true);
-            $abaAnalise.find('[name=ExecucaoLoteAcompanhada]').attr('disabled', true);
-            $abaAnalise.find('[name=Resultado]').attr('disabled', true);
-            $abaAnalise.find('[name=ObservacoesAnalise]').attr('disabled', true);
-            $abaAnalise.find('[name=ReprovadoMotivo]').attr('disabled', true);
-            $abaAnalise.find('[name="MeioAmbienteAbastecimentoVacuo"]').attr('disabled', true);
-            $abaAnalise.find('[name="MeioAmbienteAbastecimentoGranel"]').attr('disabled', true);
-            $abaAnalise.find('[name="MeioAmbienteAbastecimentoManual"]').attr('disabled', true);
-            $abaAnalise.find('[name="MeioAmbienteAcondicionamentoMate"]').attr('disabled', true);
-            $abaAnalise.find('[name="MeioAmbienteAcondicionamentoReci"]').attr('disabled', true);
-            $abaAnalise.find('[name="MeioAmbienteAumentoGeracaoResidu"]').attr('disabled', true);
-            $abaAnalise.find('[name="MeioAmbienteTipoResiduosGeradosJ"]').attr('disabled', true);
-            $abaAnalise.find('[name="MeioAmbienteAumentoConsumoAguaLi"]').attr('disabled', true);
-            $abaAnalise.find('[name="MeioAmbienteAumentoConsumoEnergi"]').attr('disabled', true);
-            $abaAnalise.find('[name="MeioAmbienteAumentoConsumoAguaFa"]').attr('disabled', true);
+            $abaAnalise.find('[name=pessoa]').attr('disabled', true);
+            $abaAnalise.find('[name=execucaoloteacompanhada]').attr('disabled', true);
+            $abaAnalise.find('[name=resultado]').attr('disabled', true);
+            $abaAnalise.find('[name=observacoesanalise]').attr('disabled', true);
+            $abaAnalise.find('[name=reprovadomotivo]').attr('disabled', true);
+            $abaAnalise.find('[name="meioambienteabastecimentovacuo"]').attr('disabled', true);
+            $abaAnalise.find('[name="meioambienteabastecimentogranel"]').attr('disabled', true);
+            $abaAnalise.find('[name="meioambienteabastecimentomanual"]').attr('disabled', true);
+            $abaAnalise.find('[name="meioambienteacondicionamentomate"]').attr('disabled', true);
+            $abaAnalise.find('[name="meioambienteacondicionamentoreci"]').attr('disabled', true);
+            $abaAnalise.find('[name="meioambienteaumentogeracaoresidu"]').attr('disabled', true);
+            $abaAnalise.find('[name="meioambientetiporesiduosgeradosj"]').attr('disabled', true);
+            $abaAnalise.find('[name="meioambienteaumentoconsumoaguali"]').attr('disabled', true);
+            $abaAnalise.find('[name="meioambienteaumentoconsumoenergi"]').attr('disabled', true);
+            $abaAnalise.find('[name="meioambienteaumentoconsumoaguafa"]').attr('disabled', true);
         }
     });
 
@@ -3099,12 +3099,12 @@ function ModificarCamposPorFormState(formState) {
             });
             break;
         case EM_CANCELAMENTO:
-            $('[name=CanceladoMotivo]').attr('disabled', false);
-            $('[name=CanceladoComentarios]').attr('disabled', false);
+            $('[name=canceladomotivo]').attr('disabled', false);
+            $('[name=canceladocomentarios]').attr('disabled', false);
             break;
         case EM_NAO_EXECUCAO:
-            $('[name=NaoExecutadoMotivo]').attr('disabled', false);
-            $('[name=NaoExecutadoComentarios]').attr('disabled', false);
+            $('[name=naoexecutadomotivo]').attr('disabled', false);
+            $('[name=naoexecutadocomentarios]').attr('disabled', false);
             break;
         case EM_REGISTRO_DE_ANALISE:
             $().SPServices({
@@ -3148,21 +3148,21 @@ function ModificarCamposPorFormState(formState) {
                         CarregarUsuarioAtual().id == FiltrarIdPorPessoaId(aprovacao.Pessoa) &&
                         ['Pendente', 'Rascunho'].indexOf(aprovacao.Resultado) != -1) {
                     var $abaAnalise = $('#' + aprovacao._abaAnaliseId);
-                    $abaAnalise.find('[name=ExecucaoLoteAcompanhada]').attr('disabled', false);
-                    $abaAnalise.find('[name=Resultado]').attr('disabled', false);
-                    $abaAnalise.find('[name=ObservacoesAnalise]').attr('disabled', false);
-                    $abaAnalise.find('[name="MeioAmbienteAbastecimentoVacuo"]').attr('disabled', false);
-                    $abaAnalise.find('[name="MeioAmbienteAbastecimentoGranel"]').attr('disabled', false);
-                    $abaAnalise.find('[name="MeioAmbienteAbastecimentoManual"]').attr('disabled', false);
-                    $abaAnalise.find('[name="MeioAmbienteAcondicionamentoMate"]').attr('disabled', false);
-                    $abaAnalise.find('[name="MeioAmbienteAcondicionamentoReci"]').attr('disabled', false);
-                    $abaAnalise.find('[name="MeioAmbienteAumentoGeracaoResidu"]').attr('disabled', false);
-                    $abaAnalise.find('[name="MeioAmbienteTipoResiduosGeradosJ"]').attr('disabled', false);
-                    $abaAnalise.find('[name="MeioAmbienteAumentoConsumoAguaLi"]').attr('disabled', false);
-                    $abaAnalise.find('[name="MeioAmbienteAumentoConsumoEnergi"]').attr('disabled', false);
-                    $abaAnalise.find('[name="MeioAmbienteAumentoConsumoAguaFa"]').attr('disabled', false);
+                    $abaAnalise.find('[name=execucaoloteacompanhada]').attr('disabled', false);
+                    $abaAnalise.find('[name=resultado]').attr('disabled', false);
+                    $abaAnalise.find('[name=observacoesanalise]').attr('disabled', false);
+                    $abaAnalise.find('[name="meioambienteabastecimentovacuo"]').attr('disabled', false);
+                    $abaAnalise.find('[name="meioambienteabastecimentogranel"]').attr('disabled', false);
+                    $abaAnalise.find('[name="meioambienteabastecimentomanual"]').attr('disabled', false);
+                    $abaAnalise.find('[name="meioambienteacondicionamentomate"]').attr('disabled', false);
+                    $abaAnalise.find('[name="meioambienteacondicionamentoreci"]').attr('disabled', false);
+                    $abaAnalise.find('[name="meioambienteaumentogeracaoresidu"]').attr('disabled', false);
+                    $abaAnalise.find('[name="meioambientetiporesiduosgeradosj"]').attr('disabled', false);
+                    $abaAnalise.find('[name="meioambienteaumentoconsumoaguali"]').attr('disabled', false);
+                    $abaAnalise.find('[name="meioambienteaumentoconsumoenergi"]').attr('disabled', false);
+                    $abaAnalise.find('[name="meioambienteaumentoconsumoaguafa"]').attr('disabled', false);
 
-                    if (mostrarAbaQualidadeGerente && index != 'Qualidade - Gerente' && !$abaAnalise.find('[name=Resultado] :selected').val().startsWith('Aprovado')) {
+                    if (mostrarAbaQualidadeGerente && index != 'Qualidade - Gerente' && !$abaAnalise.find('[name=resultado] :selected').val().startsWith('Aprovado')) {
                         mostrarAbaQualidadeGerente = false;
                     }
                 }
@@ -3547,14 +3547,14 @@ function RegistrarBindings() {
     espelharCheckBox('#acRespInofDE', '#acRespInovDEAcomp');
     espelharCheckBox('#acRespFabrica', '#acRespFabricaAcomp');
 
-    $('[name="Resultado"]').change(function () {
+    $('[name="resultado"]').change(function () {
         var $this = $(this);
         var $tab = $this.parents('.tab-pane[role="tabpanel"]');
 
         if ($this.val() == 'Reprovado') {
-            $tab.find('[name="ReprovadoMotivo"]').prop('disabled', false);
+            $tab.find('[name="reprovadomotivo"]').prop('disabled', false);
         } else {
-            $tab.find('[name="ReprovadoMotivo"]').prop('disabled', true);
+            $tab.find('[name="reprovadomotivo"]').prop('disabled', true);
         }
     });
 }
@@ -3599,7 +3599,7 @@ function ResetarAgendamento() {
 }
 
 function SalvarAgendamento() {
-    var id = $('input[name="ID"]').val();
+    var id = $('input[name="id"]').val();
 
     if (id) {
         return AtualizarAgendamento(id).then(function (response) {
@@ -3696,7 +3696,7 @@ function RegistrarBotoes() {
     var $btnSalvar = $('.btn-salvar');
     $btnSalvar.click(function () {
         SalvarAgendamento().then(function () {
-            var id = $('input[name="ID"]').val();
+            var id = $('input[name="id"]').val();
             window.history.pushState('Object', '', '/sites/DEV_LotePiloto/SiteAssets/main.aspx?action=edit&loteid=' + id);
             bloquearBotoesAbaAnexo();
 

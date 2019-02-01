@@ -22,18 +22,18 @@
 <script type="text/javascript" src="/_layouts/15/autofill.js"></script>
 <script type="text/javascript" src="/_layouts/15/1033/sts_strings.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.SPServices/2014.02/jquery.SPServices.js"></script>
-<script type="text/javascript" src="/sites/DEV_LotePiloto/SiteAssets/deploy/main/JS/lotePiloto.js?010220191216"></script>
+<script type="text/javascript" src="/sites/DEV_LotePiloto/SiteAssets/deploy/main/JS/lotePiloto.js?010220191625"></script>
 <div id="main" style="margin-bottom: 40px;">
-    <input type="hidden" name="Title" class="salvar-campo" required />
+    <input type="hidden" name="title" class="salvar-campo" required />
     <div class="container" style="background-color: rgb(242, 242, 242); padding: 10px; margin-bottom: 10px;">
         <div class="row">
             <div class="col-md-6">
                 <label for="inputId">ID</label>
-                <input type="text" readonly class="form-control salvar-campo" id="inputId" name="ID">
+                <input type="text" readonly class="form-control salvar-campo" id="inputId" name="id">
             </div>
             <div class="col-md-6">
                 <label for="status">Status</label>
-                <select class="custom-select salvar-campo" id="status" name="Status" disabled>
+                <select class="custom-select salvar-campo" id="status" name="status" disabled>
                     <option disabled selected value=""></option>
                 </select>
             </div>
@@ -41,19 +41,19 @@
         <div class="row" style="margin-top: 10px;">
             <div class="col-md-4">
                 <label for="tipoDeLote">Tipo de Lote</label>
-                <select class="custom-select salvar-campo select-enum" id="tipoDeLote" name="TipoLote">
+                <select class="custom-select salvar-campo select-enum" id="tipoDeLote" name="tipolote">
                     <option disabled selected>Selecione uma opção</option>
                 </select>
             </div>
             <div class="col-md-4">
                 <label for="fabrica">Fábrica</label>
-                <select class="custom-select salvar-campo select-tabela" id="fabrica" name="Fabrica">
+                <select class="custom-select salvar-campo select-tabela" id="fabrica" name="fabrica">
                     <option disabled selected>Selecione uma opção</option>
                 </select>
             </div>
             <div class="col-md-4">
                 <label for="linhaEquipamento">Linha ou Equipamento</label>
-                <select class="custom-select salvar-campo select-tabela" id="linhaEquipamento" name="LinhaEquipamento">
+                <select class="custom-select salvar-campo select-tabela" id="linhaEquipamento" name="linhaequipamento">
                     <option disabled selected>Selecione uma opção</option>
                 </select>
             </div>
@@ -87,11 +87,11 @@
             <div class="row" style="margin-top: 10px;">
                 <div class="col-md-6">
                     <label for="codigoProduto">Código do produto</label>
-                    <input type="text" class="form-control salvar-campo" id="codigoProduto" name="CodigoProduto">
+                    <input type="text" class="form-control salvar-campo" id="codigoProduto" name="codigoproduto">
                 </div>
                 <div class="col-md-6">
                     <label for="linhaDoProduto">Linha do produto</label>
-                    <select class="custom-select salvar-campo select-enum" id="linhaDoProduto" name="LinhaProduto">
+                    <select class="custom-select salvar-campo select-enum" id="linhaDoProduto" name="linhaproduto">
                         <option disabled selected>Selecione uma opção</option>
                     </select>
                 </div>
@@ -99,17 +99,17 @@
             <div class="row" style="margin-top: 10px;">
                 <div class="col-md-12">
                     <label for="produtoDescricao">Descrição do produto</label>
-                    <textarea class="form-control salvar-campo" id="produtoDescricao" name="DescricaoProduto" rows="3"></textarea>
+                    <textarea class="form-control salvar-campo" id="produtoDescricao" name="descricaoproduto" rows="3"></textarea>
                 </div>
             </div>
             <div class="row" style="margin-top: 10px;">
                 <div class="col-md-6">
                     <label for="produtoProjeto">Projeto</label>
-                    <input type="text" class="form-control salvar-campo" id="produtoProjeto" name="Projeto">
+                    <input type="text" class="form-control salvar-campo" id="produtoProjeto" name="projeto">
                 </div>
                 <div class="col-md-6">
                     <label for="categoriaDoProjeto">Categoria do projeto</label>
-                    <select class="custom-select salvar-campo select-enum" id="categoriaDoProjeto" name="CategoriaProjeto">
+                    <select class="custom-select salvar-campo select-enum" id="categoriaDoProjeto" name="categoriaprojeto">
                         <option disabled selected>Selecione uma opção</option>
                     </select>
                 </div>
@@ -117,18 +117,18 @@
             <div class="row" style="margin-top: 10px;">
                 <div class="col-md-6">
                     <label for="produtoFormula">Fórmula</label>
-                    <input type="text" class="form-control salvar-campo" id="produtoFormula" name="Formula">
+                    <input type="text" class="form-control salvar-campo" id="produtoFormula" name="formula">
                 </div>
                 <div class="col-md-6">
                     <label for="produtoQuantidade">Quantidade</label>
-                    <input type="number" class="form-control salvar-campo" id="produtoQuantidade" name="QuantidadePecas"
+                    <input type="number" class="form-control salvar-campo" id="produtoQuantidade" name="quantidadepecas"
                      onfocusout="ValidarLinhaEquipamento()">
                 </div>
             </div>
             <div class="row" style="margin-top: 10px;">
                 <div class="col-md-6">
                     <label for="categoriaDoProjeto">Motivo</label>
-                    <select class="custom-select salvar-campo select-enum" id="motivo" name="Motivo">
+                    <select class="custom-select salvar-campo select-enum" id="motivo" name="motivo">
                         <option disabled selected>Selecione uma opção</option>
                     </select>
                 </div>
@@ -136,7 +136,7 @@
             <div class="row" style="margin-top: 10px;">
                 <div class="col-md-auto">
                     <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input salvar-campo" id="produtoEnvioAmostras" name="EnvioAmostras">
+                        <input type="checkbox" class="custom-control-input salvar-campo" id="produtoEnvioAmostras" name="envioamostras">
                         <label class="custom-control-label" for="produtoEnvioAmostras">Solicitação de envio de amostras</label>
                     </div>
                 </div>
@@ -144,11 +144,11 @@
             <div class="row" id="formResponsavelAmostra" style="margin-top: 10px;display:none">
                 <div class="col-md-6">
                     <label for="produtoResponsavelAmostra">Responsável pela amostra</label>
-                    <input type="text" class="form-control salvar-campo" id="produtoResponsavelAmostra" name="ResponsavelAmostra">
+                    <input type="text" class="form-control salvar-campo" id="produtoResponsavelAmostra" name="responsavelamostra">
                 </div>
                 <div class="col-md-6">
                     <label for="produtoQuantidadeAmostra">Quantidade de amostras</label>
-                    <input type="number" class="form-control salvar-campo" id="produtoQuantidadeAmostra" name="QuantidadeAmostra">
+                    <input type="number" class="form-control salvar-campo" id="produtoQuantidadeAmostra" name="quantidadeamostra">
                 </div>
             </div>
         </div>
@@ -156,11 +156,11 @@
             <div class="row" style="margin-top: 10px;">
                 <div class="col-md-6">
                     <label for="agendamentoCentroCusto">Centro de custo - PEP - NT</label>
-                    <input type="text" class="form-control salvar-campo" id="agendamentoCentroCusto" name="CentroCusto">
+                    <input type="text" class="form-control salvar-campo" id="agendamentoCentroCusto" name="centrocusto">
                 </div>
                 <div class="col-md-6">
                     <label for="grauComplexidade">Grau de complexidade</label>
-                    <select class="custom-select salvar-campo select-enum" id="grauComplexidade" name="GrauComplexidade">
+                    <select class="custom-select salvar-campo select-enum" id="grauComplexidade" name="graucomplexidade">
                         <option disabled selected>Selecione uma opção</option>
                     </select>
                 </div>
@@ -168,28 +168,25 @@
             <div class="row" style="margin-top: 10px;">
                 <div class="col-md-4">
                     <label for="agendamentoDataInicioProgramado">Início programado</label>
-                    <input type="text" class="form-control salvar-campo date-time-picker" id="agendamentoDataInicioProgramado" name="InicioProgramado"
-                    />
+                    <input type="text" class="form-control salvar-campo date-time-picker" id="agendamentoDataInicioProgramado" name="inicioprogramado" />
                 </div>
                 <div class="col-md-2">
                     <label for="agendamentoDuracaoHoras">Duração (HH)</label>
-                    <input type="number" min="0" max="24" class="form-control salvar-campo" id="agendamentoDuracaoHoras" name="DuracaoEstimadaHoras"
-                    />
+                    <input type="number" min="0" max="24" class="form-control salvar-campo" id="agendamentoDuracaoHoras" name="duracaoestimadahoras" />
                 </div>
                 <div class="col-md-2">
                     <label for="agendamentoDuracaoMinutos">Duração (mm)</label>
-                    <input type="number" min="0" max="59" class="form-control salvar-campo" id="agendamentoDuracaoMinutos" name="DuracaoEstimadaMinutos"
-                    />
+                    <input type="number" min="0" max="59" class="form-control salvar-campo" id="agendamentoDuracaoMinutos" name="duracaoestimadaminutos" />
                 </div>
                 <div class="col-md-4">
                     <label for="agendamentoFim">Fim programado</label>
-                    <input type="text" class="form-control date-time-picker" id="agendamentoFim" name="FimProgramado" readonly />
+                    <input type="text" class="form-control date-time-picker" id="agendamentoFim" name="fimprogramado" readonly />
                 </div>
             </div>
             <div class="row" style="margin-top: 10px;">
                 <div class="col-md-12">
                     <label for="agendamentoObservacoes">Observações</label>
-                    <textarea class="form-control salvar-campo" id="agendamentoObservacoes" name="Observacoes" rows="3"></textarea>
+                    <textarea class="form-control salvar-campo" id="agendamentoObservacoes" name="observacoes" rows="3"></textarea>
                 </div>
             </div>
         </div>
@@ -230,7 +227,7 @@
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-auto">
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input salvar-campo" id="acRespEngEnvase" name="EngenhariaEnvaseAcompanhamento">
+                                <input type="checkbox" class="custom-control-input salvar-campo" id="acRespEngEnvase" name="engenhariaenvaseacompanhamento">
                                 <label class="custom-control-label" for="acRespEngEnvase">Haverá acompanhamento durante a execução do lote?</label>
                             </div>
                         </div>
@@ -250,7 +247,7 @@
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-auto">
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input salvar-campo" id="acRespEngfabricacao" name="EngenhariaFabricacaoAcompanhamen">
+                                <input type="checkbox" class="custom-control-input salvar-campo" id="acRespEngfabricacao" name="engenhariafabricacaoacompanhamen">
                                 <label class="custom-control-label" for="acRespEngfabricacao">Haverá acompanhamento durante a execução do lote?</label>
                             </div>
                         </div>
@@ -270,7 +267,7 @@
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-auto">
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input salvar-campo" id="acRespInofDF" name="InovacaoDfAcompanhamento">
+                                <input type="checkbox" class="custom-control-input salvar-campo" id="acRespInofDF" name="inovacaodfacompanhamento">
                                 <label class="custom-control-label" for="acRespInofDF">Haverá acompanhamento durante a execução do lote?</label>
                             </div>
                         </div>
@@ -290,7 +287,7 @@
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-auto">
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input salvar-campo" id="acRespInofDE" name="InovacaoDeAcompanhamento">
+                                <input type="checkbox" class="custom-control-input salvar-campo" id="acRespInofDE" name="inovacaodeacompanhamento">
                                 <label class="custom-control-label" for="acRespInofDE">Haverá acompanhamento durante a execução do lote?</label>
                             </div>
                         </div>
@@ -310,7 +307,7 @@
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-auto">
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input salvar-campo" id="acRespQualidade" name="QualidadeAcompanhamento">
+                                <input type="checkbox" class="custom-control-input salvar-campo" id="acRespQualidade" name="qualidadeacompanhamento">
                                 <label class="custom-control-label" for="acRespQualidade">Haverá acompanhamento durante a execução do lote?</label>
                             </div>
                         </div>
@@ -330,7 +327,7 @@
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-auto">
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input salvar-campo" id="acRespFabrica" name="FabricaAcompanhamento">
+                                <input type="checkbox" class="custom-control-input salvar-campo" id="acRespFabrica" name="fabricaacompanhamento">
                                 <label class="custom-control-label" for="acRespFabrica">Haverá acompanhamento durante a execução do lote?</label>
                             </div>
                         </div>
@@ -394,7 +391,7 @@
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-auto">
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="acRespEngEnvaseAcomp" name="ExecucaoLoteAcompanhada">
+                                <input type="checkbox" class="custom-control-input" id="acRespEngEnvaseAcomp" name="execucaoloteacompanhada">
                                 <label class="custom-control-label" for="acRespEngEnvaseAcomp">Haverá acompanhamento durante a execução do lote?</label>
                             </div>
                         </div>
@@ -414,7 +411,7 @@
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-auto">
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="acRespEngFabricacaoAcomp" name="ExecucaoLoteAcompanhada">
+                                <input type="checkbox" class="custom-control-input" id="acRespEngFabricacaoAcomp" name="execucaoloteacompanhada">
                                 <label class="custom-control-label" for="acRespEngFabricacaoAcomp">Haverá acompanhamento durante a execução do lote?</label>
                             </div>
                         </div>
@@ -434,7 +431,7 @@
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-auto">
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="acRespInovDFAcomp" name="ExecucaoLoteAcompanhada">
+                                <input type="checkbox" class="custom-control-input" id="acRespInovDFAcomp" name="execucaoloteacompanhada">
                                 <label class="custom-control-label" for="acRespInovDFAcomp">Haverá acompanhamento durante a execução do lote?</label>
                             </div>
                         </div>
@@ -454,7 +451,7 @@
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-auto">
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="acRespInovDEAcomp" name="ExecucaoLoteAcompanhada">
+                                <input type="checkbox" class="custom-control-input" id="acRespInovDEAcomp" name="execucaoloteacompanhada">
                                 <label class="custom-control-label" for="acRespInovDEAcomp">Haverá acompanhamento durante a execução do lote?</label>
                             </div>
                         </div>
@@ -474,7 +471,7 @@
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-auto">
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="acRespQualidadeAcomp" name="ExecucaoLoteAcompanhada">
+                                <input type="checkbox" class="custom-control-input" id="acRespQualidadeAcomp" name="execucaoloteacompanhada">
                                 <label class="custom-control-label" for="acRespQualidadeAcomp">Haverá acompanhamento durante a execução do lote?</label>
                             </div>
                         </div>
@@ -484,7 +481,7 @@
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-auto">
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="acRespFabricaAcomp" name="ExecucaoLoteAcompanhada">
+                                <input type="checkbox" class="custom-control-input" id="acRespFabricaAcomp" name="execucaoloteacompanhada">
                                 <label class="custom-control-label" for="acRespFabricaAcomp">Haverá acompanhamento durante a execução do lote?</label>
                             </div>
                         </div>
@@ -508,7 +505,7 @@
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-auto">
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input salvar-campo" id="acRespMeioAmbienteAcomp" name="MeioAmbienteAcompanhamento">
+                                <input type="checkbox" class="custom-control-input salvar-campo" id="acRespMeioAmbienteAcomp" name="meioambienteacompanhamento">
                                 <label class="custom-control-label" for="acRespMeioAmbienteAcomp">Haverá acompanhamento durante a execução do lote?</label>
                             </div>
                         </div>
@@ -526,7 +523,7 @@
             <div class="row" style="margin: 10px 0px 10px 0px;">
                 <div class="col-md-6">
                     <label for="agendamentoFim">Início do registro das análises</label>
-                    <input type="text" class="form-control date-time-picker" id="analiseInicio" name="RegistroAnalisesInicio" readonly />
+                    <input type="text" class="form-control date-time-picker" id="analiseInicio" name="registroanalisesinicio" readonly />
                 </div>
             </div>
             <ul class="nav nav-tabs" role="tablist">
@@ -560,7 +557,7 @@
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-6">
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" name="ExecucaoLoteAcompanhada" class="custom-control-input" id="qualidadeRespAcompanhamento">
+                                <input type="checkbox" name="execucaoloteacompanhada" class="custom-control-input" id="qualidadeRespAcompanhamento">
                                 <label class="custom-control-label" for="qualidadeRespAcompanhamento">Houve acompanhamento durante a execução do lote?</label>
                             </div>
                         </div>
@@ -568,18 +565,18 @@
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-6">
                             <label for="qualidadeRespPessoa">Pessoa</label>
-                            <input id="qualidadeRespPessoa" name="Pessoa" class="form-control" type="text"/>
+                            <input id="qualidadeRespPessoa" name="pessoa" class="form-control" type="text"/>
                         </div>
                         <div class="col-md-6">
                             <label for="qualidadeRespResultado">Resultado</label>
-                            <select class="custom-select select-enum" name="Resultado" id="qualidadeRespResultado">
+                            <select class="custom-select select-enum" name="resultado" id="qualidadeRespResultado">
                             </select>
                         </div>
                     </div>
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-12">
                             <label for="qualidadeRespObservacoes">Observações</label>
-                            <textarea class="form-control" name="ObservacoesAnalise" id="qualidadeRespObservacoes" rows="3"></textarea>
+                            <textarea class="form-control" name="observacoesanalise" id="qualidadeRespObservacoes" rows="3"></textarea>
                         </div>
                     </div>
                     <div class="row" style="margin-top: 10px;">
@@ -589,7 +586,7 @@
                         </div>
                         <div class="col-md-6">
                             <label for="qualidadeRespMotivo">Motivo Reprovação</label>
-                            <select class="custom-select select-enum" name="ReprovadoMotivo" id="qualidadeRespMotivo">
+                            <select class="custom-select select-enum" name="reprovadomotivo" id="qualidadeRespMotivo">
                                 <option disabled selected>Selecione uma opção</option>
                             </select>
                         </div>
@@ -606,7 +603,7 @@
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-6">
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" name="ExecucaoLoteAcompanhada" class="custom-control-input" id="envaseRespAcompanhamento">
+                                <input type="checkbox" name="execucaoloteacompanhada" class="custom-control-input" id="envaseRespAcompanhamento">
                                 <label class="custom-control-label" for="envaseRespAcompanhamento">Houve acompanhamento durante a execução do lote?</label>
                             </div>
                         </div>
@@ -614,18 +611,18 @@
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-6">
                             <label for="envaseRespPessoa">Pessoa</label>
-                            <input id="envaseRespPessoa" name="Pessoa" class="form-control" type="text"/>
+                            <input id="envaseRespPessoa" name="pessoa" class="form-control" type="text"/>
                         </div>
                         <div class="col-md-6">
                             <label for="envaseRespResultado">Resultado</label>
-                            <select class="custom-select select-enum" name="Resultado" id="envaseRespResultado">
+                            <select class="custom-select select-enum" name="resultado" id="envaseRespResultado">
                             </select>
                         </div>
                     </div>
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-12">
                             <label for="envaseRespObservacoes">Observações</label>
-                            <textarea class="form-control" name="ObservacoesAnalise" id="envaseRespObservacoes" rows="3"></textarea>
+                            <textarea class="form-control" name="observacoesanalise" id="envaseRespObservacoes" rows="3"></textarea>
                         </div>
                     </div>
                     <div class="row" style="margin-top: 10px;">
@@ -635,7 +632,7 @@
                         </div>
                         <div class="col-md-6">
                             <label for="envaseRespMotivo">Motivo Reprovação</label>
-                            <select class="custom-select select-enum" name="ReprovadoMotivo" id="envaseRespMotivo">
+                            <select class="custom-select select-enum" name="reprovadomotivo" id="envaseRespMotivo">
                                 <option disabled selected>Selecione uma opção</option>
                             </select>
                         </div>
@@ -653,7 +650,7 @@
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-6">
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" name="ExecucaoLoteAcompanhada" class="custom-control-input" id="fabricacaoRespAcompanhamento">
+                                <input type="checkbox" name="execucaoloteacompanhada" class="custom-control-input" id="fabricacaoRespAcompanhamento">
                                 <label class="custom-control-label" for="fabricacaoRespAcompanhamento">Houve acompanhamento durante a execução do lote?</label>
                             </div>
                         </div>
@@ -661,18 +658,18 @@
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-6">
                             <label for="fabricacaoRespPessoa">Pessoa</label>
-                            <input id="fabricacaoRespPessoa" name="Pessoa" class="form-control" type="text"/>
+                            <input id="fabricacaoRespPessoa" name="pessoa" class="form-control" type="text"/>
                         </div>
                         <div class="col-md-6">
                             <label for="fabricacaoRespResultado">Resultado</label>
-                            <select class="custom-select select-enum" name="Resultado" id="fabricacaoRespResultado">
+                            <select class="custom-select select-enum" name="resultado" id="fabricacaoRespResultado">
                             </select>
                         </div>
                     </div>
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-12">
                             <label for="fabricacaoRespObservacoes">Observações</label>
-                            <textarea class="form-control" name="ObservacoesAnalise" id="fabricacaoRespObservacoes" rows="3"></textarea>
+                            <textarea class="form-control" name="observacoesanalise" id="fabricacaoRespObservacoes" rows="3"></textarea>
                         </div>
                     </div>
                     <div class="row" style="margin-top: 10px;">
@@ -682,7 +679,7 @@
                         </div>
                         <div class="col-md-6">
                             <label for="fabricacaoRespMotivo">Motivo Reprovação</label>
-                            <select class="custom-select select-enum" name="ReprovadoMotivo" id="fabricacaoRespMotivo">
+                            <select class="custom-select select-enum" name="reprovadomotivo" id="fabricacaoRespMotivo">
                                 <option disabled selected>Selecione uma opção</option>
                             </select>
                         </div>
@@ -699,7 +696,7 @@
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-6">
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" name="ExecucaoLoteAcompanhada" class="custom-control-input" id="inovDfRespAcompanhamento">
+                                <input type="checkbox" name="execucaoloteacompanhada" class="custom-control-input" id="inovDfRespAcompanhamento">
                                 <label class="custom-control-label" for="inovDfRespAcompanhamento">Houve acompanhamento durante a execução do lote?</label>
                             </div>
                         </div>
@@ -707,18 +704,18 @@
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-6">
                             <label for="inovDfRespPessoa">Pessoa</label>
-                            <input id="inovDfRespPessoa" name="Pessoa" class="form-control" type="text"/>
+                            <input id="inovDfRespPessoa" name="pessoa" class="form-control" type="text"/>
                         </div>
                         <div class="col-md-6">
                             <label for="inovDfRespResultado">Resultado</label>
-                            <select class="custom-select select-enum" name="Resultado" id="inovDfRespResultado">
+                            <select class="custom-select select-enum" name="resultado" id="inovDfRespResultado">
                             </select>
                         </div>
                     </div>
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-12">
                             <label for="inovDfRespObservacoes">Observações</label>
-                            <textarea class="form-control" name="ObservacoesAnalise" id="inovDfRespObservacoes" rows="3"></textarea>
+                            <textarea class="form-control" name="observacoesanalise" id="inovDfRespObservacoes" rows="3"></textarea>
                         </div>
                     </div>
                     <div class="row" style="margin-top: 10px;">
@@ -728,7 +725,7 @@
                         </div>
                         <div class="col-md-6">
                             <label for="inovDfRespMotivo">Motivo Reprovação</label>
-                            <select class="custom-select select-enum" name="ReprovadoMotivo" id="inovDfRespMotivo">
+                            <select class="custom-select select-enum" name="reprovadomotivo" id="inovDfRespMotivo">
                                 <option disabled selected>Selecione uma opção</option>
                             </select>
                         </div>
@@ -745,7 +742,7 @@
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-6">
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" name="ExecucaoLoteAcompanhada" class="custom-control-input" id="inovDeRespAcompanhamento">
+                                <input type="checkbox" name="execucaoloteacompanhada" class="custom-control-input" id="inovDeRespAcompanhamento">
                                 <label class="custom-control-label" for="inovDeRespAcompanhamento">Houve acompanhamento durante a execução do lote?</label>
                             </div>
                         </div>
@@ -753,18 +750,18 @@
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-6">
                             <label for="inovDeRespPessoa">Pessoa</label>
-                            <input id="inovDeRespPessoa" name="Pessoa" class="form-control" type="text"/>
+                            <input id="inovDeRespPessoa" name="pessoa" class="form-control" type="text"/>
                         </div>
                         <div class="col-md-6">
                             <label for="inovDeRespResultado">Resultado</label>
-                            <select class="custom-select select-enum" name="Resultado" id="inovDeRespResultado">
+                            <select class="custom-select select-enum" name="resultado" id="inovDeRespResultado">
                             </select>
                         </div>
                     </div>
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-12">
                             <label for="inovDeRespObservacoes">Observações</label>
-                            <textarea class="form-control" name="ObservacoesAnalise" id="inovDeRespObservacoes" rows="3"></textarea>
+                            <textarea class="form-control" name="observacoesanalise" id="inovDeRespObservacoes" rows="3"></textarea>
                         </div>
                     </div>
                     <div class="row" style="margin-top: 10px;">
@@ -774,7 +771,7 @@
                         </div>
                         <div class="col-md-6">
                             <label for="inovDeRespMotivo">Motivo Reprovação</label>
-                            <select class="custom-select select-enum" name="ReprovadoMotivo" id="inovDeRespMotivo">
+                            <select class="custom-select select-enum" name="reprovadomotivo" id="inovDeRespMotivo">
                                 <option disabled selected>Selecione uma opção</option>
                             </select>
                         </div>
@@ -791,7 +788,7 @@
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-6">
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" name="ExecucaoLoteAcompanhada" class="custom-control-input" id="fabricaRespAcompanhamento">
+                                <input type="checkbox" name="execucaoloteacompanhada" class="custom-control-input" id="fabricaRespAcompanhamento">
                                 <label class="custom-control-label" for="fabricaRespAcompanhamento">Houve acompanhamento durante a execução do lote?</label>
                             </div>
                         </div>
@@ -799,18 +796,18 @@
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-6">
                             <label for="fabricaRespPessoa">Pessoa</label>
-                            <input id="fabricaRespPessoa" name="Pessoa" class="form-control" type="text"/>
+                            <input id="fabricaRespPessoa" name="pessoa" class="form-control" type="text"/>
                         </div>
                         <div class="col-md-6">
                             <label for="fabricaRespResultado">Resultado</label>
-                            <select class="custom-select select-enum" name="Resultado" id="fabricaRespResultado">
+                            <select class="custom-select select-enum" name="resultado" id="fabricaRespResultado">
                             </select>
                         </div>
                     </div>
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-12">
                             <label for="fabricaRespObservacoes">Observações</label>
-                            <textarea class="form-control" name="ObservacoesAnalise" id="fabricaRespObservacoes" rows="3"></textarea>
+                            <textarea class="form-control" name="observacoesanalise" id="fabricaRespObservacoes" rows="3"></textarea>
                         </div>
                     </div>
                     <div class="row" style="margin-top: 10px;">
@@ -820,7 +817,7 @@
                         </div>
                         <div class="col-md-6">
                             <label for="fabricaRespMotivo">Motivo Reprovação</label>
-                            <select class="custom-select select-enum" name="ReprovadoMotivo" id="fabricaRespMotivo">
+                            <select class="custom-select select-enum" name="reprovadomotivo" id="fabricaRespMotivo">
                                 <option disabled selected>Selecione uma opção</option>
                             </select>
                         </div>
@@ -838,7 +835,7 @@
                         <div class="row" style="margin-top: 10px;">
                             <div class="col-md-12">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" name="ExecucaoLoteAcompanhada" class="custom-control-input" id="meioAmbienteAcompanhamentoBrinde">
+                                    <input type="checkbox" name="execucaoloteacompanhada" class="custom-control-input" id="meioAmbienteAcompanhamentoBrinde">
                                     <label class="custom-control-label" for="meioAmbienteAcompanhamentoBrinde">Houve acompanhamento durante a execução do lote?</label>
                                 </div>
                             </div>
@@ -848,13 +845,13 @@
                         <div class="row" style="margin-top: 10px;">
                             <div class="col-md-6">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" name="ExecucaoLoteAcompanhada" class="custom-control-input" id="meioAmbienteAcompanhamentoFab">
+                                    <input type="checkbox" name="execucaoloteacompanhada" class="custom-control-input" id="meioAmbienteAcompanhamentoFab">
                                     <label class="custom-control-label" for="meioAmbienteAcompanhamentoFab">Houve acompanhamento durante a execução do lote?</label>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" name="MeioAmbienteAumentoConsumoAguaLi" class="custom-control-input" id="aumentoConsumoAguaLimpeza">
+                                    <input type="checkbox" name="meioambienteaumentoconsumoaguali" class="custom-control-input" id="aumentoConsumoAguaLimpeza">
                                     <label class="custom-control-label" for="aumentoConsumoAguaLimpeza">Aumento do consumo de água para limpeza?</label>
                                 </div>
                             </div>
@@ -862,13 +859,13 @@
                         <div class="row" style="margin-top: 10px;">
                             <div class="col-md-6">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" name="MeioAmbienteAumentoConsumoEnergi" class="custom-control-input" id="aumentoConsumoEnergia">
+                                    <input type="checkbox" name="meioambienteaumentoconsumoenergi" class="custom-control-input" id="aumentoConsumoEnergia">
                                     <label class="custom-control-label" for="aumentoConsumoEnergia">Aumento de consumo de energia?</label>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" name="MeioAmbienteAumentoConsumoAguaFa" class="custom-control-input" id="aumentoConsumoAguaFabricacao">
+                                    <input type="checkbox" name="meioambienteaumentoconsumoaguafa" class="custom-control-input" id="aumentoConsumoAguaFabricacao">
                                     <label class="custom-control-label" for="aumentoConsumoAguaFabricacao">Aumento de consumo de água para fabricação?</label>
                                 </div>
                             </div>
@@ -876,19 +873,19 @@
                         <div class="row" style="margin-top: 20px;">
                             <div class="col-md-4">
                                 <label for="abastecimentoGranel">Abastecimento granel</label>
-                                <select name="MeioAmbienteAbastecimentoGranel" class="custom-select select-enum" id="abastecimentoGranel">
+                                <select name="meioambienteabastecimentogranel" class="custom-select select-enum" id="abastecimentoGranel">
                                     <option disabled selected>Selecione uma opção</option>
                                 </select>
                             </div>
                             <div class="col-md-4">
                                 <label for="abastecimentoManual">Abastecimento manual</label>
-                                <select name="MeioAmbienteAbastecimentoManual" class="custom-select select-enum" id="abastecimentoManual">
+                                <select name="meioambienteabastecimentomanual" class="custom-select select-enum" id="abastecimentoManual">
                                     <option disabled selected>Selecione uma opção</option>
                                 </select>
                             </div>
                             <div class="col-md-4">
                                 <label for="abastecimentoVacuo">Abastecimento vácuo</label>
-                                <select name="MeioAmbienteAbastecimentoVacuo" class="custom-select select-enum" id="abastecimentoVacuo">
+                                <select name="meioambienteabastecimentovacuo" class="custom-select select-enum" id="abastecimentoVacuo">
                                     <option disabled selected>Selecione uma opção</option>
                                 </select>
                             </div>
@@ -898,13 +895,13 @@
                         <div class="row" style="margin-top: 10px;">
                             <div class="col-md-6">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" name="ExecucaoLoteAcompanhada" class="custom-control-input" id="meioAmbienteAcompanhamento">
+                                    <input type="checkbox" name="execucaoloteacompanhada" class="custom-control-input" id="meioAmbienteAcompanhamento">
                                     <label class="custom-control-label" for="meioAmbienteAcompanhamento">Houve acompanhamento durante a execução do lote?</label>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" name="MeioAmbienteAumentoGeracaoResidu" class="custom-control-input" id="aumentoResiduos">
+                                    <input type="checkbox" name="meioambienteaumentogeracaoresidu" class="custom-control-input" id="aumentoResiduos">
                                     <label class="custom-control-label" for="aumentoResiduos">Aumento da geração de resíduos?</label>
                                 </div>
                             </div>
@@ -912,13 +909,13 @@
                         <div class="row" style="margin-top: 10px;">
                             <div class="col-md-6">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" name="MeioAmbienteTipoResiduosGeradosJ" class="custom-control-input" id="tipoResiduosMapeados">
+                                    <input type="checkbox" name="meioambientetiporesiduosgeradosj" class="custom-control-input" id="tipoResiduosMapeados">
                                     <label class="custom-control-label" for="tipoResiduosMapeados">Tipo de resíduos gerados já estão mapeados?</label>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" name="MeioAmbienteAumentoConsumoAguaLi" class="custom-control-input" id="aumentoConsumoAguaLimpezaEnvase">
+                                    <input type="checkbox" name="meioambienteaumentoconsumoaguali" class="custom-control-input" id="aumentoConsumoAguaLimpezaEnvase">
                                     <label class="custom-control-label" for="aumentoConsumoAguaLimpezaEnvase">Aumento do consumo de água para limpeza?</label>
                                 </div>
                             </div>
@@ -926,13 +923,13 @@
                         <div class="row" style="margin-top: 20px;">
                             <div class="col-md-6">
                                 <label for="acondicionamentoRetornavel">Acondicionamento dos materiais de embalagem retornável</label>
-                                <select name="MeioAmbienteAcondicionamentoMate" class="custom-select select-enum" id="acondicionamentoRetornavel">
+                                <select name="meioambienteacondicionamentomate" class="custom-select select-enum" id="acondicionamentoRetornavel">
                                     <option disabled selected>Selecione uma opção</option>
                                 </select>
                             </div>
                             <div class="col-md-6">
                                 <label for="acondicionamentoReciclavel">Acondicionamento reciclável</label>
-                                <select name="MeioAmbienteAcondicionamentoReci" class="custom-select select-enum" id="acondicionamentoReciclavel">
+                                <select name="meioambienteacondicionamentoreci" class="custom-select select-enum" id="acondicionamentoReciclavel">
                                     <option disabled selected>Selecione uma opção</option>
                                 </select>
                             </div>
@@ -941,18 +938,18 @@
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-6">
                             <label for="meioAmbientePessoa">Pessoa</label>
-                            <input id="meioAmbientePessoa" name="Pessoa" class="form-control" type="text"/>
+                            <input id="meioAmbientePessoa" name="pessoa" class="form-control" type="text"/>
                         </div>
                         <div class="col-md-6">
                             <label for="meioAmbienteResultado">Resultado</label>
-                            <select class="custom-select select-enum" name="Resultado" id="meioAmbienteResultado">
+                            <select class="custom-select select-enum" name="resultado" id="meioAmbienteResultado">
                             </select>
                         </div>
                     </div>
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-12">
                             <label for="meioAmbienteObservacoes">Observações</label>
-                            <textarea class="form-control" name="ObservacoesAnalise" id="meioAmbienteObservacoes" rows="3"></textarea>
+                            <textarea class="form-control" name="observacoesanalise" id="meioAmbienteObservacoes" rows="3"></textarea>
                         </div>
                     </div>
                     <div class="row" style="margin-top: 10px;">
@@ -962,7 +959,7 @@
                         </div>
                         <div class="col-md-6">
                             <label for="meioAmbienteMotivo">Motivo Reprovação</label>
-                            <select class="custom-select select-enum" name="ReprovadoMotivo" id="meioAmbienteMotivo">
+                            <select class="custom-select select-enum" name="reprovadomotivo" id="meioAmbienteMotivo">
                                 <option disabled selected>Selecione uma opção</option>
                             </select>
                         </div>
@@ -979,7 +976,7 @@
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-6">
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" name="ExecucaoLoteAcompanhada" class="custom-control-input" id="qualidadeGerAcompanhamento">
+                                <input type="checkbox" name="execucaoloteacompanhada" class="custom-control-input" id="qualidadeGerAcompanhamento">
                                 <label class="custom-control-label" for="qualidadeGerAcompanhamento">Houve acompanhamento durante a execução do lote?</label>
                             </div>
                         </div>
@@ -987,18 +984,18 @@
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-6">
                             <label for="qualidadeGerPessoa">Pessoa</label>
-                            <input id="qualidadeGerPessoa" name="Pessoa" class="form-control" type="text"/>
+                            <input id="qualidadeGerPessoa" name="pessoa" class="form-control" type="text"/>
                         </div>
                         <div class="col-md-6">
                             <label for="qualidadeGerResultado">Resultado</label>
-                            <select class="custom-select select-enum" name="Resultado" id="qualidadeGerResultado">
+                            <select class="custom-select select-enum" name="resultado" id="qualidadeGerResultado">
                             </select>
                         </div>
                     </div>
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-12">
                             <label for="qualidadeGerObservacoes">Observações</label>
-                            <textarea class="form-control" name="ObservacoesAnalise" id="qualidadeGerObservacoes" rows="3"></textarea>
+                            <textarea class="form-control" name="observacoesanalise" id="qualidadeGerObservacoes" rows="3"></textarea>
                         </div>
                     </div>
                     <div class="row" style="margin-top: 10px;">
@@ -1008,7 +1005,7 @@
                         </div>
                         <div class="col-md-6">
                             <label for="qualidadeGerMotivo">Motivo Reprovação</label>
-                            <select class="custom-select select-enum" name="ReprovadoMotivo" id="qualidadeGerMotivo">
+                            <select class="custom-select select-enum" name="reprovadomotivo" id="qualidadeGerMotivo">
                                 <option disabled selected>Selecione uma opção</option>
                             </select>
                         </div>
@@ -1033,7 +1030,7 @@
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-12">
                             <label for="canceladoMotivo">Motivo</label>
-                            <select class="custom-select salvar-campo select-enum" id="canceladoMotivo" name="CanceladoMotivo">
+                            <select class="custom-select salvar-campo select-enum" id="canceladoMotivo" name="canceladomotivo">
                                 <option disabled selected>Selecione uma opção</option>
                             </select>
                         </div>
@@ -1041,7 +1038,7 @@
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-12">
                             <label for="canceladoComentarios">Comentários</label>
-                            <textarea class="form-control salvar-campo" id="canceladoComentarios" name="CanceladoComentarios" rows="3"></textarea>
+                            <textarea class="form-control salvar-campo" id="canceladoComentarios" name="canceladocomentarios" rows="3"></textarea>
                         </div>
                     </div>
                 </div>
@@ -1049,7 +1046,7 @@
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-12">
                             <label for="naoExecutadoMotivo">Motivo</label>
-                            <select class="custom-select salvar-campo select-enum" id="naoExecutadoMotivo" name="NaoExecutadoMotivo">
+                            <select class="custom-select salvar-campo select-enum" id="naoExecutadoMotivo" name="naoexecutadomotivo">
                                 <option disabled selected>Selecione uma opção</option>
                             </select>
                         </div>
@@ -1057,7 +1054,7 @@
                     <div class="row" style="margin-top: 10px;">
                         <div class="col-md-12">
                             <label for="naoExecutadoComentarios">Comentários</label>
-                            <textarea class="form-control salvar-campo" id="naoExecutadoComentarios" name="NaoExecutadoComentarios" rows="3"></textarea>
+                            <textarea class="form-control salvar-campo" id="naoExecutadoComentarios" name="naoexecutadocomentarios" rows="3"></textarea>
                         </div>
                     </div>
                 </div>
