@@ -1,5 +1,5 @@
 
-var PATH_TO_DISPFORM = "https://naturabr.sharepoint.com/sites/DEV_LotePiloto/SiteAssets/main.aspx";
+var PATH_TO_DISPFORM = "https://naturabr.sharepoint.com/sites/DEV_LotePiloto/Lists/Agendamentos/DispForm.aspx";
 var TASK_LIST = "Agendamentos";
 var Fabrica_LIST = "Fábricas Internas e Armazenamento de Fábricas Terceiras";
 var coresFabricas = new Array();
@@ -64,7 +64,7 @@ function DisplayTasks() {
         locale: 'pt-br',
         //open up the display form when a user clicks on an event
         eventClick: function (calEvent, jsEvent, view) {
-            window.open(PATH_TO_DISPFORM + "?action=edit&loteid=" + calEvent.id, "_blank");
+            window.open(PATH_TO_DISPFORM + "?ID=" + calEvent.id, "_blank");
         },
         eventRender: function (eventObj, $el) {
             $el.popover({

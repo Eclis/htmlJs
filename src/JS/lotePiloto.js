@@ -4230,6 +4230,8 @@ function getAttachmentFiles(listItem) {
 
 
 $(document).ready(function () {
+    $('#onetIDListForm').css('width', '100%');
+
     $.when(
         CarregarCategoriaProjeto(),
         CarregarFabricas(),
@@ -4249,10 +4251,12 @@ $(document).ready(function () {
         ResetarAgendamento();
         RegistrarBotoes();
 
-        if (getUrlParameter('action') == 'new') {
+        var id = getUrlParameter('ID');
+
+        if (id == '') {
             ModificarFormState(EM_CRIACAO);
-        } else if (getUrlParameter('action') == 'edit') {
-            CarregarAgendamento(getUrlParameter('loteid'));
+        } else {
+            CarregarAgendamento(id);
         }
 
         setTimeout(function () {
