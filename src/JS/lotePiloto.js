@@ -3846,23 +3846,23 @@ function BuscarMinimoEMaximoPecas(linhaEquipamentoId) {
 
 function verificarErros() {
     var $campos = {
-        tipoDeLote,
-        fabrica,
-        linhaEquipamento,
-        codigoProduto,
-        linhaDoProduto,
-        produtoDescricao,
-        produtoProjeto,
-        categoriaDoProjeto,
-        produtoFormula,
-        produtoQuantidade,
-        motivo,
-        agendamentoCentroCusto,
-        grauComplexidade,
-        agendamentoDataInicioProgramado,
-        agendamentoDuracaoHoras,
-        agendamentoDuracaoMinutos,
-        agendamentoFim
+        tipoDeLote: null,
+        fabrica: null,
+        linhaEquipamento: null,
+        codigoProduto: null,
+        linhaDoProduto: null,
+        produtoDescricao: null,
+        produtoProjeto: null,
+        categoriaDoProjeto: null,
+        produtoFormula: null,
+        produtoQuantidade: null,
+        motivo: null,
+        agendamentoCentroCusto: null,
+        grauComplexidade: null,
+        agendamentoDataInicioProgramado: null,
+        agendamentoDuracaoHoras: null,
+        agendamentoDuracaoMinutos: null,
+        agendamentoFim: null
     };
 
     var erro = 0;
@@ -3928,61 +3928,6 @@ function verificarErros() {
     }
 }
 
-function scrollToElement(ele) {
-    $(window).scrollTop(ele.offset().top);
-}
-
-
-class Agendamento {
-    constructor() {
-        this.propriedades = {};
-    }
-
-    add(propriedade) {
-        this.propriedades[propriedade.nome] = propriedade;
-    }
-
-    find(nome) {
-        return this.propriedades[nome];
-    }
-}
-
-class AgendamentoResponsavel {
-    constructor() {
-        this.propriedades = {};
-    }
-
-    add(propriedade) {
-        this.propriedades[propriedade.nome] = propriedade;
-    }
-
-    find(nome) {
-        return this.propriedades[nome];
-    }
-}
-
-class AgendamentoProcessado {
-    constructor() {
-        this.propriedades = {};
-    }
-
-    add(propriedade) {
-        this.propriedades[propriedade.nome] = propriedade;
-    }
-
-    find(nome) {
-        return this.propriedades[nome];
-    }
-}
-
-class Propriedade {
-    constructor(nome, tipo, valor) {
-        this.nome = nome;
-        this.tipo = tipo;
-        this.valor = valor;
-    }
-}
-
 function InicializarHistorico() {
     var $tabs = $('<ul class="nav nav-tabs" role="tablist"></ul>');
     var $liAgendamento = $('<li class="nav-item"><a class="nav-link active" data-toggle="pill" role="tab">Agendamento</a></li>');
@@ -4036,36 +3981,28 @@ function carregarBotoesAnexo(){
     var tableName = 'Agendamentos - Responsáveis';
 
     var qualidResp = document.getElementById('txtAtt-tab-analise-qualidade');
-    qualidResp.addEventListener('change', event => AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(qualidResp).closest('div.tab-pane').attr('id')).ID
-        ,qualidResp));
+    qualidResp.addEventListener('change', function (event) { AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(qualidResp).closest('div.tab-pane').attr('id')).ID, qualidResp) });
 
     var qualidGer = document.getElementById('txtAtt-tab-analise-qualidade-ger');
-    qualidGer.addEventListener('change', event => AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(qualidGer).closest('div.tab-pane').attr('id')).ID
-        , qualidGer));
+    qualidGer.addEventListener('change', function (event) { AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(qualidGer).closest('div.tab-pane').attr('id')).ID, qualidGer) });
 
     var envaseR = document.getElementById('txtAtt-tab-analise-envase');
-    envaseR.addEventListener('change', event => AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(envaseR).closest('div.tab-pane').attr('id')).ID
-        , envaseR));
+    envaseR.addEventListener('change', function (event) { AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(envaseR).closest('div.tab-pane').attr('id')).ID, envaseR) });
 
     var fabricacao = document.getElementById('txtAtt-tab-analise-fabricacao');
-    fabricacao.addEventListener('change', event => AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(fabricacao).closest('div.tab-pane').attr('id')).ID
-        , fabricacao));
+    fabricacao.addEventListener('change', function (event) { AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(fabricacao).closest('div.tab-pane').attr('id')).ID, fabricacao) });
 
     var fabrica = document.getElementById('txtAtt-tab-analise-fabrica');
-    fabrica.addEventListener('change', event => AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(fabrica).closest('div.tab-pane').attr('id')).ID
-        , fabrica));
+    fabrica.addEventListener('change', function (event) { AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(fabrica).closest('div.tab-pane').attr('id')).ID, fabrica) });
 
     var inovde = document.getElementById('txtAtt-tab-analise-inovDe');
-    inovde.addEventListener('change', event => AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(inovde).closest('div.tab-pane').attr('id')).ID
-        , inovde));
+    inovde.addEventListener('change', function (event) { AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(inovde).closest('div.tab-pane').attr('id')).ID, inovde) });
 
     var inovdfResp = document.getElementById('txtAtt-tab-analise-inovDf');
-    inovdfResp.addEventListener('change', event => AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(inovdfResp).closest('div.tab-pane').attr('id')).ID
-        , inovdfResp));
+    inovdfResp.addEventListener('change', function (event) { AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(inovdfResp).closest('div.tab-pane').attr('id')).ID, inovdfResp) });
 
     var meioAmbiente = document.getElementById('txtAtt-tab-analise-meio-ambiente');
-    meioAmbiente.addEventListener('change', event => AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(meioAmbiente).closest('div.tab-pane').attr('id')).ID
-        , meioAmbiente));
+    meioAmbiente.addEventListener('change', function (event) { AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(meioAmbiente).closest('div.tab-pane').attr('id')).ID, meioAmbiente) });
 }
 
 
@@ -4254,7 +4191,7 @@ $(document).ready(function () {
         ResetarAgendamento();
         RegistrarBotoes();
 
-        var id = getUrlParameter('ID');
+        var id = getUrlParameter('loteid') == '' ? getUrlParameter('ID') : getUrlParameter('loteid');
 
         if (id == '') {
             ModificarFormState(EM_CRIACAO);
