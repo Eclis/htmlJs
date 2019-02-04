@@ -1141,49 +1141,72 @@ function NotificarErroValidacao(controlType, control, controlValidator, message)
 function LimparValidacoes() {
 }
 
-//Função para adicionar anexos (Utilizado na aba de Análises)
 function AddAttachments(listName, itemId, controlName) {
-    var digest = "";
+    var $promise = $.Deferred();
+
     $.ajax({
-        url: "/sites/DEV_LotePiloto/_api/contextinfo",
+        url: _spPageContextInfo.siteAbsoluteUrl + "/_api/contextinfo",
         method: "POST",
         headers: {
             "ACCEPT": "application/json;odata=verbose",
             "Content-Type": "application/json;odata=verbose"
         },
         success: function (data) {
-            digest = data.d.GetContextWebInformation.FormDigestValue;
+            $promise.resolve(data.d.GetContextWebInformation.FormDigestValue);
         },
-        error: function (data) {
-        }
-    }).done(function () {
-        var fileInput = $(controlName);
-        var fileName = fileInput[0].files[0].name;
-        var reader = new FileReader();
-        reader.onload = function (e) {
-            var fileData = e.target.result;
-            var res11 = $.ajax({
-                url: "/sites/DEV_LotePiloto/_api/web/lists/getbytitle('" + listName + "')/items(" + itemId + ")/AttachmentFiles/add(FileName='" + fileName + "')",
-                method: "POST",
-                binaryStringRequestBody: true,
-                data: fileData,
-                processData: false,
-                headers: {
-                    "ACCEPT": "application/json;odata=verbose",
-                    "X-RequestDigest": digest,
-                    "Content-Length": fileData.byteLength
-                },
-                success: function (data) {
-                    carregarBotoesAnexo();
-                    carregarPainelAnexo();
-                    controlName.value = '';
-                },
-                error: function (data) {
-                }
-            });
-        };
-        reader.readAsArrayBuffer(fileInput[0].files[0]);
+        error: $promise.reject
     });
+
+    return $promise.then(function (digest) {
+        return UploadAnexo(digest, listName, itemId, controlName).then(function () {
+            controlName.value = '';
+            CarregarPaineisDeAnexos();
+        }).fail(function (error) {
+            alert(error.errorMessage);
+        })
+    });
+}
+
+function UploadAnexo(digest, listName, itemId, controlName) {
+    var $promise = $.Deferred();
+    var fileInput = $(controlName);
+    var fileName = fileInput[0].files[0].name;
+    var reader = new FileReader();
+
+    reader.onload = function (e) {
+        var fileData = e.target.result;
+
+        if (fileData.byteLength == 0) {
+            return $promise.reject({
+                errorCode: '0x2147024883',
+                errorMessage: 'Não é possível carregar arquivos vazios. Tente novamente'
+            });
+        }
+
+        $.ajax({
+            url: _spPageContextInfo.siteAbsoluteUrl + "/_api/web/lists/getbytitle('" + listName + "')/items(" + itemId + ")/AttachmentFiles/add(FileName='" + fileName + "')",
+            method: "POST",
+            binaryStringRequestBody: true,
+            data: fileData,
+            processData: false,
+            headers: {
+                "ACCEPT": "application/json;odata=verbose",
+                "X-RequestDigest": digest,
+                "Content-Length": fileData.byteLength
+            },
+            success: $promise.resolve,
+            error: function (data) {
+                $promise.reject({
+                    errorCode: data.errorCode,
+                    errorMessage: data.error.message.value
+                });
+            }
+        });
+    };
+
+    reader.readAsArrayBuffer(fileInput[0].files[0]);
+
+    return $promise;
 }
 
 // Query the picker for user information.
@@ -1543,7 +1566,7 @@ function CarregarAgendamento(id) {
                 return CarregarAgendamentoResponsaveis(atributos.ows_CodigoAgendamento.value).then(function () {
                     InicializarHistorico();
                     CarregarHistoricoPorAgendamento(atributos.ows_ID.value);
-                    carregarPainelAnexo();
+                    CarregarPaineisDeAnexos();
                     $promise.resolve();
                 }).fail(function (response) {
                     $promise.reject(response);
@@ -3220,9 +3243,6 @@ function ModificarFormState(formState) {
     ModificarBotoesPorFormState(formState);
     ModificarCamposPorFormState(formState);
     ModificarAbasPorFormState(formState);
-
-    carregarBotoesAnexo();
-    carregarPainelAnexo();
 }
 
 function ModificarAbasPorFormState(formState) {
@@ -3928,61 +3948,6 @@ function verificarErros() {
     }
 }
 
-function scrollToElement(ele) {
-    $(window).scrollTop(ele.offset().top);
-}
-
-
-class Agendamento {
-    constructor() {
-        this.propriedades = {};
-    }
-
-    add(propriedade) {
-        this.propriedades[propriedade.nome] = propriedade;
-    }
-
-    find(nome) {
-        return this.propriedades[nome];
-    }
-}
-
-class AgendamentoResponsavel {
-    constructor() {
-        this.propriedades = {};
-    }
-
-    add(propriedade) {
-        this.propriedades[propriedade.nome] = propriedade;
-    }
-
-    find(nome) {
-        return this.propriedades[nome];
-    }
-}
-
-class AgendamentoProcessado {
-    constructor() {
-        this.propriedades = {};
-    }
-
-    add(propriedade) {
-        this.propriedades[propriedade.nome] = propriedade;
-    }
-
-    find(nome) {
-        return this.propriedades[nome];
-    }
-}
-
-class Propriedade {
-    constructor(nome, tipo, valor) {
-        this.nome = nome;
-        this.tipo = tipo;
-        this.valor = valor;
-    }
-}
-
 function InicializarHistorico() {
     var $tabs = $('<ul class="nav nav-tabs" role="tablist"></ul>');
     var $liAgendamento = $('<li class="nav-item"><a class="nav-link active" data-toggle="pill" role="tab">Agendamento</a></li>');
@@ -4031,44 +3996,56 @@ function CarregarHistoricoPorAgendamentoResponsavel(id) {
     CarregarHistorico('{ed4669ee-2393-484a-a4c6-3068e8d6e004}', id);
 }
 
-
-function carregarBotoesAnexo(){
+function carregarBotoesAnexo() {
     var tableName = 'Agendamentos - Responsáveis';
-
     var qualidResp = document.getElementById('txtAtt-tab-analise-qualidade');
-    qualidResp.addEventListener('change', event => AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(qualidResp).closest('div.tab-pane').attr('id')).ID
-        ,qualidResp));
+
+    qualidResp.addEventListener('change', function () {
+        AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(qualidResp).closest('div.tab-pane').attr('id')).ID,qualidResp);
+    });
 
     var qualidGer = document.getElementById('txtAtt-tab-analise-qualidade-ger');
-    qualidGer.addEventListener('change', event => AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(qualidGer).closest('div.tab-pane').attr('id')).ID
-        , qualidGer));
+
+    qualidGer.addEventListener('change', function () {
+        AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(qualidGer).closest('div.tab-pane').attr('id')).ID, qualidGer);
+    });
 
     var envaseR = document.getElementById('txtAtt-tab-analise-envase');
-    envaseR.addEventListener('change', event => AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(envaseR).closest('div.tab-pane').attr('id')).ID
-        , envaseR));
+
+    envaseR.addEventListener('change', function () {
+        AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(envaseR).closest('div.tab-pane').attr('id')).ID, envaseR);
+    });
 
     var fabricacao = document.getElementById('txtAtt-tab-analise-fabricacao');
-    fabricacao.addEventListener('change', event => AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(fabricacao).closest('div.tab-pane').attr('id')).ID
-        , fabricacao));
+
+    fabricacao.addEventListener('change', function () {
+        AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(fabricacao).closest('div.tab-pane').attr('id')).ID, fabricacao);
+    });
 
     var fabrica = document.getElementById('txtAtt-tab-analise-fabrica');
-    fabrica.addEventListener('change', event => AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(fabrica).closest('div.tab-pane').attr('id')).ID
-        , fabrica));
+
+    fabrica.addEventListener('change', function () {
+        AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(fabrica).closest('div.tab-pane').attr('id')).ID, fabrica);
+    });
 
     var inovde = document.getElementById('txtAtt-tab-analise-inovDe');
-    inovde.addEventListener('change', event => AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(inovde).closest('div.tab-pane').attr('id')).ID
-        , inovde));
+
+    inovde.addEventListener('change', function () {
+        AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(inovde).closest('div.tab-pane').attr('id')).ID, inovde);
+    });
 
     var inovdfResp = document.getElementById('txtAtt-tab-analise-inovDf');
-    inovdfResp.addEventListener('change', event => AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(inovdfResp).closest('div.tab-pane').attr('id')).ID
-        , inovdfResp));
+
+    inovdfResp.addEventListener('change', function () {
+        AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(inovdfResp).closest('div.tab-pane').attr('id')).ID, inovdfResp);
+    });
 
     var meioAmbiente = document.getElementById('txtAtt-tab-analise-meio-ambiente');
-    meioAmbiente.addEventListener('change', event => AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(meioAmbiente).closest('div.tab-pane').attr('id')).ID
-        , meioAmbiente));
+
+    meioAmbiente.addEventListener('change', function () {
+        AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(meioAmbiente).closest('div.tab-pane').attr('id')).ID, meioAmbiente);
+    });
 }
-
-
 
 function bloquearBotoesAbaAnexo(){
 
@@ -4110,65 +4087,70 @@ function liberarBotoesAbaAnexo(){
     meioAmbiente.disabled = false;
 }
 
-function carregarPainelAnexo(){
-
+function CarregarPaineisDeAnexos() {
     var tabAnexoVisible = ProcurarAprovacaoPorAbaAnaliseId($('#txtAtt-tab-analise-qualidade').closest('div.tab-pane').attr('id'));
-    if ( tabAnexoVisible != null ){
+
+    if (tabAnexoVisible != null) {
         var table = $("#data-table-anexo-qualidade");
-        table.empty()
+        table.empty();
         getListItemAttachments("Agendamentos - Responsáveis", tabAnexoVisible.ID, table);
     }
 
     var tabAnexoEnvase = ProcurarAprovacaoPorAbaAnaliseId($('#txtAtt-tab-analise-envase').closest('div.tab-pane').attr('id'));
-    if ( tabAnexoEnvase != null ){
+
+    if (tabAnexoEnvase != null) {
         var table = $("#data-table-anexo-envase");
-        table.empty()
+        table.empty();
         getListItemAttachments("Agendamentos - Responsáveis", tabAnexoEnvase.ID, table);
     }
 
     var tabAnexoGerente = ProcurarAprovacaoPorAbaAnaliseId($('#txtAtt-tab-analise-qualidade-ger').closest('div.tab-pane').attr('id'));
-    if ( tabAnexoGerente != null ){
+
+    if (tabAnexoGerente != null) {
         var table = $("#data-table-anexo-qualid-ger");
-        table.empty()
+        table.empty();
         getListItemAttachments("Agendamentos - Responsáveis", tabAnexoGerente.ID, table);
     }
 
     var tabAnexoFabricacao = ProcurarAprovacaoPorAbaAnaliseId($('#txtAtt-tab-analise-fabricacao').closest('div.tab-pane').attr('id'));
-    if ( tabAnexoFabricacao != null ){
+
+    if (tabAnexoFabricacao != null) {
         var table = $("#data-table-anexo-fabricacao");
-        table.empty()
+        table.empty();
         getListItemAttachments("Agendamentos - Responsáveis", tabAnexoFabricacao.ID, table );
     }
 
     var tabAnexoFabrica = ProcurarAprovacaoPorAbaAnaliseId($('#txtAtt-tab-analise-fabrica').closest('div.tab-pane').attr('id'));
-    if ( tabAnexoFabrica != null ){
+
+    if (tabAnexoFabrica != null) {
         var table = $("#data-table-anexo-fabrica");
-        table.empty()
+        table.empty();
         getListItemAttachments("Agendamentos - Responsáveis", tabAnexoFabrica.ID, table);
     }
 
     var tabAnexoInovDe = ProcurarAprovacaoPorAbaAnaliseId($('#txtAtt-tab-analise-inovDe').closest('div.tab-pane').attr('id'));
-    if ( tabAnexoInovDe != null ){
+
+    if (tabAnexoInovDe != null) {
         var table = $("#data-table-anexo-inovDe");
-        table.empty()
+        table.empty();
         getListItemAttachments("Agendamentos - Responsáveis", tabAnexoInovDe.ID, table);
     }
 
     var tabAnexoInovDfResp = ProcurarAprovacaoPorAbaAnaliseId($('#txtAtt-tab-analise-inovDf').closest('div.tab-pane').attr('id'));
-    if ( tabAnexoInovDfResp != null ){
+    if (tabAnexoInovDfResp != null) {
         var table = $("#data-table-anexo-inov-df-resp");
-        table.empty()
+        table.empty();
         getListItemAttachments("Agendamentos - Responsáveis", tabAnexoInovDfResp.ID, table);
     }
 
     var tabAnexoMeioAmbiente = ProcurarAprovacaoPorAbaAnaliseId($('#txtAtt-tab-analise-meio-ambiente').closest('div.tab-pane').attr('id'));
-    if ( tabAnexoMeioAmbiente != null ){
+
+    if (tabAnexoMeioAmbiente != null) {
         var table = $("#data-table-anexo-meio-ambiente");
-        table.empty()
+        table.empty();
         getListItemAttachments("Agendamentos - Responsáveis", tabAnexoMeioAmbiente.ID, table );
     }
 }
-
 
 function getListItemAttachments(listTitle, itemId, tableAnexo) {
     var $promise = $.Deferred();
@@ -4254,7 +4236,7 @@ $(document).ready(function () {
         ResetarAgendamento();
         RegistrarBotoes();
 
-        var id = getUrlParameter('ID');
+        var id = getUrlParameter('loteid') == '' ? getUrlParameter('ID') : getUrlParameter('loteid');
 
         if (id == '') {
             ModificarFormState(EM_CRIACAO);
@@ -4264,7 +4246,7 @@ $(document).ready(function () {
 
         setTimeout(function () {
             carregarBotoesAnexo();
-            carregarPainelAnexo();
+            CarregarPaineisDeAnexos();
             bloquearBotoesAbaAnexo();
         }, 3000);
     });
