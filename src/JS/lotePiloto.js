@@ -3704,7 +3704,7 @@ function DerivarAgendamento() {
     $('#produtoDescricao').val("");
     ModificarStatusPorFormState(EM_CRIACAO);
     ModificarFormState(EM_CRIACAO);
-    window.history.pushState("object", "", "main.aspx?action=new");
+    window.history.pushState("object", '', _spPageContextInfo.siteAbsoluteUrl + "/Lists/Agendamentos/NewForm.aspx");
 }
 
 function ValidarQtdPecas() {
@@ -3717,7 +3717,7 @@ function RegistrarBotoes() {
     $btnSalvar.click(function () {
         SalvarAgendamento().then(function () {
             var id = $('input[name="ID"]').val();
-            window.history.pushState('Object', '', '/sites/DEV_LotePiloto/SiteAssets/main.aspx?action=edit&loteid=' + id);
+            window.history.pushState('Object', '', _spPageContextInfo.siteAbsoluteUrl + '/Lists/Agendamentos/DispForm.aspx?ID=' + id);
             bloquearBotoesAbaAnexo();
 
             if (id) {
@@ -3994,7 +3994,7 @@ function InicializarHistorico() {
 }
 
 function CarregarHistorico(lista, id) {
-    $historicoIframe[0].contentWindow.document.location.href = 'https://naturabr.sharepoint.com/sites/DEV_LotePiloto/_layouts/15/Versions.aspx?list=' + lista + '&ID=' + id + '&IsDlg=1';
+    $historicoIframe[0].contentWindow.document.location.href = _spPageContextInfo.siteAbsoluteUrl + '/_layouts/15/Versions.aspx?list=' + lista + '&ID=' + id + '&IsDlg=1';
 }
 
 function CarregarHistoricoPorAgendamento(id) {
