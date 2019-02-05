@@ -3981,7 +3981,13 @@ function InicializarHistorico() {
 
         $(frameDocument).ready(function () {
             $(frameDocument).find('body').css('overflow', 'auto');
+
+            $(frameDocument).find('table .ms-vb a').click(function () {
+                return false;
+            });
+
             frameWindow.oBuildMenu = frameWindow.BuildMenu;
+            frameWindow.ViewVersion = function () {};
 
             frameWindow.BuildMenu = function (a, f) {
                 var menu = frameWindow.oBuildMenu(a, f);
