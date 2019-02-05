@@ -2869,7 +2869,7 @@ function ModificarCamposPorFormState(formState) {
     var $envaseResponsavelPPGer = $('#peoplePickerAbaRespGerEngEnvase_TopSpan_EditorInput');
     var $engFabResponsavelAcompanhamento = $('[name=EngenhariaFabricacaoAcompanhamen]');
     var $engFabResponsavelPPResp = $('#peoplePickerAbaRespRespEngFabricacao_TopSpan_EditorInput');
-    var $engFabResponsavelPPGer = $('#peoplePickerAbaRespRespGerFabricacao_TopSpan_EditorInput');
+    var $engFabResponsavelGer =    $('#peoplePickerAbaRespGerEngFabricacao_TopSpan_EditorInput');
     var $inovDfResponsavelAcompanhamento = $('[name=InovacaoDfAcompanhamento]');
     var $inovDfResponsavelPPResp = $('#peoplePickerAbaRespRespInovDF_TopSpan_EditorInput');
     var $inovDfResponsavelPPGer = $('#peoplePickerAbaRespGerInovDF_TopSpan_EditorInput');
@@ -2879,7 +2879,7 @@ function ModificarCamposPorFormState(formState) {
     var $fabricaResponsavelAcompanhamento = $('[name=FabricaAcompanhamento]');
     var $fabricaResponsavelPPCoordProg = $('#peoplePickerAbaRespCoordProgFabrica_TopSpan_EditorInput');
     var $fabricaResponsavelPPCoordMan = $('#peoplePickerAbaRespCoordManFabrica_TopSpan_EditorInput');
-    var $fabricaResponsavelPPGer = $('#peoplePickerAbaRespGerInovDE_TopSpan_EditorInput');
+    var $fabricaResponsavelPPGer = $('#peoplePickerAbaRespGerFabrica_TopSpan_EditorInput');
     var $qualidadeResponsavelAcompanhamento = $('[name=QualidadeAcompanhamento]');
     var $qualidadeResponsavelPPResp = $('#peoplePickerAbaRespRespQualidade_TopSpan_EditorInput');
     var $qualidadeResponsavelPPGer = $('#peoplePickerAbaRespGerQualidade_TopSpan_EditorInput');
@@ -2935,7 +2935,7 @@ function ModificarCamposPorFormState(formState) {
     $envaseResponsavelPPGer.attr('disabled', true);
     $engFabResponsavelAcompanhamento.attr('disabled', true);
     $engFabResponsavelPPResp.attr('disabled', true);
-    $engFabResponsavelPPGer.attr('disabled', true);
+    $engFabResponsavelGer.attr('disabled', true);
     $inovDfResponsavelAcompanhamento.attr('disabled', true);
     $inovDfResponsavelPPResp.attr('disabled', true);
     $inovDfResponsavelPPGer.attr('disabled', true);
@@ -3025,7 +3025,7 @@ function ModificarCamposPorFormState(formState) {
             $envaseResponsavelPPGer.attr('disabled', false);
             $engFabResponsavelAcompanhamento.attr('disabled', false);
             $engFabResponsavelPPResp.attr('disabled', false);
-            $engFabResponsavelPPGer.attr('disabled', false);
+            $engFabResponsavelGer.attr('disabled', false);
             $inovDfResponsavelAcompanhamento.attr('disabled', false);
             $inovDfResponsavelPPResp.attr('disabled', false);
             $inovDfResponsavelPPGer.attr('disabled', false);
@@ -3084,7 +3084,7 @@ function ModificarCamposPorFormState(formState) {
                     if (usuarioPertenceAoGrupo($xml, engFabricacao)) {
                         $engFabResponsavelAcompanhamento.attr('disabled', false);
                         $engFabResponsavelPPResp.attr('disabled', false);
-                        $engFabResponsavelPPGer.attr('disabled', false);
+                        $engFabResponsavelGer.attr('disabled', false);
                         $LinhaEquipamento.attr('disabled', false);
                         $Observacoes.attr('disabled', false);
                     }
@@ -3142,7 +3142,7 @@ function ModificarCamposPorFormState(formState) {
                         $envaseResponsavelPPGer.attr('disabled', false);
                         $engFabResponsavelAcompanhamento.attr('disabled', false);
                         $engFabResponsavelPPResp.attr('disabled', false);
-                        $engFabResponsavelPPGer.attr('disabled', false);
+                        $engFabResponsavelGer.attr('disabled', false);
                         $inovDfResponsavelAcompanhamento.attr('disabled', false);
                         $inovDfResponsavelPPResp.attr('disabled', false);
                         $inovDfResponsavelPPGer.attr('disabled', false);
