@@ -3976,10 +3976,19 @@ function InicializarHistorico() {
         .append($historicoIframe);
 
     $historicoIframe.on('load', function () {
-        var frameDocument = $historicoIframe[0].contentWindow.document;
+        var frameWindow = $historicoIframe[0].contentWindow;
+        var frameDocument = frameWindow.document;
 
         $(frameDocument).ready(function () {
             $(frameDocument).find('body').css('overflow', 'auto');
+            frameWindow.oBuildMenu = frameWindow.BuildMenu;
+
+            frameWindow.BuildMenu = function (a, f) {
+                var menu = frameWindow.oBuildMenu(a, f);
+                $(menu).find('#ID_ViewVersion').remove();
+
+                return menu;
+            }
         });
     });
 }
