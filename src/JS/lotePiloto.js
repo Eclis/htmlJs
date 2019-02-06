@@ -3184,6 +3184,7 @@ function ModificarCamposPorFormState(formState) {
                     $abaAnalise.find('[name="MeioAmbienteAumentoConsumoAguaLi"]').attr('disabled', false);
                     $abaAnalise.find('[name="MeioAmbienteAumentoConsumoEnergi"]').attr('disabled', false);
                     $abaAnalise.find('[name="MeioAmbienteAumentoConsumoAguaFa"]').attr('disabled', false);
+                    $abaAnalise.find('[name="InserirAnexo"]').attr('disabled', false);
 
                     if (mostrarAbaQualidadeGerente && index != 'Qualidade - Gerente' && !$abaAnalise.find('[name=Resultado] :selected').val().startsWith('Aprovado')) {
                         mostrarAbaQualidadeGerente = false;
@@ -3769,7 +3770,6 @@ function RegistrarBotoes() {
             ModificarFormState(AGENDAMENTO_EM_EDICAO);
         } else if(status == REGISTRO_DE_ANALISE) {
             ModificarFormState(EM_REGISTRO_DE_ANALISE);
-            liberarBotoesAbaAnexo();
         }
     });
 
@@ -4080,26 +4080,6 @@ function bloquearBotoesAbaAnexo(){
     inovde.disabled = true;
     inovdfResp.disabled = true;
     meioAmbiente.disabled = true;
-}
-
-function liberarBotoesAbaAnexo(){
-
-    var qualidResp = document.getElementById('txtAtt-tab-analise-qualidade');
-    var qualidGer = document.getElementById('txtAtt-tab-analise-qualidade-ger');
-    var envaseR = document.getElementById('txtAtt-tab-analise-envase');
-    var fabricacao = document.getElementById('txtAtt-tab-analise-fabricacao');
-    var fabrica = document.getElementById('txtAtt-tab-analise-fabrica');
-    var inovde = document.getElementById('txtAtt-tab-analise-inovDe');
-    var inovdfResp = document.getElementById('txtAtt-tab-analise-inovDf');
-    var meioAmbiente = document.getElementById('txtAtt-tab-analise-meio-ambiente');
-    qualidResp.disabled = false;
-    qualidGer.disabled = false;
-    envaseR.disabled = false;
-    fabricacao.disabled = false;
-    fabrica.disabled = false;
-    inovde.disabled = false;
-    inovdfResp.disabled = false;
-    meioAmbiente.disabled = false;
 }
 
 function CarregarPaineisDeAnexos() {
