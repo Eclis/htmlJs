@@ -1058,7 +1058,12 @@ function ValidarStatusECamposObrigatorios() {
                 NotificarErroValidacao('select', 'select#canceladoMotivo', '', '');
             }
             break;
-        // case EM_CANCELAMENTO:
+        case EM_NAO_EXECUCAO:
+            if ($('select#naoExecutadoMotivo').children('option:selected').val() === 'Selecione uma opção') {
+                erros++;
+                NotificarErroValidacao('select', 'select#naoExecutadoMotivo', '', '');
+            }
+            break;
         // case EM_REGISTRO_DE_ANALISE:
     }
     if (erros > 0) {
