@@ -1049,6 +1049,26 @@ function ValidarAgendamentosAcompanhamentos(tipoDeLote) {
     return errorAgendamentosAcompanhamentos;
 }
 
+function ValidarStatusECamposObrigatorios() {
+    var erros = 0;
+    switch (state) {
+        case EM_CANCELAMENTO:
+            if ($('select#canceladoMotivo').children('option:selected').val() === 'Selecione uma opção') {
+                erros++;
+                NotificarErroValidacao('select', 'select#canceladoMotivo', '', '');
+            }
+            break;
+        // case EM_CANCELAMENTO:
+        // case EM_REGISTRO_DE_ANALISE:
+    }
+    if (erros > 0) {
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
 function ValidarAgendamento() {
     verificarErros();
 
@@ -2971,6 +2991,7 @@ function ModificarCamposPorFormState(formState) {
     $meioAmbienteAcompPPResp.attr('disabled', true);
 
     $('#pills-analise-qualidade-ger').addClass('disabled');
+    bloquearBotoesAbaAnexo();
 
     Object.keys(aprovacoes).forEach(function (index) {
         var aprovacao = aprovacoes[index];
@@ -3717,21 +3738,23 @@ function ValidarQtdPecas() {
 function RegistrarBotoes() {
     var $btnSalvar = $('.btn-salvar');
     $btnSalvar.click(function () {
-        SalvarAgendamento().then(function () {
-            var id = $('input[name="ID"]').val();
-            window.history.pushState('Object', '', _spPageContextInfo.siteAbsoluteUrl + '/Lists/Agendamentos/DispForm.aspx?ID=' + id);
-            bloquearBotoesAbaAnexo();
+        if (ValidarStatusECamposObrigatorios()) {
+            SalvarAgendamento().then(function () {
+                var id = $('input[name="ID"]').val();
+                window.history.pushState('Object', '', _spPageContextInfo.siteAbsoluteUrl + '/Lists/Agendamentos/DispForm.aspx?ID=' + id);
+                bloquearBotoesAbaAnexo();
 
-            if (id) {
-                alert('Alterações salvas');
-            } else {
-                alert('Agendamento salvo');
-            }
-        }).fail(function (response) {
-            alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
-        });
+                if (id) {
+                    alert('Alterações salvas');
+                } else {
+                    alert('Agendamento salvo');
+                }
+            }).fail(function (response) {
+                alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
+            });
 
-        return false;
+            return false;
+        }
     });
 
     $('.btn-carregar').click(function () {
