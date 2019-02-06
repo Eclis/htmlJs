@@ -3167,24 +3167,25 @@ function ModificarCamposPorFormState(formState) {
             Object.keys(aprovacoes).forEach(function (index) {
                 var aprovacao = aprovacoes[index];
 
-                if (aprovacao._abaAnaliseId != null &&
-                        CarregarUsuarioAtual().id == FiltrarIdPorPessoaId(aprovacao.Pessoa) &&
-                        ['Pendente', 'Rascunho'].indexOf(aprovacao.Resultado) != -1) {
+                if (aprovacao._abaAnaliseId != null) {
                     var $abaAnalise = $('#' + aprovacao._abaAnaliseId);
-                    $abaAnalise.find('[name=ExecucaoLoteAcompanhada]').attr('disabled', false);
-                    $abaAnalise.find('[name=Resultado]').attr('disabled', false);
-                    $abaAnalise.find('[name=ObservacoesAnalise]').attr('disabled', false);
-                    $abaAnalise.find('[name="MeioAmbienteAbastecimentoVacuo"]').attr('disabled', false);
-                    $abaAnalise.find('[name="MeioAmbienteAbastecimentoGranel"]').attr('disabled', false);
-                    $abaAnalise.find('[name="MeioAmbienteAbastecimentoManual"]').attr('disabled', false);
-                    $abaAnalise.find('[name="MeioAmbienteAcondicionamentoMate"]').attr('disabled', false);
-                    $abaAnalise.find('[name="MeioAmbienteAcondicionamentoReci"]').attr('disabled', false);
-                    $abaAnalise.find('[name="MeioAmbienteAumentoGeracaoResidu"]').attr('disabled', false);
-                    $abaAnalise.find('[name="MeioAmbienteTipoResiduosGeradosJ"]').attr('disabled', false);
-                    $abaAnalise.find('[name="MeioAmbienteAumentoConsumoAguaLi"]').attr('disabled', false);
-                    $abaAnalise.find('[name="MeioAmbienteAumentoConsumoEnergi"]').attr('disabled', false);
-                    $abaAnalise.find('[name="MeioAmbienteAumentoConsumoAguaFa"]').attr('disabled', false);
-                    $abaAnalise.find('[name="InserirAnexo"]').attr('disabled', false);
+                    if (CarregarUsuarioAtual().id == FiltrarIdPorPessoaId(aprovacao.Pessoa) &&
+                    ['Pendente', 'Rascunho'].indexOf(aprovacao.Resultado) != -1) {
+                        $abaAnalise.find('[name=ExecucaoLoteAcompanhada]').attr('disabled', false);
+                        $abaAnalise.find('[name=Resultado]').attr('disabled', false);
+                        $abaAnalise.find('[name=ObservacoesAnalise]').attr('disabled', false);
+                        $abaAnalise.find('[name="MeioAmbienteAbastecimentoVacuo"]').attr('disabled', false);
+                        $abaAnalise.find('[name="MeioAmbienteAbastecimentoGranel"]').attr('disabled', false);
+                        $abaAnalise.find('[name="MeioAmbienteAbastecimentoManual"]').attr('disabled', false);
+                        $abaAnalise.find('[name="MeioAmbienteAcondicionamentoMate"]').attr('disabled', false);
+                        $abaAnalise.find('[name="MeioAmbienteAcondicionamentoReci"]').attr('disabled', false);
+                        $abaAnalise.find('[name="MeioAmbienteAumentoGeracaoResidu"]').attr('disabled', false);
+                        $abaAnalise.find('[name="MeioAmbienteTipoResiduosGeradosJ"]').attr('disabled', false);
+                        $abaAnalise.find('[name="MeioAmbienteAumentoConsumoAguaLi"]').attr('disabled', false);
+                        $abaAnalise.find('[name="MeioAmbienteAumentoConsumoEnergi"]').attr('disabled', false);
+                        $abaAnalise.find('[name="MeioAmbienteAumentoConsumoAguaFa"]').attr('disabled', false);
+                        $abaAnalise.find('[name="InserirAnexo"]').attr('disabled', false);
+                    }
 
                     if (mostrarAbaQualidadeGerente && index != 'Qualidade - Gerente' && !$abaAnalise.find('[name=Resultado] :selected').val().startsWith('Aprovado')) {
                         mostrarAbaQualidadeGerente = false;
