@@ -1064,7 +1064,25 @@ function ValidarStatusECamposObrigatorios() {
                 NotificarErroValidacao('select', 'select#naoExecutadoMotivo', '', '');
             }
             break;
-        // case EM_REGISTRO_DE_ANALISE:
+        case EM_REGISTRO_DE_ANALISE:
+            Object.keys(aprovacoes).forEach(function (index) {
+                var aprovacao = aprovacoes[index];
+
+                if (aprovacao._abaAnaliseId != null) {
+                    var $abaAnalise = $('#' + aprovacao._abaAnaliseId);
+                    if (CarregarUsuarioAtual().id == FiltrarIdPorPessoaId(aprovacao.Pessoa)) {
+                        var resultado = $abaAnalise.find('[name=Resultado]');
+
+                        var reprovadoMotivo = $abaAnalise.find('[name=ReprovadoMotivo]');
+                        if (resultado.children('option:selected').val() === 'Reprovado'
+                            && reprovadoMotivo.children('option:selected').val() === 'Selecione uma opção') {
+                            erros++;
+                            NotificarErroValidacao('name', reprovadoMotivo, '', '');
+                        }
+                    }
+                }
+            });
+            break;
     }
     if (erros > 0) {
         return false;
@@ -1160,6 +1178,12 @@ function NotificarErroValidacao(controlType, control, controlValidator, message)
                 });
                 break;
             }
+        case 'name':
+            control.css({
+                "border-color": "#a94442",
+                "-webkit-box-shadow": "inset 0 1px 1px rgba(0,0,0,.075)",
+                "box-shadow": "inset 0 1px 1px rgba(0,0,0,.075)"
+            });
     }
 }
 
