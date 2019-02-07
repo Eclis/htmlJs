@@ -2670,6 +2670,7 @@ function InserirResponsavelAgendamento(codigoAgendamento, responsavel, usuario) 
 function InstanciarDateTimePicker() {
     $('.date-time-picker:not([readonly])').daterangepicker({
         opens: 'center',
+        drops: 'up',
         singleDatePicker: true,
         showDropdowns: true,
         timePicker: true,
