@@ -1056,12 +1056,14 @@ function ValidarStatusECamposObrigatorios() {
             if ($('select#canceladoMotivo').children('option:selected').val() === 'Selecione uma opção') {
                 erros++;
                 NotificarErroValidacao('select', 'select#canceladoMotivo', '', '');
+                alert("Favor preencher motivo do cancelamento");
             }
             break;
         case EM_NAO_EXECUCAO:
             if ($('select#naoExecutadoMotivo').children('option:selected').val() === 'Selecione uma opção') {
                 erros++;
                 NotificarErroValidacao('select', 'select#naoExecutadoMotivo', '', '');
+                alert("Favor preencher motivo da não execução");
             }
             break;
         case EM_REGISTRO_DE_ANALISE:
@@ -1078,6 +1080,7 @@ function ValidarStatusECamposObrigatorios() {
                             && reprovadoMotivo.children('option:selected').val() === 'Selecione uma opção') {
                             erros++;
                             NotificarErroValidacao('name', reprovadoMotivo, '', '');
+                            alert("Favor preencher motivo da reprovação");
                         }
                     }
                 }
@@ -1106,6 +1109,7 @@ function ValidarAgendamento() {
     erroTotal = errosPnlGeral + errosAbaProduto + errorAbaAgendamento + errorAgendamentosResponsaveis; //+ errorAgendamentosAcompanhamentos;
 
     if (erroTotal > 0) {
+        alert("Favor preencher os campos obrigatórios");
         return false;
     }
     else {
@@ -1184,6 +1188,7 @@ function NotificarErroValidacao(controlType, control, controlValidator, message)
                 "-webkit-box-shadow": "inset 0 1px 1px rgba(0,0,0,.075)",
                 "box-shadow": "inset 0 1px 1px rgba(0,0,0,.075)"
             });
+            break;
     }
 }
 
