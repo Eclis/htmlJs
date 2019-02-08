@@ -2739,18 +2739,6 @@ function DispararCarregarLinhasEquipamentos() {
     }
 }
 
-function EscolherAgendamento() {
-    var agendamentoId = prompt('Digite o ID do agendamento');
-
-    if (agendamentoId) {
-        ResetarAgendamento();
-
-        CarregarAgendamento(agendamentoId).fail(function (response) {
-            alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
-        });
-    }
-}
-
 function ExcluirResponsaveisAgendamentosPorCodigoAgendamento(codigoAgendamento) {
     $().SPServices.SPUpdateMultipleListItems({
         async: false,
@@ -4165,10 +4153,6 @@ function RegistrarBotoes() {
 
             return false;
         }
-    });
-
-    $('.btn-carregar').click(function () {
-        EscolherAgendamento();
     });
 
     $('.btn-agendar').click(function () {
