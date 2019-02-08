@@ -32,7 +32,6 @@ var historicos = {
     'TIPO_LOTE_ALTERADO':           'Tipo de lote alterado de "%s" para "%s"',
     'MOTIVO_ALTERADO':              'Motivo alterado de "%s" para "%s"',
     'CATEGORIA_PROJETO_ALTERADA':   'Categoria alterada de "%s" para "%s"',
-    'FABRICA_TERCEIRA_ADICIONADA':  'Fábrica "%s" adicionada',
     'LINHA_EQUIPAMENTO_ALTERADA':   'Linha/Equipamento alterada de "%s" para "%s"',
     'GRAU_COMPLEXIDADE_ALTERADO':   'Complexidade alterada de %s para %s',
     'OBSERVACOES_ADICIONADAS':      'Observação adicionada',
@@ -1568,7 +1567,6 @@ function AtributoNumber(number) {
 
 function AtualizarAgendamento(id) {
     var $promise = $.Deferred();
-    AtualizarAgendamentoEmMemoria();
     CalcularCamposCalculaveis();
     ModificarStatusPorFormState(state);
     var campos = [];
@@ -1663,10 +1661,12 @@ function AtualizarAgendamentoEmMemoria() {
     });
 }
 
-function RegistrarHistoricoPendente(historico, antigo, novo) {
+function RegistrarHistoricoPendente(historico) {
+    AtualizarAgendamentoEmMemoria();
+
     historicosPendentes.push({
-        codigoAgendamento: novo.CodigoAgendamento,
-        mensagem: GerarMensagemHistorico(historico, antigo, novo)
+        codigoAgendamento: agendamento.CodigoAgendamento,
+        mensagem: GerarMensagemHistorico(historico, null, agendamento)
     });
 }
 
@@ -1731,7 +1731,7 @@ function GerarMensagemHistorico(historico, antigo, novo) {
         case historicos.EXECUTADO:                   return sprintf(historicos.EXECUTADO, novo.RegistroAnalisesInicio);
         case historicos.NAO_EXECUTADO:               return sprintf(historicos.NAO_EXECUTADO, novo.NaoExecutadoMotivo);
         case historicos.STATUS_ALTERADO:             return sprintf(historicos.STATUS_ALTERADO, novo.Status);
-        case historicos.CANCELADO:                   return sprintf(historicos.CANCELADO, novo.ID, novo.CanceladoMotivo);
+        case historicos.CANCELADO:                   return sprintf(historicos.CANCELADO, novo.CodigoAgendamento, novo.CanceladoMotivo);
         case historicos.TIPO_LOTE_ALTERADO:          return sprintf(historicos.TIPO_LOTE_ALTERADO, antigo.TipoLote, novo.TipoLote);
         case historicos.MOTIVO_ALTERADO:             return sprintf(historicos.MOTIVO_ALTERADO, antigo.Motivo, novo.Motivo);
         case historicos.CATEGORIA_PROJETO_ALTERADA:  return sprintf(historicos.CATEGORIA_PROJETO_ALTERADA, antigo.CategoriaProjeto, novo.CategoriaProjeto);
@@ -2828,7 +2828,6 @@ function GerarISPClientPeoplePickerEntityPorUsuario(usuario) {
 
 function InserirAgendamento() {
     var $promise = $.Deferred();
-    AtualizarAgendamentoEmMemoria();
     CalcularCamposCalculaveis();
     var campos = [];
     agendamento = {};
@@ -2900,7 +2899,7 @@ function InserirAgendamento() {
                 return response;
             });
         }).then(function (response) {
-            RegistrarHistoricoPendente(historicos.CRIADO, null, agendamento);
+            RegistrarHistoricoPendente(historicos.CRIADO);
 
             return InserirHistoricosPendentes().then(function () {
                 return response;
@@ -3639,18 +3638,19 @@ function ModificarStatusPorFormState(formState) {
             $status.val(REGISTRO_DE_ANALISE);
             break;
         case EM_CANCELAMENTO:
+            RegistrarHistoricoPendente(historicos.CANCELADO);
             $status.val(CANCELADO);
             break;
         case EM_NAO_EXECUCAO:
-            RegistrarHistoricoPendente(historicos.NAO_EXECUTADO, null, agendamento);
-            RegistrarHistoricoPendente(historicos.AGUARDANDO_REAGENDAMENTO, null, agendamento);
+            RegistrarHistoricoPendente(historicos.NAO_EXECUTADO);
+            RegistrarHistoricoPendente(historicos.AGUARDANDO_REAGENDAMENTO);
             $status.val(LOTE_NAO_EXECUTADO);
             break;
         case APROVADO:
             $status.val(APROVADO);
             break;
         case REPROVADO:
-            RegistrarHistoricoPendente(historicos.LOTE_REPROVADO, null, agendamento);
+            RegistrarHistoricoPendente(historicos.LOTE_REPROVADO);
             $status.val(REPROVADO);
             break;
         case EM_CRIACAO:
@@ -3664,7 +3664,7 @@ function ModificarStatusPorFormState(formState) {
             break;
         case EM_REGISTRO_DE_ANALISE:
             if ($("#qualidadeGerResultado :selected").val().startsWith('Aprovado')) {
-                RegistrarHistoricoPendente(historicos.LOTE_APROVADO, null, agendamento);
+                RegistrarHistoricoPendente(historicos.LOTE_APROVADO);
                 $status.val(APROVADO);
             } else {
                 $status.val(REGISTRO_DE_ANALISE);
@@ -4176,14 +4176,14 @@ function RegistrarBotoes() {
     $('.btn-agendar').click(function () {
         if (ValidarAgendamento()) {
             ModificarFormState(AGENDADO);
-            RegistrarHistoricoPendente(historicos.AGENDADO, null, agendamento);
+            RegistrarHistoricoPendente(historicos.AGENDADO);
             SalvarAgendamento();
         }
     });
 
     $('.btn-executado').click(function () {
         ModificarFormState(REGISTRO_DE_ANALISE);
-        RegistrarHistoricoPendente(historicos.EXECUTADO, null, agendamento);
+        RegistrarHistoricoPendente(historicos.EXECUTADO);
         SalvarAgendamento();
     });
 
@@ -4193,7 +4193,6 @@ function RegistrarBotoes() {
     });
 
     $('.btn-cancelar-agendamento').click(function () {
-        RegistrarHistoricoPendente(historicos.CANCELADO, null, agendamento);
         ModificarFormState(EM_CANCELAMENTO);
     });
 
@@ -4221,7 +4220,7 @@ function RegistrarBotoes() {
     });
 
     $('.btn-reagendar').click(function () {
-        RegistrarHistoricoPendente(historicos.REAGENDADO, null, agendamento);
+        RegistrarHistoricoPendente(historicos.REAGENDADO);
         ModificarFormState(RASCUNHO_EM_EDICAO);
     });
 }
