@@ -2831,7 +2831,7 @@ function InserirAgendamento() {
 
         if ($this.is('[type=checkbox]')) {
             campos.push([this.name, $this.prop('checked') ? '1' : '0']);
-        } else if ($this.is('.date-time-picker')) {
+        } else if ($this.is('.date-time-picker') && $this.val() != undefined) {
             campos.push([this.name, moment($this.val(), 'DD/MM/YYYY HH:mm').format('YYYY-MM-DDTHH:mm:ss[-00:00]')]);
         } else if ($this.val() != undefined) {
             campos.push([this.name, $this.val()]);
