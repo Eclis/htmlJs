@@ -1734,7 +1734,7 @@ function GerarMensagemHistorico(historico, antigo, novo) {
         case historicos.OBSERVACOES_ADICIONADAS:     return sprintf(historicos.OBSERVACOES_ADICIONADAS);
         case historicos.RESPONSAVEL_ALTERADO:        return sprintf(historicos.RESPONSAVEL_ALTERADO);
         case historicos.LOTE_CANCELADO:              return sprintf(historicos.LOTE_CANCELADO);
-        case historicos.LOTE_APROVADO:               return sprintf(historicos.LOTE_APROVADO);
+        case historicos.LOTE_APROVADO:               return sprintf(historicos.LOTE_APROVADO, moment(new Date(), 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm'));
         case historicos.LOTE_REPROVADO:              return sprintf(historicos.LOTE_REPROVADO);
         case historicos.AGUARDANDO_REAGENDAMENTO:    return sprintf(historicos.AGUARDANDO_REAGENDAMENTO);
         default:                                     return '';
