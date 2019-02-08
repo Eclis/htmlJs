@@ -1735,7 +1735,7 @@ function GerarMensagemHistorico(historico, antigo, novo) {
         case historicos.RESPONSAVEL_ALTERADO:        return sprintf(historicos.RESPONSAVEL_ALTERADO);
         case historicos.LOTE_CANCELADO:              return sprintf(historicos.LOTE_CANCELADO);
         case historicos.LOTE_APROVADO:               return sprintf(historicos.LOTE_APROVADO, moment(new Date(), 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm'));
-        case historicos.LOTE_REPROVADO:              return sprintf(historicos.LOTE_REPROVADO);
+        case historicos.LOTE_REPROVADO:              return sprintf(historicos.LOTE_REPROVADO, moment(new Date(), 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm'));
         case historicos.AGUARDANDO_REAGENDAMENTO:    return sprintf(historicos.AGUARDANDO_REAGENDAMENTO);
         default:                                     return '';
     }
@@ -1801,7 +1801,10 @@ function ReprovarAgendamentoPorCodigoAgendamento(id) {
 
             if (errorCode == '0x00000000') {
                 $('select#status').val(REPROVADO);
-                $promise.resolve();
+                RegistrarHistoricoPendente(historicos.LOTE_REPROVADO);
+                InserirHistoricosPendentes()
+                    .then($promise.resolve)
+                    .fail($promise.reject);
             } else {
                 $promise.reject({
                     errorCode: errorCode,
@@ -3646,7 +3649,6 @@ function ModificarStatusPorFormState(formState) {
             $status.val(APROVADO);
             break;
         case REPROVADO:
-            RegistrarHistoricoPendente(historicos.LOTE_REPROVADO);
             $status.val(REPROVADO);
             break;
         case EM_CRIACAO:
