@@ -1583,12 +1583,6 @@ function AtualizarAgendamento(id) {
         }
     });
 
-    var $registroAnalisesInicio = $('[name=RegistroAnalisesInicio]');
-
-    if (!$registroAnalisesInicio.val() && state == REGISTRO_DE_ANALISE) {
-        campos.push([$registroAnalisesInicio.attr('name'), moment(new Date(), 'DD/MM/YYYY HH:mm').format('YYYY-MM-DDTHH:mm:ss[-00:00]')]);
-    }
-
     $().SPServices({
         operation: "UpdateListItems",
         async: false,
@@ -3633,13 +3627,15 @@ function ModificarStatusPorFormState(formState) {
     switch (formState) {
         case AGENDADO:
             $status.val(AGENDADO);
+            RegistrarHistoricoPendente(historicos.STATUS_ALTERADO);
             break;
         case REGISTRO_DE_ANALISE:
             $status.val(REGISTRO_DE_ANALISE);
+            RegistrarHistoricoPendente(historicos.STATUS_ALTERADO);
             break;
         case EM_CANCELAMENTO:
-            RegistrarHistoricoPendente(historicos.CANCELADO);
             $status.val(CANCELADO);
+            RegistrarHistoricoPendente(historicos.CANCELADO);
             break;
         case EM_NAO_EXECUCAO:
             RegistrarHistoricoPendente(historicos.NAO_EXECUTADO);
@@ -4182,6 +4178,8 @@ function RegistrarBotoes() {
     });
 
     $('.btn-executado').click(function () {
+        var $registroAnalisesInicio = $('[name=RegistroAnalisesInicio]');
+        $registroAnalisesInicio.val(moment(new Date(), 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm'));
         ModificarFormState(REGISTRO_DE_ANALISE);
         RegistrarHistoricoPendente(historicos.EXECUTADO);
         SalvarAgendamento();
