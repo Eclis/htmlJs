@@ -6,39 +6,13 @@ var coresFabricas = new Array();
 
 var FabricaRESTQuery = "/_api/Web/Lists/GetByTitle('" + Fabrica_LIST + "')/items?$select=ID,Chave";
 var FabricaSelecionada = "*";
-var openFabricaCall = $.ajax({
-    url: _spPageContextInfo.webAbsoluteUrl + FabricaRESTQuery,
-    type: "GET",
-    dataType: "json",
-    headers: {
-        Accept: "application/json;odata=verbose"
-    }
-});
 
 
 var cores = ["#446AC1", "#E490AE", "#FFA565", "#B2B208", "#88D73C", "#2A9983", "#EDA700", "#8B2F9E", "#999090", "#E40000"];
+var openFabricaCall;
 
 
 
-openFabricaCall.done(function (data, textStatus, jqXHR) {
-
-    for (index in data.d.results) {
-        var corNum = index.substr(index.length - 1);
-        var corNome = cores[corNum];
-
-        var cor = {};
-        cor.id = data.d.results[index].ID;
-        cor.cor = corNome;
-
-        coresFabricas.push(cor);
-
-        $('#fabrica-selector').append(
-            $('<option/>')
-                .attr('value', data.d.results[index].ID)
-                .text(data.d.results[index].Chave)
-        );
-    }
-});
 
 $('#fabrica-selector').on('change', function () {
     FabricaSelecionada = this.value;
@@ -48,6 +22,16 @@ $('#fabrica-selector').on('change', function () {
 DisplayTasks();
 
 function DisplayTasks() {
+
+    openFabricaCall = $.ajax({
+        url: _spPageContextInfo.webAbsoluteUrl + FabricaRESTQuery,
+        type: "GET",
+        async: false,
+        dataType: "json",
+        headers: {
+            Accept: "application/json;odata=verbose"
+        }
+    });
 
     var initialLocaleCode = 'pt-br';
     $('#calendar').fullCalendar('destroy');
@@ -82,11 +66,11 @@ function DisplayTasks() {
         eventLimit: true,
         navLinks: true,
         droppable: false, // this allows things to be dropped onto the calendar
-        //update the end date when a user drags and drops an event 
+        //update the end date when a user drags and drops an event
         eventDrop: function (event, delta, revertFunc) {
             UpdateTask(event.id, event.end);
         },
-        //put the events on the calendar 
+        //put the events on the calendar
         events: function (start, end, timezone, callback) {
             startDate = start.format('YYYY-MM-DD');
             endDate = end.format('YYYY-MM-DD');
@@ -110,38 +94,42 @@ function DisplayTasks() {
             });
 
             opencall.done(function (data, textStatus, jqXHR) {
-				var cores = ["#446AC1", "#E490AE", "#FFA565", "#B2B208", "#88D73C", "#2A9983", "#EDA700", "#8B2F9E", "#999090", "#E40000"];
+                var cores = ["#446AC1", "#E490AE", "#FFA565", "#B2B208", "#88D73C", "#2A9983", "#EDA700", "#8B2F9E", "#999090", "#E40000"];
 
                 var events = [];
                 for (index in data.d.results) {
                     var fabrica = "";
                     var titulo = data.d.results[index].CodigoProduto;
-					var descricaoProduto = data.d.results[index].DescricaoProduto;
+                    var descricaoProduto = data.d.results[index].DescricaoProduto;
                     var tipoLote = data.d.results[index].TipoLote;
                     var cor = "#E40000";
                     var inicio = moment.utc(data.d.results[index].InicioProgramado).local();
                     var fim = moment.utc(data.d.results[index].FimProgramado).local();
-					var haveraAcompanhamento = (data.d.results[index].HaveraAcompanhamento === "1")
-					var strHaveraAcompanhamento = haveraAcompanhamento ? 'Sim' : 'Não';
-                    // try{
-					if (data.d.results[index].Fabrica.Chave) {
-                        fabrica = data.d.results[index].Fabrica.Chave;
-                        cor = (coresFabricas.filter(obj => { return obj.id === data.d.results[index].Fabrica.ID }))[0].cor
+                    var haveraAcompanhamento = (data.d.results[index].HaveraAcompanhamento === "1")
+                    var strHaveraAcompanhamento = haveraAcompanhamento ? 'Sim' : 'Não';
+                    try{
+                        if (data.d.results[index].Fabrica.Chave) {
+                            fabrica = data.d.results[index].Fabrica.Chave;
+                            cor = (coresFabricas.filter(obj => { return obj.id === data.d.results[index].Fabrica.ID }))[0].cor
+                        }
                     }
-					// }
-					
-					// catch(err){
-						// alert(err);
-					// }
-					if(haveraAcompanhamento){
-						titulo = '\u2690' + " " +titulo;
-					}
+
+                    catch(err){
+                        console.log(err);
+                        console.log(data.d.results[index].Fabrica.ID);
+                        console.log((coresFabricas.filter(obj => { return obj.id === data.d.results[index].Fabrica.ID })));
+                        console.log(data.d.results);
+                        console.log(coresFabricas);
+                    }
+                    if(haveraAcompanhamento){
+                        titulo = '\u2690' + " " +titulo;
+                    }
                     events.push({
                         // title: data.d.results[index].Title ,
                         title: titulo,
                         id: data.d.results[index].ID,
-						border : haveraAcompanhamento ? "dashed" : "solid",
-                        color: cor, //specify the background color and border color can also create a class and use className paramter. 
+                        border : haveraAcompanhamento ? "dashed" : "solid",
+                        color: cor, //specify the background color and border color can also create a class and use className paramter.
                         start: inicio.format('YYYY-MM-DD HH:mm'),
                         end: fim.format('YYYY-MM-DD HH:mm'), //add one day to end date so that calendar properly shows event ending on that day
                         description: descricaoProduto + "<br /><b>Tipo de Lote: </b>" + tipoLote + "<br /><b>Fábrica: </b>" + fabrica + "<br /><b> Haverá acompanhamento: </b>" + strHaveraAcompanhamento + "<br /><b>Início: </b>" + inicio.format('DD-MM-YYYY HH:mm') + "<br /><b>Fim: </b>" + fim.format('DD-MM-YYYY HH:mm')
@@ -184,3 +172,23 @@ function UpdateTask(id, dueDate) {
         DisplayTasks();
     });
 }
+
+openFabricaCall.done(function (data, textStatus, jqXHR) {
+
+    for (index in data.d.results) {
+        var corNum = index.substr(index.length - 1);
+        var corNome = cores[corNum];
+
+        var cor = {};
+        cor.id = data.d.results[index].ID;
+        cor.cor = corNome;
+
+        coresFabricas.push(cor);
+
+        $('#fabrica-selector').append(
+            $('<option/>')
+                .attr('value', data.d.results[index].ID)
+                .text(data.d.results[index].Chave)
+        );
+    }
+});
