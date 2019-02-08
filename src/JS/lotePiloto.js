@@ -19,6 +19,7 @@ var EM_REGISTRO_DE_ANALISE = 'emRegistroDeAnalise';
 var state;
 var aprovacoes = {};
 var agendamento = null;
+var historicosPendentes = [];
 
 var historicos = {
     'CRIADO':                       'Agendamento criado - lote id %d',
@@ -1639,11 +1640,35 @@ function AtualizarAgendamento(id) {
 
         return $.when.apply($, promises).then(function () {
             return response;
+        }).then(function (response) {
+            return InserirHistoricosPendentes().then(function () {
+                return response;
+            });
         });
     });
 }
 
-function InserirHistorico(historico, antigo, novo) {
+function RegistrarHistoricoPendente(historico, antigo, novo) {
+    historicosPendentes.push({
+        codigoAgendamento: novo.CodigoAgendamento,
+        mensagem: GerarMensagemHistorico(historico, antigo, novo)
+    });
+}
+
+function InserirHistoricosPendentes() {
+    var promises = [];
+
+    for (var i = 0; i < historicosPendentes.length; i ++) {
+        var historico = historicosPendentes[i];
+        promises.push(InserirHistorico(historico.codigoAgendamento, historico.mensagem));
+    }
+
+    historicosPendentes = [];
+
+    return $.when.apply($, promises);
+}
+
+function InserirHistorico(codigoAgendamento, mensagem) {
     var $promise = $.Deferred();
 
     $().SPServices({
@@ -1651,8 +1676,8 @@ function InserirHistorico(historico, antigo, novo) {
         batchCmd: "New",
         listName: "Agendamentos - Histórico",
         valuepairs: [
-            ['CodigoAgendamento', novo.CodigoAgendamento],
-            ['Mensagem', GerarMensagemHistorico(historico, antigo, novo)],
+            ['CodigoAgendamento', codigoAgendamento],
+            ['Mensagem', mensagem],
         ],
         completefunc: function (xData, Status) {
             if (Status != 'success') {
@@ -1892,6 +1917,8 @@ function CarregarAgendamento(id) {
 
             var atributos = $registro.get(0).attributes;
             var selectsACarregar = [];
+            agendamento = {};
+            agendamento.CodigoAgendamento = atributos.ows_CodigoAgendamento.value;
 
             $.each(atributos, function () {
                 if (this.value.startsWith('datetime;#')) {
@@ -1902,12 +1929,15 @@ function CarregarAgendamento(id) {
 
                 if ($elemento.is('[type=checkbox]')) {
                     $elemento.prop('checked', this.value == "1");
+                    agendamento[$elemento.attr('name')] = this.value == "1";
                     $elemento.change();
                 } else if ($elemento.is('[type=number]')) {
                     $elemento.val(AtributoNumber(this.value));
+                    agendamento[$elemento.attr('name')] = AtributoNumber(this.value);
                     $elemento.change();
                 } else if ($elemento.is('.date-time-picker')) {
                     $elemento.val(moment(this.value, 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm'));
+                    agendamento[$elemento.attr('name')] = moment(this.value, 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm');
 
                     if ($elemento.is(':not([readonly])')) {
                         $elemento.data('daterangepicker').elementChanged();
@@ -1915,20 +1945,26 @@ function CarregarAgendamento(id) {
 
                     $elemento.change();
                 } else if ($elemento.is('select.select-tabela')) {
+                    agendamento[$elemento.attr('name')] = this.value.slice(0, this.value.indexOf(';#'));
+
                     selectsACarregar[$elemento.attr('name')] = {
                         elemento: $elemento,
                         valor: this.value.slice(0, this.value.indexOf(';#'))
                     };
                 } else if ($elemento.is('select')) {
+                    agendamento[$elemento.attr('name')] = this.value;
+
                     selectsACarregar[$elemento.attr('name')] = {
                         elemento: $elemento,
                         valor: this.value
                     };
                 } else if ($elemento.is('div')) {
                     $elemento.text(this.value);
+                    agendamento[$elemento.attr('name')] = this.value;
                     $elemento.change();
                 } else {
                     $elemento.val(this.value);
+                    agendamento[$elemento.attr('name')] = this.value;
                     $elemento.change();
                 }
             });
@@ -1985,15 +2021,6 @@ function CarregarAgendamentoResponsaveis(agendamento) {
             }
 
             var registros = $(Data.responseText).find('z\\:row');
-
-            if (registros.length <= 0) {
-                $promise.reject({
-                    errorCode: '0x99999998',
-                    errorText: 'Registros de responsáveis não encontrados'
-                });
-
-                return;
-            }
 
             aprovacoes = {};
             var promessas = [];
@@ -2796,10 +2823,10 @@ function InserirAgendamento() {
 
         if ($this.is('[type=checkbox]')) {
             campos.push([this.name, $this.prop('checked') ? '1' : '0']);
-            agendamento[this.name] = $this.prop('checked') ? '1' : '0';
+            agendamento[this.name] = $this.prop('checked');
         } else if ($this.is('.date-time-picker')) {
             campos.push([this.name, moment($this.val(), 'DD/MM/YYYY HH:mm').format('YYYY-MM-DDTHH:mm:ss[-00:00]')]);
-            agendamento[this.name] = moment($this.val(), 'DD/MM/YYYY HH:mm').format('YYYY-MM-DDTHH:mm:ss[-00:00]');
+            agendamento[this.name] = $this.val();
         } else if ($this.val() != undefined) {
             campos.push([this.name, $this.val()]);
             agendamento[this.name] = $this.val();
@@ -2861,7 +2888,9 @@ function InserirAgendamento() {
                 return response;
             });
         }).then(function (response) {
-            return InserirHistorico(historicos.CRIADO, null, agendamento).then(function () {
+            RegistrarHistoricoPendente(historicos.CRIADO, null, agendamento);
+
+            return InserirHistoricosPendentes().then(function () {
                 return response;
             });
         });
@@ -4131,6 +4160,7 @@ function RegistrarBotoes() {
     $('.btn-agendar').click(function () {
         if (ValidarAgendamento()) {
             ModificarFormState(AGENDADO);
+            RegistrarHistoricoPendente(historicos.AGENDADO, null, agendamento);
             SalvarAgendamento();
         }
     });
@@ -4367,7 +4397,7 @@ function CarregarHistorico(codigoAgendamento) {
         }
     });
 
-    $('#historico').append($table);
+    $('#historico').empty().append($table);
 
     return $promise;
 }
