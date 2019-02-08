@@ -24,7 +24,7 @@ var historicosPendentes = [];
 var historicos = {
     'CRIADO':                       'Agendamento criado - lote id %d',
     'AGENDADO':                     'Execução agendada para %s',
-    'REAGENDADO':                   'Execução reagendada para %s\nMotivo: %s\nJustificativa: %s',
+    'REAGENDADO':                   'Execução reagendada para %s',
     'EXECUTADO':                    'Lote executado em %s',
     'NAO_EXECUTADO':                'Lote não executado\nJustificativa: %s',
     'STATUS_ALTERADO':              'Lote em %s',
@@ -1568,6 +1568,7 @@ function AtributoNumber(number) {
 
 function AtualizarAgendamento(id) {
     var $promise = $.Deferred();
+    AtualizarAgendamentoEmMemoria();
     CalcularCamposCalculaveis();
     ModificarStatusPorFormState(state);
     var campos = [];
@@ -1648,6 +1649,20 @@ function AtualizarAgendamento(id) {
     });
 }
 
+function AtualizarAgendamentoEmMemoria() {
+    $('#main [name].salvar-campo').each(function () {
+        var $this = $(this);
+
+        if ($this.is('[type=checkbox]')) {
+            agendamento[this.name] = $this.prop('checked');
+        } else if ($this.is('.date-time-picker')) {
+            agendamento[this.name] = $this.val();
+        } else if ($this.val() != undefined) {
+            agendamento[this.name] = $this.val();
+        }
+    });
+}
+
 function RegistrarHistoricoPendente(historico, antigo, novo) {
     historicosPendentes.push({
         codigoAgendamento: novo.CodigoAgendamento,
@@ -1712,7 +1727,7 @@ function GerarMensagemHistorico(historico, antigo, novo) {
     switch (historico) {
         case historicos.CRIADO:                      return sprintf(historicos.CRIADO, novo.CodigoAgendamento);
         case historicos.AGENDADO:                    return sprintf(historicos.AGENDADO, novo.InicioProgramado);
-        case historicos.REAGENDADO:                  return sprintf(historicos.REAGENDADO); //
+        case historicos.REAGENDADO:                  return sprintf(historicos.REAGENDADO, novo.InicioProgramado);
         case historicos.EXECUTADO:                   return sprintf(historicos.EXECUTADO, novo.RegistroAnalisesInicio);
         case historicos.NAO_EXECUTADO:               return sprintf(historicos.NAO_EXECUTADO, novo.NaoExecutadoMotivo);
         case historicos.STATUS_ALTERADO:             return sprintf(historicos.STATUS_ALTERADO, novo.Status);
@@ -1720,7 +1735,6 @@ function GerarMensagemHistorico(historico, antigo, novo) {
         case historicos.TIPO_LOTE_ALTERADO:          return sprintf(historicos.TIPO_LOTE_ALTERADO, antigo.TipoLote, novo.TipoLote);
         case historicos.MOTIVO_ALTERADO:             return sprintf(historicos.MOTIVO_ALTERADO, antigo.Motivo, novo.Motivo);
         case historicos.CATEGORIA_PROJETO_ALTERADA:  return sprintf(historicos.CATEGORIA_PROJETO_ALTERADA, antigo.CategoriaProjeto, novo.CategoriaProjeto);
-        case historicos.FABRICA_TERCEIRA_ADICIONADA: return sprintf(historicos.FABRICA_TERCEIRA_ADICIONADA); //
         case historicos.LINHA_EQUIPAMENTO_ALTERADA:  return sprintf(historicos.LINHA_EQUIPAMENTO_ALTERADA, antigo.LinhaEquipamento, novo.LinhaEquipamento);
         case historicos.GRAU_COMPLEXIDADE_ALTERADO:  return sprintf(historicos.GRAU_COMPLEXIDADE_ALTERADO, antigo.GrauComplexidade, novo.GrauComplexidade);
         case historicos.OBSERVACOES_ADICIONADAS:     return sprintf(historicos.OBSERVACOES_ADICIONADAS);
@@ -2814,6 +2828,7 @@ function GerarISPClientPeoplePickerEntityPorUsuario(usuario) {
 
 function InserirAgendamento() {
     var $promise = $.Deferred();
+    AtualizarAgendamentoEmMemoria();
     CalcularCamposCalculaveis();
     var campos = [];
     agendamento = {};
@@ -2823,13 +2838,10 @@ function InserirAgendamento() {
 
         if ($this.is('[type=checkbox]')) {
             campos.push([this.name, $this.prop('checked') ? '1' : '0']);
-            agendamento[this.name] = $this.prop('checked');
         } else if ($this.is('.date-time-picker')) {
             campos.push([this.name, moment($this.val(), 'DD/MM/YYYY HH:mm').format('YYYY-MM-DDTHH:mm:ss[-00:00]')]);
-            agendamento[this.name] = $this.val();
         } else if ($this.val() != undefined) {
             campos.push([this.name, $this.val()]);
-            agendamento[this.name] = $this.val();
         }
     });
 
@@ -3630,12 +3642,15 @@ function ModificarStatusPorFormState(formState) {
             $status.val(CANCELADO);
             break;
         case EM_NAO_EXECUCAO:
+            RegistrarHistoricoPendente(historicos.NAO_EXECUTADO, null, agendamento);
+            RegistrarHistoricoPendente(historicos.AGUARDANDO_REAGENDAMENTO, null, agendamento);
             $status.val(LOTE_NAO_EXECUTADO);
             break;
         case APROVADO:
             $status.val(APROVADO);
             break;
         case REPROVADO:
+            RegistrarHistoricoPendente(historicos.LOTE_REPROVADO, null, agendamento);
             $status.val(REPROVADO);
             break;
         case EM_CRIACAO:
@@ -3649,6 +3664,7 @@ function ModificarStatusPorFormState(formState) {
             break;
         case EM_REGISTRO_DE_ANALISE:
             if ($("#qualidadeGerResultado :selected").val().startsWith('Aprovado')) {
+                RegistrarHistoricoPendente(historicos.LOTE_APROVADO, null, agendamento);
                 $status.val(APROVADO);
             } else {
                 $status.val(REGISTRO_DE_ANALISE);
@@ -4167,6 +4183,7 @@ function RegistrarBotoes() {
 
     $('.btn-executado').click(function () {
         ModificarFormState(REGISTRO_DE_ANALISE);
+        RegistrarHistoricoPendente(historicos.EXECUTADO, null, agendamento);
         SalvarAgendamento();
     });
 
@@ -4176,6 +4193,7 @@ function RegistrarBotoes() {
     });
 
     $('.btn-cancelar-agendamento').click(function () {
+        RegistrarHistoricoPendente(historicos.CANCELADO, null, agendamento);
         ModificarFormState(EM_CANCELAMENTO);
     });
 
@@ -4203,6 +4221,7 @@ function RegistrarBotoes() {
     });
 
     $('.btn-reagendar').click(function () {
+        RegistrarHistoricoPendente(historicos.REAGENDADO, null, agendamento);
         ModificarFormState(RASCUNHO_EM_EDICAO);
     });
 }
