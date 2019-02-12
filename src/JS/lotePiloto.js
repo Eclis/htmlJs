@@ -18,7 +18,8 @@ var EM_REGISTRO_DE_ANALISE = 'emRegistroDeAnalise';
 
 var state;
 var aprovacoes = {};
-var agendamento = null;
+var memoriaAgendamentoNovo = null;
+var memoriaAgendamentoAntigo = null;
 var historicosPendentes = [];
 
 var historicos = {
@@ -273,6 +274,15 @@ var historicos = {
     }
     /* eslint-enable quote-props */
 }(); // eslint-disable-line
+
+jQuery.extend({
+    union: function(array1, array2) {
+        var hash = {}, union = [];
+        $.each($.merge($.merge([], array1), array2), function (index, value) { hash[value] = value; });
+        $.each(hash, function (key, value) { union.push(key); } );
+        return union;
+    }
+});
 
 function ValidarAgendamentosGeral() {
     var errorAgendamentosGeral = 0;
@@ -1569,6 +1579,8 @@ function AtualizarAgendamento(id) {
     var $promise = $.Deferred();
     CalcularCamposCalculaveis();
     ModificarStatusPorFormState(state);
+    AtualizarAgendamentoEmMemoria();
+
     var campos = [];
 
     $('#main [name].salvar-campo').each(function () {
@@ -1642,30 +1654,64 @@ function AtualizarAgendamento(id) {
 }
 
 function AtualizarAgendamentoEmMemoria() {
+    memoriaAgendamentoAntigo = $.extend({}, memoriaAgendamentoNovo);
+
     $('#main [name].salvar-campo').each(function () {
         var $this = $(this);
 
         if ($this.is('[type=checkbox]')) {
-            agendamento[this.name] = $this.prop('checked');
+            memoriaAgendamentoNovo[this.name] = $this.prop('checked');
         } else if ($this.is('.date-time-picker')) {
-            agendamento[this.name] = $this.val();
+            memoriaAgendamentoNovo[this.name] = $this.val();
         } else if ($this.val() != undefined) {
-            agendamento[this.name] = $this.val();
+            memoriaAgendamentoNovo[this.name] = $this.val();
         }
     });
+
+    var chaves = $.union(Object.keys(memoriaAgendamentoAntigo), Object.keys(memoriaAgendamentoNovo));
+
+    for (var i = 0; i < chaves.length; i ++) {
+        var valorAntigo = memoriaAgendamentoAntigo[chaves[i]];
+        var valorNovo = memoriaAgendamentoNovo[chaves[i]];
+
+        if (valorAntigo != valorNovo) {
+            if (chaves[i] == 'TipoLote') {
+                RegistrarHistoricoPendente(historicos.TIPO_LOTE_ALTERADO, true);
+            }
+
+            if (chaves[i] == 'Motivo') {
+                RegistrarHistoricoPendente(historicos.MOTIVO_ALTERADO, true);
+            }
+
+            if (chaves[i] == 'CategoriaProjeto') {
+                RegistrarHistoricoPendente(historicos.CATEGORIA_PROJETO_ALTERADA, true);
+            }
+
+            if (chaves[i] == 'LinhaEquipamento') {
+                RegistrarHistoricoPendente(historicos.LINHA_EQUIPAMENTO_ALTERADA, true);
+            }
+
+            if (chaves[i] == 'GrauComplexidade') {
+                RegistrarHistoricoPendente(historicos.GRAU_COMPLEXIDADE_ALTERADO, true);
+            }
+        }
+    }
 }
 
-function RegistrarHistoricoPendente(historico) {
-    AtualizarAgendamentoEmMemoria();
+function RegistrarHistoricoPendente(historico, naoAtualizar) {
+    if (!naoAtualizar) {
+        AtualizarAgendamentoEmMemoria();
+    }
 
     historicosPendentes.push({
-        codigoAgendamento: agendamento.CodigoAgendamento,
-        mensagem: GerarMensagemHistorico(historico, null, agendamento)
+        codigoAgendamento: memoriaAgendamentoNovo.CodigoAgendamento,
+        mensagem: GerarMensagemHistorico(historico, memoriaAgendamentoAntigo, memoriaAgendamentoNovo)
     });
 }
 
 function InserirHistoricosPendentes() {
     var promises = [];
+    AtualizarAgendamentoEmMemoria();
 
     for (var i = 0; i < historicosPendentes.length; i ++) {
         var historico = historicosPendentes[i];
@@ -1928,8 +1974,8 @@ function CarregarAgendamento(id) {
 
             var atributos = $registro.get(0).attributes;
             var selectsACarregar = [];
-            agendamento = {};
-            agendamento.CodigoAgendamento = atributos.ows_CodigoAgendamento.value;
+            memoriaAgendamentoNovo = {};
+            memoriaAgendamentoNovo.CodigoAgendamento = atributos.ows_CodigoAgendamento.value;
 
             $.each(atributos, function () {
                 if (this.value.startsWith('datetime;#')) {
@@ -1940,15 +1986,15 @@ function CarregarAgendamento(id) {
 
                 if ($elemento.is('[type=checkbox]')) {
                     $elemento.prop('checked', this.value == "1");
-                    agendamento[$elemento.attr('name')] = this.value == "1";
+                    memoriaAgendamentoNovo[$elemento.attr('name')] = this.value == "1";
                     $elemento.change();
                 } else if ($elemento.is('[type=number]')) {
                     $elemento.val(AtributoNumber(this.value));
-                    agendamento[$elemento.attr('name')] = AtributoNumber(this.value);
+                    memoriaAgendamentoNovo[$elemento.attr('name')] = AtributoNumber(this.value);
                     $elemento.change();
                 } else if ($elemento.is('.date-time-picker')) {
                     $elemento.val(moment(this.value, 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm'));
-                    agendamento[$elemento.attr('name')] = moment(this.value, 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm');
+                    memoriaAgendamentoNovo[$elemento.attr('name')] = moment(this.value, 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm');
 
                     if ($elemento.is(':not([readonly])')) {
                         $elemento.data('daterangepicker').elementChanged();
@@ -1956,14 +2002,14 @@ function CarregarAgendamento(id) {
 
                     $elemento.change();
                 } else if ($elemento.is('select.select-tabela')) {
-                    agendamento[$elemento.attr('name')] = this.value.slice(0, this.value.indexOf(';#'));
+                    memoriaAgendamentoNovo[$elemento.attr('name')] = this.value.slice(0, this.value.indexOf(';#'));
 
                     selectsACarregar[$elemento.attr('name')] = {
                         elemento: $elemento,
                         valor: this.value.slice(0, this.value.indexOf(';#'))
                     };
                 } else if ($elemento.is('select')) {
-                    agendamento[$elemento.attr('name')] = this.value;
+                    memoriaAgendamentoNovo[$elemento.attr('name')] = this.value;
 
                     selectsACarregar[$elemento.attr('name')] = {
                         elemento: $elemento,
@@ -1971,11 +2017,11 @@ function CarregarAgendamento(id) {
                     };
                 } else if ($elemento.is('div')) {
                     $elemento.text(this.value);
-                    agendamento[$elemento.attr('name')] = this.value;
+                    memoriaAgendamentoNovo[$elemento.attr('name')] = this.value;
                     $elemento.change();
                 } else {
                     $elemento.val(this.value);
-                    agendamento[$elemento.attr('name')] = this.value;
+                    memoriaAgendamentoNovo[$elemento.attr('name')] = this.value;
                     $elemento.change();
                 }
             });
@@ -2815,7 +2861,7 @@ function InserirAgendamento() {
     var $promise = $.Deferred();
     CalcularCamposCalculaveis();
     var campos = [];
-    agendamento = {};
+    memoriaAgendamentoNovo = {};
 
     $('#main [name].salvar-campo').each(function () {
         var $this = $(this);
@@ -2864,8 +2910,8 @@ function InserirAgendamento() {
 
     return $promise.then(function (response) {
         return GravarCodigoAgendamento(response.record).then(function (response) {
-            agendamento.ID = response.record.attr('ows_ID');
-            agendamento.CodigoAgendamento = response.record.attr('ows_CodigoAgendamento');
+            memoriaAgendamentoNovo.ID = response.record.attr('ows_ID');
+            memoriaAgendamentoNovo.CodigoAgendamento = response.record.attr('ows_CodigoAgendamento');
             let $TipoLote = $('[name=TipoLote]');
             let promises = [];
             let responsaveis = GetResponsaveisPorTipoDeLote($TipoLote.val());
@@ -4600,7 +4646,6 @@ function getAttachmentFiles(listItem) {
 
     return $promise;
 }
-
 
 $(document).ready(function () {
     $('#onetIDListForm').css('width', '100%');
