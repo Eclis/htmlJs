@@ -17,9 +17,10 @@ var EM_NAO_EXECUCAO = 'emNaoExecucao';
 var EM_REGISTRO_DE_ANALISE = 'emRegistroDeAnalise';
 
 var state;
-var aprovacoes = {};
-var memoriaAgendamentoNovo = null;
+var memoriaAprovacoesAntigo = {};
+var memoriaAprovacoesAtual = {};
 var memoriaAgendamentoAntigo = null;
+var memoriaAgendamentoAtual = null;
 var historicosPendentes = [];
 
 var historicos = {
@@ -36,7 +37,8 @@ var historicos = {
     'LINHA_EQUIPAMENTO_ALTERADA':   'Linha/Equipamento alterada de "%s" para "%s"',
     'GRAU_COMPLEXIDADE_ALTERADO':   'Complexidade alterada de %s para %s',
     'OBSERVACOES_ADICIONADAS':      'Observação adicionada',
-    'RESPONSAVEL_ALTERADO':         'Responsável de DF alterado de "%s" para "%s"',
+    'FABRICA_ADICIONADA':           'Fabrica "%s" adicionada',
+    'RESPONSAVEL_ALTERADO':         'Responsável de %s alterado de "%s" para "%s"',
     'LOTE_CANCELADO':               'Lote cancelado em %s',
     'LOTE_APROVADO':                'Lote aprovado em %s',
     'LOTE_REPROVADO':               'Lote reprovado em %s',
@@ -1331,8 +1333,8 @@ function ValidarStatusECamposObrigatorios() {
             }
             break;
         case EM_REGISTRO_DE_ANALISE:
-            Object.keys(aprovacoes).forEach(function (index) {
-                var aprovacao = aprovacoes[index];
+            Object.keys(memoriaAprovacoesAtual).forEach(function (index) {
+                var aprovacao = memoriaAprovacoesAtual[index];
 
                 if (aprovacao._abaAnaliseId != null) {
                     var $abaAnalise = $('#' + aprovacao._abaAnaliseId);
@@ -1654,25 +1656,25 @@ function AtualizarAgendamento(id) {
 }
 
 function AtualizarAgendamentoEmMemoria() {
-    memoriaAgendamentoAntigo = $.extend({}, memoriaAgendamentoNovo);
+    memoriaAgendamentoAntigo = $.extend({}, memoriaAgendamentoAtual);
 
     $('#main [name].salvar-campo').each(function () {
         var $this = $(this);
 
         if ($this.is('[type=checkbox]')) {
-            memoriaAgendamentoNovo[this.name] = $this.prop('checked');
+            memoriaAgendamentoAtual[this.name] = $this.prop('checked');
         } else if ($this.is('.date-time-picker')) {
-            memoriaAgendamentoNovo[this.name] = $this.val();
+            memoriaAgendamentoAtual[this.name] = $this.val();
         } else if ($this.val() != undefined) {
-            memoriaAgendamentoNovo[this.name] = $this.val();
+            memoriaAgendamentoAtual[this.name] = $this.val();
         }
     });
 
-    var chaves = $.union(Object.keys(memoriaAgendamentoAntigo), Object.keys(memoriaAgendamentoNovo));
+    var chaves = $.union(Object.keys(memoriaAgendamentoAntigo), Object.keys(memoriaAgendamentoAtual));
 
     for (var i = 0; i < chaves.length; i ++) {
         var valorAntigo = memoriaAgendamentoAntigo[chaves[i]];
-        var valorNovo = memoriaAgendamentoNovo[chaves[i]];
+        var valorNovo = memoriaAgendamentoAtual[chaves[i]];
 
         if (valorAntigo != valorNovo) {
             if (chaves[i] == 'TipoLote') {
@@ -1694,18 +1696,26 @@ function AtualizarAgendamentoEmMemoria() {
             if (chaves[i] == 'GrauComplexidade') {
                 RegistrarHistoricoPendente(historicos.GRAU_COMPLEXIDADE_ALTERADO, true);
             }
+
+            if (chaves[i] == 'Fabrica') {
+                RegistrarHistoricoPendente(historicos.FABRICA_ADICIONADA, true);
+            }
+
+            if (chaves[i] == 'Observacoes') {
+                RegistrarHistoricoPendente(historicos.OBSERVACOES_ADICIONADAS, true);
+            }
         }
     }
 }
 
-function RegistrarHistoricoPendente(historico, naoAtualizar) {
+function RegistrarHistoricoPendente(historico, naoAtualizar, responsavelNome, responsavelAntigo, responsavelAtual) {
     if (!naoAtualizar) {
         AtualizarAgendamentoEmMemoria();
     }
 
     historicosPendentes.push({
-        codigoAgendamento: memoriaAgendamentoNovo.CodigoAgendamento,
-        mensagem: GerarMensagemHistorico(historico, memoriaAgendamentoAntigo, memoriaAgendamentoNovo)
+        codigoAgendamento: memoriaAgendamentoAtual.CodigoAgendamento,
+        mensagem: GerarMensagemHistorico(historico, memoriaAgendamentoAntigo, memoriaAgendamentoAtual, responsavelNome, responsavelAntigo, responsavelAtual)
     });
 }
 
@@ -1763,7 +1773,7 @@ function InserirHistorico(codigoAgendamento, mensagem) {
     return $promise;
 }
 
-function GerarMensagemHistorico(historico, antigo, novo) {
+function GerarMensagemHistorico(historico, antigo, novo, responsavelNome, responsavelAntigo, responsavelAtual) {
     switch (historico) {
         case historicos.CRIADO:                      return sprintf(historicos.CRIADO, novo.CodigoAgendamento);
         case historicos.AGENDADO:                    return sprintf(historicos.AGENDADO, novo.InicioProgramado);
@@ -1778,7 +1788,7 @@ function GerarMensagemHistorico(historico, antigo, novo) {
         case historicos.LINHA_EQUIPAMENTO_ALTERADA:  return sprintf(historicos.LINHA_EQUIPAMENTO_ALTERADA, antigo.LinhaEquipamento, novo.LinhaEquipamento);
         case historicos.GRAU_COMPLEXIDADE_ALTERADO:  return sprintf(historicos.GRAU_COMPLEXIDADE_ALTERADO, antigo.GrauComplexidade, novo.GrauComplexidade);
         case historicos.OBSERVACOES_ADICIONADAS:     return sprintf(historicos.OBSERVACOES_ADICIONADAS);
-        case historicos.RESPONSAVEL_ALTERADO:        return sprintf(historicos.RESPONSAVEL_ALTERADO);
+        case historicos.RESPONSAVEL_ALTERADO:        return sprintf(historicos.RESPONSAVEL_ALTERADO, responsavelNome, responsavelAntigo, responsavelAtual);
         case historicos.LOTE_CANCELADO:              return sprintf(historicos.LOTE_CANCELADO);
         case historicos.LOTE_APROVADO:               return sprintf(historicos.LOTE_APROVADO, moment(new Date(), 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm'));
         case historicos.LOTE_REPROVADO:              return sprintf(historicos.LOTE_REPROVADO, moment(new Date(), 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm'));
@@ -1864,9 +1874,11 @@ function ReprovarAgendamentoPorCodigoAgendamento(id) {
 }
 
 function AtualizarResponsavelAgendamento(codigoAgendamento, responsavel, usuario) {
-    if (aprovacoes[responsavel.nome] == null) {
+    if (memoriaAprovacoesAtual[responsavel.nome] == null) {
         return InserirResponsavelAgendamento(codigoAgendamento, responsavel, usuario);
     }
+
+    memoriaAprovacoesAntigo = $.extend({}, memoriaAprovacoesAtual);
 
     return AtualizarAprovacaoEmMemoria(responsavel).then(function (aprovacao) {
         var $promise = $.Deferred();
@@ -1974,8 +1986,8 @@ function CarregarAgendamento(id) {
 
             var atributos = $registro.get(0).attributes;
             var selectsACarregar = [];
-            memoriaAgendamentoNovo = {};
-            memoriaAgendamentoNovo.CodigoAgendamento = atributos.ows_CodigoAgendamento.value;
+            memoriaAgendamentoAtual = {};
+            memoriaAgendamentoAtual.CodigoAgendamento = atributos.ows_CodigoAgendamento.value;
 
             $.each(atributos, function () {
                 if (this.value.startsWith('datetime;#')) {
@@ -1986,15 +1998,15 @@ function CarregarAgendamento(id) {
 
                 if ($elemento.is('[type=checkbox]')) {
                     $elemento.prop('checked', this.value == "1");
-                    memoriaAgendamentoNovo[$elemento.attr('name')] = this.value == "1";
+                    memoriaAgendamentoAtual[$elemento.attr('name')] = this.value == "1";
                     $elemento.change();
                 } else if ($elemento.is('[type=number]')) {
                     $elemento.val(AtributoNumber(this.value));
-                    memoriaAgendamentoNovo[$elemento.attr('name')] = AtributoNumber(this.value);
+                    memoriaAgendamentoAtual[$elemento.attr('name')] = AtributoNumber(this.value);
                     $elemento.change();
                 } else if ($elemento.is('.date-time-picker')) {
                     $elemento.val(moment(this.value, 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm'));
-                    memoriaAgendamentoNovo[$elemento.attr('name')] = moment(this.value, 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm');
+                    memoriaAgendamentoAtual[$elemento.attr('name')] = moment(this.value, 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm');
 
                     if ($elemento.is(':not([readonly])')) {
                         $elemento.data('daterangepicker').elementChanged();
@@ -2002,14 +2014,14 @@ function CarregarAgendamento(id) {
 
                     $elemento.change();
                 } else if ($elemento.is('select.select-tabela')) {
-                    memoriaAgendamentoNovo[$elemento.attr('name')] = this.value.slice(0, this.value.indexOf(';#'));
+                    memoriaAgendamentoAtual[$elemento.attr('name')] = this.value.slice(0, this.value.indexOf(';#'));
 
                     selectsACarregar[$elemento.attr('name')] = {
                         elemento: $elemento,
                         valor: this.value.slice(0, this.value.indexOf(';#'))
                     };
                 } else if ($elemento.is('select')) {
-                    memoriaAgendamentoNovo[$elemento.attr('name')] = this.value;
+                    memoriaAgendamentoAtual[$elemento.attr('name')] = this.value;
 
                     selectsACarregar[$elemento.attr('name')] = {
                         elemento: $elemento,
@@ -2017,11 +2029,11 @@ function CarregarAgendamento(id) {
                     };
                 } else if ($elemento.is('div')) {
                     $elemento.text(this.value);
-                    memoriaAgendamentoNovo[$elemento.attr('name')] = this.value;
+                    memoriaAgendamentoAtual[$elemento.attr('name')] = this.value;
                     $elemento.change();
                 } else {
                     $elemento.val(this.value);
-                    memoriaAgendamentoNovo[$elemento.attr('name')] = this.value;
+                    memoriaAgendamentoAtual[$elemento.attr('name')] = this.value;
                     $elemento.change();
                 }
             });
@@ -2048,11 +2060,11 @@ function CarregarAgendamento(id) {
 }
 
 function ProcurarAprovacaoPorAbaAnaliseId(abaAnaliseId) {
-    var chaves = Object.keys(aprovacoes);
+    var chaves = Object.keys(memoriaAprovacoesAtual);
 
     for (var i = 0; i < chaves.length; i ++) {
-        if (aprovacoes[chaves[i]]._abaAnaliseId == abaAnaliseId) {
-            return aprovacoes[chaves[i]];
+        if (memoriaAprovacoesAtual[chaves[i]]._abaAnaliseId == abaAnaliseId) {
+            return memoriaAprovacoesAtual[chaves[i]];
         }
     }
 
@@ -2079,13 +2091,13 @@ function CarregarAgendamentoResponsaveis(agendamento) {
 
             var registros = $(Data.responseText).find('z\\:row');
 
-            aprovacoes = {};
+            memoriaAprovacoesAtual = {};
             var promessas = [];
 
             $.each(registros, function () {
                 var responsavel = GetResponsavelPorNomeETipoDeLote(this.attributes.ows_TipoResponsavel.value, $('#tipoDeLote').val());
 
-                aprovacoes[this.attributes.ows_TipoResponsavel.value] = {
+                memoriaAprovacoesAtual[this.attributes.ows_TipoResponsavel.value] = {
                     ID: this.attributes.ows_ID.value,
                     Pessoa: this.attributes.ows_Pessoa.value,
                     TipoResponsavel: this.attributes.ows_TipoResponsavel.value,
@@ -2137,39 +2149,40 @@ function CarregarAgendamentoResponsaveis(agendamento) {
 }
 
 function AtualizarAprovacaoEmMemoria(responsavel) {
-    aprovacoes[responsavel.nome].Pessoa = null;
+    memoriaAprovacoesAntigo[responsavel.nome] = $.extend({}, memoriaAprovacoesAtual[responsavel.nome]);
+    memoriaAprovacoesAtual[responsavel.nome].Pessoa = null;
 
     if (responsavel.abaAnaliseId) {
         var $abaAnalise = $('#' + responsavel.abaAnaliseId);
-        aprovacoes[responsavel.nome].ExecucaoLoteAcompanhada = $abaAnalise.find('[name=ExecucaoLoteAcompanhada]').prop('checked') ? '1' : '0';
-        aprovacoes[responsavel.nome].Resultado = $abaAnalise.find('[name=Resultado]').val();
-        aprovacoes[responsavel.nome].Observacoes = $abaAnalise.find('[name=ObservacoesAnalise]').val();
-        aprovacoes[responsavel.nome].ReprovadoMotivo = $abaAnalise.find('[name=ReprovadoMotivo]').val();
+        memoriaAprovacoesAtual[responsavel.nome].ExecucaoLoteAcompanhada = $abaAnalise.find('[name=ExecucaoLoteAcompanhada]').prop('checked') ? '1' : '0';
+        memoriaAprovacoesAtual[responsavel.nome].Resultado = $abaAnalise.find('[name=Resultado]').val();
+        memoriaAprovacoesAtual[responsavel.nome].Observacoes = $abaAnalise.find('[name=ObservacoesAnalise]').val();
+        memoriaAprovacoesAtual[responsavel.nome].ReprovadoMotivo = $abaAnalise.find('[name=ReprovadoMotivo]').val();
 
         if (responsavel.nome == 'Meio Ambiente - Responsável') {
             switch ($('[name=TipoLote]').val()) {
                 case 'Brinde':
                     var $brinde = $('#brindeMeioAmbiente');
-                    aprovacoes[responsavel.nome].ExecucaoLoteAcompanhada = $brinde.find('[name=ExecucaoLoteAcompanhada]').prop('checked') ? '1' : '0';
+                    memoriaAprovacoesAtual[responsavel.nome].ExecucaoLoteAcompanhada = $brinde.find('[name=ExecucaoLoteAcompanhada]').prop('checked') ? '1' : '0';
                     break;
                 case 'Envase':
                     var $envase = $('#envaseMeioAmbiente');
-                    aprovacoes[responsavel.nome].ExecucaoLoteAcompanhada = $envase.find('[name=ExecucaoLoteAcompanhada]').prop('checked') ? '1' : '0';
-                    aprovacoes[responsavel.nome].MeioAmbienteAumentoGeracaoResidu = $envase.find('[name=MeioAmbienteAumentoGeracaoResidu]').prop('checked') ? '1' : '0';
-                    aprovacoes[responsavel.nome].MeioAmbienteTipoResiduosGeradosJ = $envase.find('[name=MeioAmbienteTipoResiduosGeradosJ]').prop('checked') ? '1' : '0';
-                    aprovacoes[responsavel.nome].MeioAmbienteAumentoConsumoAguaLi = $envase.find('[name=MeioAmbienteAumentoConsumoAguaLi]').prop('checked') ? '1' : '0';
-                    aprovacoes[responsavel.nome].MeioAmbienteAcondicionamentoMate = $envase.find('[name=MeioAmbienteAcondicionamentoMate]').val();
-                    aprovacoes[responsavel.nome].MeioAmbienteAcondicionamentoReci = $envase.find('[name=MeioAmbienteAcondicionamentoReci]').val();
+                    memoriaAprovacoesAtual[responsavel.nome].ExecucaoLoteAcompanhada = $envase.find('[name=ExecucaoLoteAcompanhada]').prop('checked') ? '1' : '0';
+                    memoriaAprovacoesAtual[responsavel.nome].MeioAmbienteAumentoGeracaoResidu = $envase.find('[name=MeioAmbienteAumentoGeracaoResidu]').prop('checked') ? '1' : '0';
+                    memoriaAprovacoesAtual[responsavel.nome].MeioAmbienteTipoResiduosGeradosJ = $envase.find('[name=MeioAmbienteTipoResiduosGeradosJ]').prop('checked') ? '1' : '0';
+                    memoriaAprovacoesAtual[responsavel.nome].MeioAmbienteAumentoConsumoAguaLi = $envase.find('[name=MeioAmbienteAumentoConsumoAguaLi]').prop('checked') ? '1' : '0';
+                    memoriaAprovacoesAtual[responsavel.nome].MeioAmbienteAcondicionamentoMate = $envase.find('[name=MeioAmbienteAcondicionamentoMate]').val();
+                    memoriaAprovacoesAtual[responsavel.nome].MeioAmbienteAcondicionamentoReci = $envase.find('[name=MeioAmbienteAcondicionamentoReci]').val();
                     break;
                 case 'Fabricação':
                     var $fabricacao = $('#fabricacaoMeioAmbiente');
-                    aprovacoes[responsavel.nome].ExecucaoLoteAcompanhada = $fabricacao.find('[name=ExecucaoLoteAcompanhada]').prop('checked') ? '1' : '0';
-                    aprovacoes[responsavel.nome].MeioAmbienteAumentoConsumoAguaLi = $fabricacao.find('[name=MeioAmbienteAumentoConsumoAguaLi]').prop('checked') ? '1' : '0';
-                    aprovacoes[responsavel.nome].MeioAmbienteAumentoConsumoEnergi = $fabricacao.find('[name=MeioAmbienteAumentoConsumoEnergi]').val();
-                    aprovacoes[responsavel.nome].MeioAmbienteAumentoConsumoAguaFa = $fabricacao.find('[name=MeioAmbienteAumentoConsumoAguaFa]').val();
-                    aprovacoes[responsavel.nome].MeioAmbienteAbastecimentoGranel = $fabricacao.find('[name=MeioAmbienteAbastecimentoGranel]').val();
-                    aprovacoes[responsavel.nome].MeioAmbienteAbastecimentoManual = $fabricacao.find('[name=MeioAmbienteAbastecimentoManual]').val();
-                    aprovacoes[responsavel.nome].MeioAmbienteAbastecimentoVacuo = $fabricacao.find('[name=MeioAmbienteAbastecimentoVacuo]').val();
+                    memoriaAprovacoesAtual[responsavel.nome].ExecucaoLoteAcompanhada = $fabricacao.find('[name=ExecucaoLoteAcompanhada]').prop('checked') ? '1' : '0';
+                    memoriaAprovacoesAtual[responsavel.nome].MeioAmbienteAumentoConsumoAguaLi = $fabricacao.find('[name=MeioAmbienteAumentoConsumoAguaLi]').prop('checked') ? '1' : '0';
+                    memoriaAprovacoesAtual[responsavel.nome].MeioAmbienteAumentoConsumoEnergi = $fabricacao.find('[name=MeioAmbienteAumentoConsumoEnergi]').val();
+                    memoriaAprovacoesAtual[responsavel.nome].MeioAmbienteAumentoConsumoAguaFa = $fabricacao.find('[name=MeioAmbienteAumentoConsumoAguaFa]').val();
+                    memoriaAprovacoesAtual[responsavel.nome].MeioAmbienteAbastecimentoGranel = $fabricacao.find('[name=MeioAmbienteAbastecimentoGranel]').val();
+                    memoriaAprovacoesAtual[responsavel.nome].MeioAmbienteAbastecimentoManual = $fabricacao.find('[name=MeioAmbienteAbastecimentoManual]').val();
+                    memoriaAprovacoesAtual[responsavel.nome].MeioAmbienteAbastecimentoVacuo = $fabricacao.find('[name=MeioAmbienteAbastecimentoVacuo]').val();
                     break;
             }
         }
@@ -2178,13 +2191,22 @@ function AtualizarAprovacaoEmMemoria(responsavel) {
     var usuarioDoPeoplePicker = PegarUsuarioDoPeoplePicker(responsavel.peoplePickerId);
 
     if (!usuarioDoPeoplePicker) {
-        return $.when(aprovacoes[responsavel.nome]);
+        return $.when(memoriaAprovacoesAtual[responsavel.nome]);
     }
 
     return CarregarUsuarioPorLoginName(usuarioDoPeoplePicker.loginName).then(function (usuario) {
-        aprovacoes[responsavel.nome].Pessoa = usuario.id;
+        memoriaAprovacoesAtual[responsavel.nome].Pessoa = usuario.id;
 
-        return aprovacoes[responsavel.nome];
+        if (FiltrarIdPorPessoaId(memoriaAprovacoesAntigo[responsavel.nome].Pessoa) != FiltrarIdPorPessoaId(memoriaAprovacoesAtual[responsavel.nome].Pessoa)) {
+            RegistrarHistoricoPendente(
+                historicos.RESPONSAVEL_ALTERADO,
+                true,
+                responsavel.nome,
+                FiltrarNomeUsuarioPorPessoaId(memoriaAprovacoesAntigo[responsavel.nome].Pessoa),
+                usuario.nome);
+        }
+
+        return memoriaAprovacoesAtual[responsavel.nome];
     });
 }
 
@@ -2193,6 +2215,8 @@ function FiltrarNomeUsuarioPorPessoaId(pessoaId) {
 }
 
 function FiltrarIdPorPessoaId(pessoaId) {
+    pessoaId = '' + pessoaId;
+
     if (pessoaId.indexOf(';#') == -1) {
         return pessoaId;
     }
@@ -2201,7 +2225,7 @@ function FiltrarIdPorPessoaId(pessoaId) {
 }
 
 function PreencherAbaAnalises(responsavel) {
-    var aprovacao = aprovacoes[responsavel.nome];
+    var aprovacao = memoriaAprovacoesAtual[responsavel.nome];
 
     if (responsavel.abaAnaliseId == null) {
         return;
@@ -2861,7 +2885,7 @@ function InserirAgendamento() {
     var $promise = $.Deferred();
     CalcularCamposCalculaveis();
     var campos = [];
-    memoriaAgendamentoNovo = {};
+    memoriaAgendamentoAtual = {};
 
     $('#main [name].salvar-campo').each(function () {
         var $this = $(this);
@@ -2910,8 +2934,8 @@ function InserirAgendamento() {
 
     return $promise.then(function (response) {
         return GravarCodigoAgendamento(response.record).then(function (response) {
-            memoriaAgendamentoNovo.ID = response.record.attr('ows_ID');
-            memoriaAgendamentoNovo.CodigoAgendamento = response.record.attr('ows_CodigoAgendamento');
+            memoriaAgendamentoAtual.ID = response.record.attr('ows_ID');
+            memoriaAgendamentoAtual.CodigoAgendamento = response.record.attr('ows_CodigoAgendamento');
             let $TipoLote = $('[name=TipoLote]');
             let promises = [];
             let responsaveis = GetResponsaveisPorTipoDeLote($TipoLote.val());
@@ -3431,8 +3455,8 @@ function ModificarCamposPorFormState(formState) {
     $('#pills-analise-qualidade-ger').addClass('disabled');
     bloquearBotoesAbaAnexo();
 
-    Object.keys(aprovacoes).forEach(function (index) {
-        var aprovacao = aprovacoes[index];
+    Object.keys(memoriaAprovacoesAtual).forEach(function (index) {
+        var aprovacao = memoriaAprovacoesAtual[index];
 
         if (aprovacao._abaAnaliseId != null) {
             var $abaAnalise = $('#' + aprovacao._abaAnaliseId);
@@ -3623,8 +3647,8 @@ function ModificarCamposPorFormState(formState) {
 
             var mostrarAbaQualidadeGerente = true;
 
-            Object.keys(aprovacoes).forEach(function (index) {
-                var aprovacao = aprovacoes[index];
+            Object.keys(memoriaAprovacoesAtual).forEach(function (index) {
+                var aprovacao = memoriaAprovacoesAtual[index];
 
                 if (aprovacao._abaAnaliseId != null) {
                     var $abaAnalise = $('#' + aprovacao._abaAnaliseId);
