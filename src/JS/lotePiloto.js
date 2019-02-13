@@ -1634,6 +1634,7 @@ function AtualizarAgendamento(id) {
         let $TipoLote = $('[name=TipoLote]');
         let promises = [];
         let responsaveis = GetResponsaveisPorTipoDeLote($TipoLote.val());
+        memoriaAprovacoesAntigo = $.extend(true, {}, memoriaAprovacoesAtual);
 
         $.each(responsaveis, function (i, responsavel) {
             var usuarioDoPeoplePicker = PegarUsuarioDoPeoplePicker(responsavel.peoplePickerId);
@@ -1676,7 +1677,7 @@ function AtualizarAgendamentoEmMemoria() {
         var valorAntigo = memoriaAgendamentoAntigo[chaves[i]];
         var valorNovo = memoriaAgendamentoAtual[chaves[i]];
 
-        if (valorAntigo != valorNovo) {
+        if ((valorAntigo || valorNovo) && valorNovo != valorAntigo) {
             if (chaves[i] == 'TipoLote') {
                 RegistrarHistoricoPendente(historicos.TIPO_LOTE_ALTERADO, true);
             }
@@ -1782,12 +1783,13 @@ function GerarMensagemHistorico(historico, antigo, novo, responsavelNome, respon
         case historicos.NAO_EXECUTADO:               return sprintf(historicos.NAO_EXECUTADO, novo.NaoExecutadoMotivo);
         case historicos.STATUS_ALTERADO:             return sprintf(historicos.STATUS_ALTERADO, novo.Status);
         case historicos.CANCELADO:                   return sprintf(historicos.CANCELADO, novo.CodigoAgendamento, novo.CanceladoMotivo);
-        case historicos.TIPO_LOTE_ALTERADO:          return sprintf(historicos.TIPO_LOTE_ALTERADO, antigo.TipoLote, novo.TipoLote);
-        case historicos.MOTIVO_ALTERADO:             return sprintf(historicos.MOTIVO_ALTERADO, antigo.Motivo, novo.Motivo);
-        case historicos.CATEGORIA_PROJETO_ALTERADA:  return sprintf(historicos.CATEGORIA_PROJETO_ALTERADA, antigo.CategoriaProjeto, novo.CategoriaProjeto);
-        case historicos.LINHA_EQUIPAMENTO_ALTERADA:  return sprintf(historicos.LINHA_EQUIPAMENTO_ALTERADA, antigo.LinhaEquipamento, novo.LinhaEquipamento);
-        case historicos.GRAU_COMPLEXIDADE_ALTERADO:  return sprintf(historicos.GRAU_COMPLEXIDADE_ALTERADO, antigo.GrauComplexidade, novo.GrauComplexidade);
+        case historicos.TIPO_LOTE_ALTERADO:          return sprintf(historicos.TIPO_LOTE_ALTERADO, (!antigo.TipoLote) ? antigo.TipoLote : '', (!novo.TipoLote) ? novo.TipoLote : '');
+        case historicos.MOTIVO_ALTERADO:             return sprintf(historicos.MOTIVO_ALTERADO, (!antigo.Motivo) ? antigo.Motivo : '', (!novo.Motivo) ? novo.Motivo : '');
+        case historicos.CATEGORIA_PROJETO_ALTERADA:  return sprintf(historicos.CATEGORIA_PROJETO_ALTERADA, (antigo.CategoriaProjeto) ? antigo.CategoriaProjeto : '', (novo.CategoriaProjeto) ? novo.CategoriaProjeto : '');
+        case historicos.LINHA_EQUIPAMENTO_ALTERADA:  return sprintf(historicos.LINHA_EQUIPAMENTO_ALTERADA, (antigo.LinhaEquipamento) ? $('#linhaEquipamento option[value=' + antigo.LinhaEquipamento + ']').text() : '', (novo.LinhaEquipamento) ? $('#linhaEquipamento option[value=' + novo.LinhaEquipamento + ']').text() : '');
+        case historicos.GRAU_COMPLEXIDADE_ALTERADO:  return sprintf(historicos.GRAU_COMPLEXIDADE_ALTERADO, (antigo.GrauComplexidade) ? antigo.GrauComplexidade : '', (novo.GrauComplexidade) ? novo.GrauComplexidade : '');
         case historicos.OBSERVACOES_ADICIONADAS:     return sprintf(historicos.OBSERVACOES_ADICIONADAS);
+        case historicos.FABRICA_ADICIONADA:          return sprintf(historicos.FABRICA_ADICIONADA, $('#fabrica option:selected').text());
         case historicos.RESPONSAVEL_ALTERADO:        return sprintf(historicos.RESPONSAVEL_ALTERADO, responsavelNome, responsavelAntigo, responsavelAtual);
         case historicos.LOTE_CANCELADO:              return sprintf(historicos.LOTE_CANCELADO);
         case historicos.LOTE_APROVADO:               return sprintf(historicos.LOTE_APROVADO, moment(new Date(), 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm'));
@@ -1877,8 +1879,6 @@ function AtualizarResponsavelAgendamento(codigoAgendamento, responsavel, usuario
     if (memoriaAprovacoesAtual[responsavel.nome] == null) {
         return InserirResponsavelAgendamento(codigoAgendamento, responsavel, usuario);
     }
-
-    memoriaAprovacoesAntigo = $.extend({}, memoriaAprovacoesAtual);
 
     return AtualizarAprovacaoEmMemoria(responsavel).then(function (aprovacao) {
         var $promise = $.Deferred();
@@ -2092,6 +2092,7 @@ function CarregarAgendamentoResponsaveis(agendamento) {
             var registros = $(Data.responseText).find('z\\:row');
 
             memoriaAprovacoesAtual = {};
+            memoriaAprovacoesAntigo = {};
             var promessas = [];
 
             $.each(registros, function () {
@@ -2122,6 +2123,8 @@ function CarregarAgendamentoResponsaveis(agendamento) {
                     _abaAcompanhanteId: responsavel.abaAcompanhanteId,
                 };
 
+                memoriaAprovacoesAntigo[this.attributes.ows_TipoResponsavel.value] = $.extend({}, memoriaAprovacoesAtual[this.attributes.ows_TipoResponsavel.value]);
+
                 var usuarioNome = FiltrarNomeUsuarioPorPessoaId(this.attributes.ows_Pessoa.value);
 
                 promessas.push(CarregarUsuarioPorLoginName(usuarioNome).then(function (usuario) {
@@ -2149,7 +2152,6 @@ function CarregarAgendamentoResponsaveis(agendamento) {
 }
 
 function AtualizarAprovacaoEmMemoria(responsavel) {
-    memoriaAprovacoesAntigo[responsavel.nome] = $.extend({}, memoriaAprovacoesAtual[responsavel.nome]);
     memoriaAprovacoesAtual[responsavel.nome].Pessoa = null;
 
     if (responsavel.abaAnaliseId) {
@@ -2211,6 +2213,10 @@ function AtualizarAprovacaoEmMemoria(responsavel) {
 }
 
 function FiltrarNomeUsuarioPorPessoaId(pessoaId) {
+    if (!pessoaId) {
+        return '';
+    }
+
     return pessoaId.slice(pessoaId.indexOf(';#') + ';#'.length);
 }
 

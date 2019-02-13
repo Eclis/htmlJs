@@ -18,9 +18,14 @@ gulp.task('build-ts', function () {
 });
 
 gulp.task('build-js', function () {
+    if (usuario != 'main') {
+        return gulp.src('src/JS/*.js')
+            .pipe(replace('/Lists/Agendamentos/DispForm.aspx\\?ID=', '/SiteAssets/' + usuario + '.aspx?loteid='))
+            .pipe(replace('/Lists/Agendamentos/NewForm.aspx', '/SiteAssets/' + usuario + '.aspx'))
+            .pipe(gulp.dest('dist'));
+    }
+
     return gulp.src('src/JS/*.js')
-        .pipe(replace('/sites/DEV_LotePiloto/SiteAssets/main.aspx', '/sites/DEV_LotePiloto/SiteAssets/' + usuario + '.aspx'))
-        .pipe(replace('/sites/DEV_LotePiloto/SiteAssets/main-agendamentos.aspx', '/sites/DEV_LotePiloto/SiteAssets/' + usuario + '-agendamentos.aspx'))
         .pipe(gulp.dest('dist'));
 });
 
