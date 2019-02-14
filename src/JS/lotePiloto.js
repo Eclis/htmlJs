@@ -1677,7 +1677,7 @@ function AtualizarAgendamentoEmMemoria() {
         var valorAntigo = memoriaAgendamentoAntigo[chaves[i]];
         var valorNovo = memoriaAgendamentoAtual[chaves[i]];
 
-        if ((valorAntigo || valorNovo) && valorNovo != valorAntigo) {
+        if (valorAntigo && valorNovo != valorAntigo) {
             if (chaves[i] == 'TipoLote') {
                 RegistrarHistoricoPendente(historicos.TIPO_LOTE_ALTERADO, true);
             }
@@ -1783,8 +1783,8 @@ function GerarMensagemHistorico(historico, antigo, novo, responsavelNome, respon
         case historicos.NAO_EXECUTADO:               return sprintf(historicos.NAO_EXECUTADO, novo.NaoExecutadoMotivo);
         case historicos.STATUS_ALTERADO:             return sprintf(historicos.STATUS_ALTERADO, novo.Status);
         case historicos.CANCELADO:                   return sprintf(historicos.CANCELADO, novo.CodigoAgendamento, novo.CanceladoMotivo);
-        case historicos.TIPO_LOTE_ALTERADO:          return sprintf(historicos.TIPO_LOTE_ALTERADO, (!antigo.TipoLote) ? antigo.TipoLote : '', (!novo.TipoLote) ? novo.TipoLote : '');
-        case historicos.MOTIVO_ALTERADO:             return sprintf(historicos.MOTIVO_ALTERADO, (!antigo.Motivo) ? antigo.Motivo : '', (!novo.Motivo) ? novo.Motivo : '');
+        case historicos.TIPO_LOTE_ALTERADO:          return sprintf(historicos.TIPO_LOTE_ALTERADO, (antigo.TipoLote) ? antigo.TipoLote : '', (novo.TipoLote) ? novo.TipoLote : '');
+        case historicos.MOTIVO_ALTERADO:             return sprintf(historicos.MOTIVO_ALTERADO, (antigo.Motivo) ? antigo.Motivo : '', (novo.Motivo) ? novo.Motivo : '');
         case historicos.CATEGORIA_PROJETO_ALTERADA:  return sprintf(historicos.CATEGORIA_PROJETO_ALTERADA, (antigo.CategoriaProjeto) ? antigo.CategoriaProjeto : '', (novo.CategoriaProjeto) ? novo.CategoriaProjeto : '');
         case historicos.LINHA_EQUIPAMENTO_ALTERADA:  return sprintf(historicos.LINHA_EQUIPAMENTO_ALTERADA, (antigo.LinhaEquipamento) ? $('#linhaEquipamento option[value=' + antigo.LinhaEquipamento + ']').text() : '', (novo.LinhaEquipamento) ? $('#linhaEquipamento option[value=' + novo.LinhaEquipamento + ']').text() : '');
         case historicos.GRAU_COMPLEXIDADE_ALTERADO:  return sprintf(historicos.GRAU_COMPLEXIDADE_ALTERADO, (antigo.GrauComplexidade) ? antigo.GrauComplexidade : '', (novo.GrauComplexidade) ? novo.GrauComplexidade : '');
