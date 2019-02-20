@@ -45,7 +45,6 @@ var historicos = {
     'AGUARDANDO_REAGENDAMENTO':     'Lote aguardando reagendamento',
 };
 
-var idAgendamento;
 /* global window, exports, define */
 
 !function() {
@@ -1642,7 +1641,7 @@ function AtualizarAgendamento(id) {
 
             if (usuarioDoPeoplePicker) {
                 promises.push(CarregarUsuarioPorLoginName(usuarioDoPeoplePicker.loginName).then(function (usuario) {
-                    return AtualizarResponsavelAgendamento(response.record.attr('ows_ID'), response.record.attr('ows_CodigoAgendamento'), responsavel, usuario);
+                    return AtualizarResponsavelAgendamento(response.record.attr('ows_CodigoAgendamento'), responsavel, usuario);
                 }));
             }
         });
@@ -1876,9 +1875,9 @@ function ReprovarAgendamentoPorCodigoAgendamento(id) {
     return $promise;
 }
 
-function AtualizarResponsavelAgendamento(idAgendamento, codigoAgendamento, responsavel, usuario) {
+function AtualizarResponsavelAgendamento(codigoAgendamento, responsavel, usuario) {
     if (memoriaAprovacoesAtual[responsavel.nome] == null) {
-        return InserirResponsavelAgendamento(idAgendamento, codigoAgendamento, responsavel, usuario);
+        return InserirResponsavelAgendamento(codigoAgendamento, responsavel, usuario);
     }
 
     return AtualizarAprovacaoEmMemoria(responsavel).then(function (aprovacao) {
@@ -1990,23 +1989,12 @@ function CarregarAgendamento(id) {
             memoriaAgendamentoAtual = {};
             memoriaAgendamentoAtual.CodigoAgendamento = atributos.ows_CodigoAgendamento.value;
 
-            var codigoAgendamento = 0;
             $.each(atributos, function () {
                 if (this.value.startsWith('datetime;#')) {
                     this.value = this.value.slice('datetime;#'.length);
                 }
 
                 var $elemento = $('#main [name=' + this.name.substr(4) + ' i]');
-
-                var comparar = this.name.substr(4);
-
-                if (comparar === 'codigoagendamento') {
-                     codigoAgendamento = this.value;
-                }
-
-                if (comparar === 'id' ) {
-                    idAgendamento = this.value;
-                }
 
                 if ($elemento.is('[type=checkbox]')) {
                     $elemento.prop('checked', this.value == "1");
@@ -2049,10 +2037,6 @@ function CarregarAgendamento(id) {
                     $elemento.change();
                 }
             });
-
-
-            var inputId = $('#inputId');
-            inputId.val(codigoAgendamento);
 
             PreencherSelectsConsiderandoDependencia(selectsACarregar);
 
@@ -2964,9 +2948,10 @@ function InserirAgendamento() {
 
             $.each(responsaveis, function (i, responsavel) {
                 var usuarioDoPeoplePicker = PegarUsuarioDoPeoplePicker(responsavel.peoplePickerId);
+
                 if (usuarioDoPeoplePicker) {
                     promises.push(CarregarUsuarioPorLoginName(usuarioDoPeoplePicker.loginName).then(function (usuario) {
-                        return InserirResponsavelAgendamento(response.record.attr('ows_ID'), response.record.attr('ows_CodigoAgendamento'), responsavel, usuario);
+                        return InserirResponsavelAgendamento(response.record.attr('ows_CodigoAgendamento'), responsavel, usuario);
                     }));
                 }
             });
@@ -3073,7 +3058,7 @@ function PegarUsuarioDoPeoplePicker(peoplePickerId) {
     };
 }
 
-function InserirResponsavelAgendamento(idAgendamento, codigoAgendamento, responsavel, usuario) {
+function InserirResponsavelAgendamento(codigoAgendamento, responsavel, usuario) {
     var $promise = $.Deferred();
 
     $().SPServices({
@@ -3084,8 +3069,7 @@ function InserirResponsavelAgendamento(idAgendamento, codigoAgendamento, respons
             ['CodigoAgendamento', codigoAgendamento],
             ['Title', codigoAgendamento + ' - ' + responsavel.nome],
             ['TipoResponsavel', responsavel.nome],
-            ['Pessoa', usuario.id],
-            ['IDAgendamento', idAgendamento]
+            ['Pessoa', usuario.id]
         ],
         completefunc: function (xData, Status) {
             if (Status != 'success') {
@@ -4139,6 +4123,7 @@ function SalvarAgendamento() {
             return CarregarAgendamento(response.record.attr('ows_ID'));
         });
     }
+
     return InserirAgendamento().then(function (response) {
         return CarregarAgendamento(response.record.attr('ows_ID'));
     });
@@ -4227,12 +4212,9 @@ function ValidarQtdPecas() {
 function RegistrarBotoes() {
     var $btnSalvar = $('.btn-salvar');
     $btnSalvar.click(function () {
-
-        var codigoAgendamento = $('#inputId').val();
-        $('#inputId').val(idAgendamento);
         if (ValidarStatusECamposObrigatorios()) {
             SalvarAgendamento().then(function () {
-                var id = idAgendamento;
+                var id = $('input[name="ID"]').val();
                 window.history.pushState('Object', '', _spPageContextInfo.siteAbsoluteUrl + '/Lists/Agendamentos/DispForm.aspx?ID=' + id);
                 bloquearBotoesAbaAnexo();
 
@@ -4242,7 +4224,6 @@ function RegistrarBotoes() {
                     alert('Agendamento salvo');
                 }
             }).fail(function (response) {
-                $('#inputId').val(codigoAgendamento)
                 alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
             });
 
