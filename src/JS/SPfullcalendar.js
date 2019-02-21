@@ -12,7 +12,10 @@ var cores = ["#446AC1", "#E490AE", "#FFA565", "#B2B208", "#88D73C", "#2A9983", "
 var openFabricaCall;
 
 
+function ConvertToString(valor){
 
+    return valorTratado = !valor ?  "" : String(valor);
+}
 
 $('#fabrica-selector').on('change', function () {
     FabricaSelecionada = this.value;
@@ -99,9 +102,9 @@ function DisplayTasks() {
                 var events = [];
                 for (index in data.d.results) {
                     var fabrica = "";
-                    var titulo = data.d.results[index].CodigoProduto;
-                    var descricaoProduto = data.d.results[index].DescricaoProduto;
-                    var tipoLote = data.d.results[index].TipoLote;
+                    var titulo = ConvertToString(data.d.results[index].CodigoProduto);
+                    var descricaoProduto = ConvertToString(data.d.results[index].DescricaoProduto);
+                    var tipoLote = ConvertToString(data.d.results[index].TipoLote);
                     var cor = "#E40000";
                     var inicio = moment.utc(data.d.results[index].InicioProgramado).local();
                     var fim = moment.utc(data.d.results[index].FimProgramado).local();
@@ -109,7 +112,7 @@ function DisplayTasks() {
                     var strHaveraAcompanhamento = haveraAcompanhamento ? 'Sim' : 'Não';
                     try{
                         if (data.d.results[index].Fabrica.Chave) {
-                            fabrica = data.d.results[index].Fabrica.Chave;
+                            fabrica = ConvertToString(data.d.results[index].Fabrica.Chave);
                             cor = (coresFabricas.filter(obj => { return obj.id === data.d.results[index].Fabrica.ID }))[0].cor
                         }
                     }
