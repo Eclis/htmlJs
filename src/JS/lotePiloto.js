@@ -1913,27 +1913,9 @@ function AtualizarResponsavelAgendamento(codigoAgendamento, responsavel, usuario
                 if (errorCode == '0x00000000') {
                     var $record = $response.find('z\\:row:first');
 
-                    if ($('select#status').val() == REGISTRO_DE_ANALISE && aprovacao.Resultado == 'Reprovado') {
-                        CarregarStatusAgendamentoPorCodigoAgendamento($('input[name="ID"]').val()).then(function (status) {
-                            if (status == REGISTRO_DE_ANALISE) {
-                                ReprovarAgendamentoPorCodigoAgendamento($('input[name="ID"]').val()).then(function () {
-                                    $promise.resolve({
-                                        record: $record
-                                    });
-                                }).fail(function (error) {
-                                    $promise.reject(error);
-                                });
-                            } else {
-                                $promise.resolve({
-                                    record: $record
-                                });
-                            }
-                        });
-                    } else {
-                        $promise.resolve({
-                            record: $record
-                        });
-                    }
+                    $promise.resolve({
+                        record: $record
+                    });
                 } else {
                     $promise.reject({
                         errorCode: errorCode,
@@ -3659,7 +3641,7 @@ function ModificarCamposPorFormState(formState) {
                 if (aprovacao._abaAnaliseId != null) {
                     var $abaAnalise = $('#' + aprovacao._abaAnaliseId);
                     if (CarregarUsuarioAtual().id == FiltrarIdPorPessoaId(aprovacao.Pessoa) &&
-                    ['Pendente', 'Rascunho'].indexOf(aprovacao.Resultado) != -1) {
+                            ['Pendente', 'Rascunho'].indexOf(aprovacao.Resultado) != -1) {
                         $abaAnalise.find('[name=ExecucaoLoteAcompanhada]').attr('disabled', false);
                         $abaAnalise.find('[name=Resultado]').attr('disabled', false);
                         $abaAnalise.find('[name=ObservacoesAnalise]').attr('disabled', false);
@@ -3676,7 +3658,7 @@ function ModificarCamposPorFormState(formState) {
                         $abaAnalise.find('[name="InserirAnexo"]').attr('disabled', false);
                     }
 
-                    if (mostrarAbaQualidadeGerente && index != 'Qualidade - Gerente' && !$abaAnalise.find('[name=Resultado] :selected').val().startsWith('Aprovado')) {
+                    if (mostrarAbaQualidadeGerente && index != 'Qualidade - Gerente' && ['Pendente', 'Rascunho'].indexOf(aprovacao.Resultado) != -1) {
                         mostrarAbaQualidadeGerente = false;
                     }
                 }
@@ -3728,6 +3710,9 @@ function ModificarStatusPorFormState(formState) {
             if ($("#qualidadeGerResultado :selected").val().startsWith('Aprovado')) {
                 RegistrarHistoricoPendente(historicos.LOTE_APROVADO);
                 $status.val(APROVADO);
+            } else if ($("#qualidadeGerResultado :selected").val() == 'Reprovado') {
+                RegistrarHistoricoPendente(historicos.LOTE_REPROVADO);
+                $status.val(REPROVADO);
             } else {
                 $status.val(REGISTRO_DE_ANALISE);
             }
