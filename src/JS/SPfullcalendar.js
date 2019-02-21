@@ -2,13 +2,33 @@
 var PATH_TO_DISPFORM = _spPageContextInfo.webAbsoluteUrl  + "/Lists/Agendamentos/DispForm.aspx";
 var TASK_LIST = "Agendamentos";
 var Fabrica_LIST = "Fábricas Internas e Armazenamento de Fábricas Terceiras";
-var coresFabricas = new Array();
+//var coresFabricas = new Array();
+var coresTipoLote = new Array();
+var cores = ["#446AC1", "#E40000", "#B2B208", "#FFA565", "#88D73C", "#2A9983", "#EDA700", "#8B2F9E", "#999090", "#E490AE"];
+
+
+var tiposLote = ["Brinde","Envase","Fabricação","Picking"];
+
+for (index in tiposLote) {
+    var corNum = index.substr(index.length - 1);
+    var corNome = cores[corNum];
+
+    var cor = {};
+    cor.tipoLote = tiposLote[index];
+    cor.cor = corNome;
+    
+    coresTipoLote.push(cor);
+
+    $("#legenda").append(`<div style="padding-left: 10px;"><span class="legenda" style=" width:20px; height: 20px; background-color: `+ cor.cor+`"></span><span class="legenda">`+ cor.tipoLote+`</span></div>`);
+      
+}
+
+
 
 var FabricaRESTQuery = "/_api/Web/Lists/GetByTitle('" + Fabrica_LIST + "')/items?$select=ID,Chave";
 var FabricaSelecionada = "*";
 
 
-var cores = ["#446AC1", "#E490AE", "#FFA565", "#B2B208", "#88D73C", "#2A9983", "#EDA700", "#8B2F9E", "#999090", "#E40000"];
 var openFabricaCall;
 
 
@@ -81,10 +101,10 @@ function DisplayTasks() {
             var RESTQuery = "";
 
             if (FabricaSelecionada != "*") {
-                RESTQuery = "/_api/Web/Lists/GetByTitle('" + TASK_LIST + "')/items?$select=ID,Title,Status,HaveraAcompanhamento,InicioProgramado,FimProgramado,CodigoProduto,DescricaoProduto,TipoLote,Fabrica/ID,Fabrica/Chave&$expand=Fabrica&$filter=Fabrica/ID eq " + FabricaSelecionada;
+                RESTQuery = "/_api/Web/Lists/GetByTitle('" + TASK_LIST + "')/items?$select=ID,Title,Status,HaveraAcompanhamento,InicioProgramado,FimProgramado,CodigoProduto,DescricaoProduto,TipoLote,Fabrica/ID,Fabrica/Chave&$expand=Fabrica&$filter=(Status eq 'Agendado' or Status eq 'Lote Não Executado') and Fabrica/ID eq " + FabricaSelecionada;
             }
             else {
-                RESTQuery = "/_api/Web/Lists/GetByTitle('" + TASK_LIST + "')/items?$select=ID,Title,Status,HaveraAcompanhamento,InicioProgramado,FimProgramado,CodigoProduto,DescricaoProduto,TipoLote,Fabrica/ID,Fabrica/Chave&$expand=Fabrica";
+                RESTQuery = "/_api/Web/Lists/GetByTitle('" + TASK_LIST + "')/items?$select=ID,Title,Status,HaveraAcompanhamento,InicioProgramado,FimProgramado,CodigoProduto,DescricaoProduto,TipoLote,Fabrica/ID,Fabrica/Chave&$expand=Fabrica&$filter=(Status eq 'Agendado' or Status eq 'Lote Não Executado')";
             }
 
             var opencall = $.ajax({
@@ -97,8 +117,7 @@ function DisplayTasks() {
             });
 
             opencall.done(function (data, textStatus, jqXHR) {
-                var cores = ["#446AC1", "#E490AE", "#FFA565", "#B2B208", "#88D73C", "#2A9983", "#EDA700", "#8B2F9E", "#999090", "#E40000"];
-
+                
                 var events = [];
                 for (index in data.d.results) {
                     var fabrica = "";
@@ -110,10 +129,16 @@ function DisplayTasks() {
                     var fim = moment.utc(data.d.results[index].FimProgramado).local();
                     var haveraAcompanhamento = (data.d.results[index].HaveraAcompanhamento === "1")
                     var strHaveraAcompanhamento = haveraAcompanhamento ? 'Sim' : 'Não';
+                    
+                    
                     try{
+                        if(ConvertToString(data.d.results[index].TipoLote)){
+                            cor = (coresTipoLote.filter(obj => { return obj.tipoLote === data.d.results[index].TipoLote }))[0].cor
+                        }
+
                         if (data.d.results[index].Fabrica.Chave) {
                             fabrica = ConvertToString(data.d.results[index].Fabrica.Chave);
-                            cor = (coresFabricas.filter(obj => { return obj.id === data.d.results[index].Fabrica.ID }))[0].cor
+                           //desativandoCorPorFabrica cor = (coresFabricas.filter(obj => { return obj.id === data.d.results[index].Fabrica.ID }))[0].cor
                         }
                     }
 
@@ -186,7 +211,7 @@ openFabricaCall.done(function (data, textStatus, jqXHR) {
         cor.id = data.d.results[index].ID;
         cor.cor = corNome;
 
-        coresFabricas.push(cor);
+        // removido cores por fabrica coresFabricas.push(cor);
 
         $('#fabrica-selector').append(
             $('<option/>')
