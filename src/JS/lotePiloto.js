@@ -21,6 +21,7 @@ var memoriaAprovacoesAntigo = {};
 var memoriaAprovacoesAtual = {};
 var memoriaAgendamentoAntigo = null;
 var memoriaAgendamentoAtual = null;
+var memoriaGrupos = null;
 var historicosPendentes = [];
 
 var historicos = {
@@ -44,6 +45,19 @@ var historicos = {
     'LOTE_REPROVADO':               'Lote reprovado em %s',
     'AGUARDANDO_REAGENDAMENTO':     'Lote aguardando reagendamento',
 };
+
+var historicosAreas = [
+    'Administradores Lote Piloto',
+    'Área - Engenharia de Fabricação',
+    'Área - Engenharia de Envase',
+    'Área - DL PCL',
+    'Agendamento - Planta Piloto',
+    'Área - Fábrica',
+    'Área - Inovação DF',
+    'Área - Inovação DE',
+    'Área - Qualidade',
+    'Área - Meio Ambiente',
+];
 
 /* global window, exports, define */
 
@@ -1736,6 +1750,14 @@ function InserirHistoricosPendentes() {
 
 function InserirHistorico(codigoAgendamento, mensagem) {
     var $promise = $.Deferred();
+    var area = '';
+
+    for (var i = 0; i < historicosAreas.length; i ++) {
+        if (memoriaGrupos.indexOf(historicosAreas[i]) > -1) {
+            area = historicosAreas[i];
+            break;
+        }
+    }
 
     $().SPServices({
         operation: "UpdateListItems",
@@ -1744,6 +1766,7 @@ function InserirHistorico(codigoAgendamento, mensagem) {
         valuepairs: [
             ['CodigoAgendamento', codigoAgendamento],
             ['Mensagem', mensagem],
+            ['Area', area],
         ],
         completefunc: function (xData, Status) {
             if (Status != 'success') {
@@ -4270,6 +4293,40 @@ function RegistrarBotoes() {
     });
 }
 
+function CarregarGruposDoUsuarioAtual() {
+    return CarregarGruposPorLoginName(CarregarUsuarioAtual().loginName).then(function (grupos) {
+        memoriaGrupos = grupos;
+    });
+}
+
+function CarregarGruposPorLoginName(loginName) {
+    var $promise = $.Deferred();
+    var grupos = [];
+
+    $().SPServices({
+        operation: "GetGroupCollectionFromUser",
+        userLoginName: loginName,
+        completefunc: function (xData, Status) {
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
+                });
+
+                return;
+            }
+
+            $(xData.responseText).find('Group[Name]').each(function () {
+                grupos.push(this.attributes.name.value);
+            });
+
+            $promise.resolve(grupos);
+        }
+    });
+
+    return $promise;
+}
+
 function VerificarGrupoDlPclOuPlantaPiloto() {
     var result = false;
     $().SPServices({
@@ -4434,13 +4491,13 @@ function verificarErros() {
 
 function CarregarHistorico(codigoAgendamento) {
     var $promise = $.Deferred();
-    var $table = $('<table width="100%"><thead class="thead-dark"><tr><th scope="col">Data</th><th scope="col">Usuário</th><th scope="col">Mensagem</th></tr></thead><tbody></tbody></table>');
+    var $table = $('<table width="100%"><thead class="thead-dark"><tr><th scope="col">Data</th><th scope="col">Área</th><th scope="col">Usuário</th><th scope="col">Mensagem</th></tr></thead><tbody></tbody></table>');
 
     $().SPServices({
         operation: 'GetListItems',
         listName: 'Agendamentos - Histórico',
         CAMLQuery: '<Query><Where><Eq><FieldRef Name="CodigoAgendamento" /><Value Type="Text">' + codigoAgendamento + '</Value></Eq></Where></Query>',
-        CAMLViewFields: '<ViewFields><FieldRef Name="Title" /><FieldRef Name="ID" /><FieldRef Name="Mensagem" /><FieldRef Name="Modified" /><FieldRef Name="Created" /><FieldRef Name="Author" /><FieldRef Name="Editor" /></ViewFields>',
+        CAMLViewFields: '<ViewFields><FieldRef Name="Title" /><FieldRef Name="ID" /><FieldRef Name="Area" /><FieldRef Name="Mensagem" /><FieldRef Name="Modified" /><FieldRef Name="Created" /><FieldRef Name="Author" /><FieldRef Name="Editor" /></ViewFields>',
         completefunc: function (Data, Status) {
             if (Status != 'success') {
                 $promise.reject({
@@ -4453,7 +4510,7 @@ function CarregarHistorico(codigoAgendamento) {
 
             $(Data.responseXML).SPFilterNode("z:row").each(function () {
                 var $this = $(this);
-                $table.find('tbody').append('<tr><th scope="row">' + moment($this.attr("ows_Created"), 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm') + '</th><td scope="row">' + FiltrarNomeUsuarioPorPessoaId($this.attr("ows_Author")) + '</td><td scope="row">' + $this.attr("ows_Mensagem") + '</td></tr>');
+                $table.find('tbody').append('<tr><th scope="row">' + moment($this.attr("ows_Created"), 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm') + '</th><td scope="row">' + $this.attr("ows_Area") + '</td><td scope="row">' + FiltrarNomeUsuarioPorPessoaId($this.attr("ows_Author")) + '</td><td scope="row">' + $this.attr("ows_Mensagem") + '</td></tr>');
             });
 
             $promise.resolve();
@@ -4677,7 +4734,8 @@ $(document).ready(function () {
         CarregarMotivoNaoExecutado(),
         InitializeAllPeoplePickers(),
         CarregarListaMotivoAnalise(),
-        CarregarListasDeMeioAmbiente()
+        CarregarListasDeMeioAmbiente(),
+        CarregarGruposDoUsuarioAtual()
     ).then(function () {
         InstanciarDateTimePicker();
         RegistrarBindings();
