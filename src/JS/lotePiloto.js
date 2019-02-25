@@ -373,15 +373,6 @@ function ValidarAgendamentosProduto() {
         LimparValidacao('select', 'select#categoriaDoProjeto', '');
     }
 
-    if ($('input#produtoFormula').val() === null || $('input#produtoFormula').val() == '') {
-        errorAgendamentosProduto++;
-        NotificarErroValidacao('text', 'input#produtoFormula', '', '');
-    }
-    else {
-        LimparValidacao('text', 'input#produtoFormula', '');
-    }
-
-
     if ($('input#produtoQuantidade').val() === null || $('input#produtoQuantidade').val() == '') {
         errorAgendamentosProduto++;
         NotificarErroValidacao('text', 'input#produtoQuantidade', '', '');
@@ -4485,7 +4476,6 @@ function verificarErros() {
         produtoDescricao,
         produtoProjeto,
         categoriaDoProjeto,
-        produtoFormula,
         produtoQuantidade,
         motivo,
         agendamentoCentroCusto,
