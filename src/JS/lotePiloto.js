@@ -2435,6 +2435,7 @@ function CarregarFabricas() {
 
             $(Data.responseXML).SPFilterNode("z:row").each(function () {
                 $('select#fabrica').append('<option value="' + $(this).attr("ows_ID") + '">' + $(this).attr("ows_Title") + ' - ' + $(this).attr("ows_Numero") + '</option>')
+                $('select#maoObra').append('<option value="' + $(this).attr("ows_ID") + '">' + $(this).attr("ows_Title") + ' - ' + $(this).attr("ows_Numero") + '</option>')
             });
 
             $promise.resolve();
@@ -3378,6 +3379,7 @@ function usuarioPertenceAoGrupo($xml, grupo) {
 function ModificarCamposPorFormState(formState) {
     var $TipoLote = $('[name=TipoLote]');
     var $Fabrica = $('[name=Fabrica]');
+    var $MaoObra = $('[name=MaoObra]');
     var $LinhaEquipamento = $('[name=LinhaEquipamento]');
     var $CodigoProduto = $('[name=CodigoProduto]');
     var $LinhaProduto = $('[name=LinhaProduto]');
@@ -3445,6 +3447,12 @@ function ModificarCamposPorFormState(formState) {
 
     $TipoLote.attr('disabled', true);
     $Fabrica.attr('disabled', true);
+    $MaoObra.attr('disabled', true);
+
+    if ($TipoLote.val() != 'Fabricação') {
+        $MaoObra.val('');
+    }
+
     $LinhaEquipamento.attr('disabled', true);
     $CodigoProduto.attr('disabled', true);
     $LinhaProduto.attr('disabled', true);
@@ -3541,6 +3549,11 @@ function ModificarCamposPorFormState(formState) {
         case AGENDAMENTO_EM_EDICAO:
             $TipoLote.attr('disabled', false);
             $Fabrica.attr('disabled', false);
+
+            if ($TipoLote.val() == 'Fabricação') {
+                $MaoObra.attr('disabled', false);
+            }
+
             $LinhaEquipamento.attr('disabled', false);
             $CodigoProduto.attr('disabled', false);
             $LinhaProduto.attr('disabled', false);
@@ -4037,6 +4050,16 @@ function RegistrarBindings() {
 
     $tipoLote.change(function () {
         ModificarAbasPorTipoDeLote(this.value);
+
+        if ([EM_CRIACAO, RASCUNHO_EM_EDICAO, AGENDAMENTO_EM_EDICAO].indexOf(state) > -1) {
+            if ($tipoLote.val() == 'Fabricação') {
+                $('#maoObra').prop('disabled', false);
+            } else {
+                $('#maoObra').prop('disabled', true);
+                $('#maoObra').val('');
+            }
+        }
+
         DispararCarregarLinhasEquipamentos();
     });
 
