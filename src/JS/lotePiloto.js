@@ -1687,7 +1687,11 @@ function AtualizarAgendamento(id) {
 
             if (usuarioDoPeoplePicker) {
                 promises.push(CarregarUsuarioPorLoginName(usuarioDoPeoplePicker.loginName).then(function (usuario) {
-                    return AtualizarResponsavelAgendamento(response.record.attr('ows_CodigoAgendamento'), responsavel, usuario);
+                    return AtualizarResponsavelAgendamento(
+                            memoriaAgendamentoAtual.ID,
+                            memoriaAgendamentoAtual.CodigoAgendamento,
+                            responsavel,
+                            usuario);
                 }));
             }
         });
@@ -1930,9 +1934,13 @@ function ReprovarAgendamentoPorCodigoAgendamento(id) {
     return $promise;
 }
 
-function AtualizarResponsavelAgendamento(codigoAgendamento, responsavel, usuario) {
+function AtualizarResponsavelAgendamento(agendamentoId, codigoAgendamento, responsavel, usuario) {
     if (memoriaAprovacoesAtual[responsavel.nome] == null) {
-        return InserirResponsavelAgendamento(codigoAgendamento, responsavel, usuario);
+        return InserirResponsavelAgendamento(
+                agendamentoId,
+                codigoAgendamento,
+                responsavel,
+                usuario);
     }
 
     return AtualizarAprovacaoEmMemoria(responsavel).then(function (aprovacao) {
@@ -2988,7 +2996,11 @@ function InserirAgendamento() {
 
                 if (usuarioDoPeoplePicker) {
                     promises.push(CarregarUsuarioPorLoginName(usuarioDoPeoplePicker.loginName).then(function (usuario) {
-                        return InserirResponsavelAgendamento(response.record.attr('ows_CodigoAgendamento'), responsavel, usuario);
+                        return InserirResponsavelAgendamento(
+                                memoriaAgendamentoAtual.ID,
+                                memoriaAgendamentoAtual.CodigoAgendamento,
+                                responsavel,
+                                usuario);
                     }));
                 }
             });
@@ -3095,7 +3107,7 @@ function PegarUsuarioDoPeoplePicker(peoplePickerId) {
     };
 }
 
-function InserirResponsavelAgendamento(codigoAgendamento, responsavel, usuario) {
+function InserirResponsavelAgendamento(agendamentoId, codigoAgendamento, responsavel, usuario) {
     var $promise = $.Deferred();
 
     $().SPServices({
@@ -3103,6 +3115,7 @@ function InserirResponsavelAgendamento(codigoAgendamento, responsavel, usuario) 
         batchCmd: "New",
         listName: "Agendamentos - Responsáveis",
         valuepairs: [
+            ['Agendamento', agendamentoId],
             ['CodigoAgendamento', codigoAgendamento],
             ['Title', codigoAgendamento + ' - ' + responsavel.nome],
             ['TipoResponsavel', responsavel.nome],
