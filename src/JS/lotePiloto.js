@@ -1476,26 +1476,8 @@ function LimparValidacoes() {
 }
 
 function AddAttachments(listName, itemId, controlName) {
-    var $promise = $.Deferred();
-
-    $.ajax({
-        url: _spPageContextInfo.siteAbsoluteUrl + "/_api/contextinfo",
-        method: "POST",
-        headers: {
-            "ACCEPT": "application/json;odata=verbose",
-            "Content-Type": "application/json;odata=verbose"
-        },
-        success: function (data) {
-            $promise.resolve(data.d.GetContextWebInformation.FormDigestValue);
-        },
-        error: $promise.reject
-    });
-
-    return $promise.then(function (digest) {
-        return UploadAnexo(digest, listName, itemId, controlName).then(function () {
-            controlName.value = '';
-            CarregarPaineisDeAnexos();
-        }).fail(function (error) {
+    return RequestRestDigest().then(function (digest) {
+        return UploadAnexo(digest, listName, itemId, controlName).fail(function (error) {
             alert(error.errorMessage);
         })
     });
@@ -1528,11 +1510,25 @@ function UploadAnexo(digest, listName, itemId, controlName) {
                 "X-RequestDigest": digest,
                 "Content-Length": fileData.byteLength
             },
-            success: $promise.resolve,
+            success: function () {
+                var $tabelaAnexos = fileInput.closest('div.tab-pane').find('.row .table.table-hover table tbody');
+                var contador = $tabelaAnexos.find('tr').length + 1;
+
+                $tabelaAnexos.append('<tr>' +
+                '   <th scope="row" width="10%">' + contador + '</th>' +
+                '   <td><a href="' + _spPageContextInfo.siteAbsoluteUrl + '/Lists/AgendamentosResponsaveis/Attachments/' + itemId + '/' + fileName + '?web=1" target="_blank">' + fileName + '</a></td>' +
+                '   <td><a name="ExcluirAnexo" href="#" onclick="DeleteAttachmentFile(this, \'Agendamentos - Responsáveis\', \'' + itemId + '\', \'' + fileName + '\'); return false;">Excluir</a></td>' +
+                '</tr>');
+
+                controlName.value = '';
+                $promise.resolve();
+            },
             error: function (data) {
+                controlName.value = '';
+
                 $promise.reject({
-                    errorCode: data.errorCode,
-                    errorMessage: data.error.message.value
+                    errorCode: data.responseJSON.error.code,
+                    errorMessage: data.responseJSON.error.message.value
                 });
             }
         });
@@ -1541,6 +1537,42 @@ function UploadAnexo(digest, listName, itemId, controlName) {
     reader.readAsArrayBuffer(fileInput[0].files[0]);
 
     return $promise;
+}
+
+function RequestRestDigest() {
+    var $promise = $.Deferred();
+
+    $.ajax({
+        url: _spPageContextInfo.siteAbsoluteUrl + "/_api/contextinfo",
+        method: "POST",
+        headers: {
+            "ACCEPT": "application/json;odata=verbose",
+            "Content-Type": "application/json;odata=verbose"
+        },
+        success: function (data) {
+            $promise.resolve(data.d.GetContextWebInformation.FormDigestValue);
+        },
+        error: $promise.reject
+    });
+
+    return $promise;
+}
+
+function DeleteAttachmentFile(element, listName, itemId, fileName) {
+    return RequestRestDigest().then(function (digest) {
+        return $.ajax({
+            url: _spPageContextInfo.siteAbsoluteUrl + "/_api/lists/getByTitle('" + listName + "')/getItemById(" + itemId + ")/AttachmentFiles/getByFileName('" + fileName + "')",
+            method: 'POST',
+            contentType: 'application/json;odata=verbose',
+            headers: {
+                'X-RequestDigest': digest,
+                'X-HTTP-Method' : 'DELETE',
+                'Accept': 'application/json;odata=verbose'
+            }
+        }).then(function () {
+            $(element).closest('tr').remove();
+        });
+    });
 }
 
 // Query the picker for user information.
@@ -3486,6 +3518,7 @@ function ModificarCamposPorFormState(formState) {
             $abaAnalise.find('[name="MeioAmbienteAumentoConsumoAguaLi"]').attr('disabled', true);
             $abaAnalise.find('[name="MeioAmbienteAumentoConsumoEnergi"]').attr('disabled', true);
             $abaAnalise.find('[name="MeioAmbienteAumentoConsumoAguaFa"]').attr('disabled', true);
+            $abaAnalise.find('[name="ExcluirAnexo"]').hide();
         }
     });
 
@@ -3679,6 +3712,7 @@ function ModificarCamposPorFormState(formState) {
                         $abaAnalise.find('[name="MeioAmbienteAumentoConsumoEnergi"]').attr('disabled', false);
                         $abaAnalise.find('[name="MeioAmbienteAumentoConsumoAguaFa"]').attr('disabled', false);
                         $abaAnalise.find('[name="InserirAnexo"]').attr('disabled', false);
+                        $abaAnalise.find('[name="ExcluirAnexo"]').show();
                     }
 
                     if (mostrarAbaQualidadeGerente && index != 'Qualidade - Gerente' && ['Pendente', 'Rascunho'].indexOf(aprovacao.Resultado) != -1) {
@@ -4673,17 +4707,21 @@ function getListItemAttachments(listTitle, itemId, tableAnexo) {
                 tableAnexo.show();
                 tableAnexo.empty();
                 var contador = 1;
-                tableAnexo.append('<thead class="thead-dark"><tr><th scope="col" width="10%">#</th> <th scope="col" >Anexos</th></tr></thead>');
+                tableAnexo.append('<thead class="thead-dark"><tr><th scope="col" width="10%">#</th><th scope="col" colspan="2">Anexos</th></tr></thead>');
                 tableAnexo.append('<tbody>');
-                var table = '<tbody>';
+                var table = '';
+
                 attachments.forEach(function (attachment) {
-                    table = table + '<tr>';
-                    table = table + '<th scope="row" width="10%">'+contador+'</th> <td ><a href="' + _spPageContextInfo.siteAbsoluteUrl + '/Lists/AgendamentosResponsaveis/Attachments/'+itemId+'/'+attachment['name']+'?web=1'+'" target="_blank">'+attachment['name']+'</a></td>';
-                    table = table + '</tr>';
+                    table = table +
+                        '<tr>' +
+                        '   <th scope="row" width="10%">' + contador + '</th>' +
+                        '   <td><a href="' + _spPageContextInfo.siteAbsoluteUrl + '/Lists/AgendamentosResponsaveis/Attachments/' + itemId + '/' + attachment['name'] + '?web=1" target="_blank">' + attachment['name'] + '</a></td>' +
+                        '   <td><a name="ExcluirAnexo" href="#" onclick="DeleteAttachmentFile(this, \'Agendamentos - Responsáveis\', \'' + itemId + '\', \'' + attachment['name'] + '\'); return false;" style="display: none;">Excluir</a></td>' +
+                        '</tr>';
                     contador = contador +1;
                 });
-                table.concat('</tbody>');
-                tableAnexo.append(table);
+
+                tableAnexo.find('tbody').append(table);
                 // $promise.resolve(attachments);
             }).fail($promise.reject);
         } else {
