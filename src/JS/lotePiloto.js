@@ -1756,8 +1756,13 @@ function RegistrarHistoricoPendente(historico, naoAtualizar, responsavelNome, re
     }
 
     historicosPendentes.push({
-        codigoAgendamento: memoriaAgendamentoAtual.CodigoAgendamento,
-        mensagem: GerarMensagemHistorico(historico, memoriaAgendamentoAntigo, memoriaAgendamentoAtual, responsavelNome, responsavelAntigo, responsavelAtual)
+        mensagem: GerarMensagemHistorico(
+            historico,
+            memoriaAgendamentoAntigo,
+            memoriaAgendamentoAtual,
+            responsavelNome,
+            responsavelAntigo,
+            responsavelAtual)
     });
 }
 
@@ -1767,7 +1772,7 @@ function InserirHistoricosPendentes() {
 
     for (var i = 0; i < historicosPendentes.length; i ++) {
         var historico = historicosPendentes[i];
-        promises.push(InserirHistorico(historico.codigoAgendamento, historico.mensagem));
+        promises.push(InserirHistorico(memoriaAgendamentoAtual.CodigoAgendamento, historico.mensagem));
     }
 
     historicosPendentes = [];
@@ -2924,6 +2929,7 @@ function GerarISPClientPeoplePickerEntityPorUsuario(usuario) {
 function InserirAgendamento() {
     var $promise = $.Deferred();
     CalcularCamposCalculaveis();
+    ModificarStatusPorFormState(state);
     var campos = [];
     memoriaAgendamentoAtual = {};
 
@@ -2939,7 +2945,7 @@ function InserirAgendamento() {
         }
     });
 
-    campos.push(['Status', 'Rascunho']);
+    campos.push(['Status', $('select#status').val()]);
 
     $().SPServices({
         operation: "UpdateListItems",
@@ -3232,6 +3238,7 @@ function ModificarBotoesPorFormState(formState) {
     var $btnDerivar = $('.btn-derivar');
     var $btnCancelar = $('.btn-cancelar-agendamento');
     var $btnSalvar = $('.btn-salvar');
+    var $btnSalvarAgendar = $('.btn-salvar-agendar');
     var $btnNaoExecutado = $('.btn-nao-executado');
     var $btnEditar = $('.btn-editar');
     var $btnEditarRespOuAcomp = $('.btn-editar-resp-acomp');
@@ -3243,6 +3250,7 @@ function ModificarBotoesPorFormState(formState) {
     $btnDerivar.hide();
     $btnCancelar.hide();
     $btnSalvar.hide();
+    $btnSalvarAgendar.hide();
     $btnNaoExecutado.hide();
     $btnEditar.hide();
     $btnEditarRespOuAcomp.hide();
@@ -3253,6 +3261,7 @@ function ModificarBotoesPorFormState(formState) {
         case EM_CRIACAO:
             if (VerificarGrupoDlPclOuPlantaPiloto()) {
                 $btnSalvar.show();
+                $btnSalvarAgendar.show();
             }
             break;
         case RASCUNHO:
@@ -4015,13 +4024,28 @@ function CarregarUsuarioPorLoginName(loginName) {
 }
 
 function PreencherPeoplePicker(peoplePickerId, usuario) {
+    var $promise = $.Deferred();
     var peoplePicker = PegarPeoplePickerPorId(peoplePickerId);
     peoplePicker.DeleteProcessedUser();
+
+    peoplePicker.OnUserResolvedClientScript = function () {
+        peoplePicker.OnUserResolvedClientScript = null;
+        $promise.resolve();
+    };
+
+    setTimeout(function () {
+        if (peoplePicker.OnUserResolvedClientScript != null) {
+            $promise.reject();
+        }
+    }, 5000);
+
     peoplePicker.AddUnresolvedUser(GerarISPClientPeoplePickerEntityPorUsuario(usuario), true);
+
+    return $promise;
 }
 
 function PreencherResponsavelDlPcl() {
-    PreencherPeoplePicker('peoplePickerAbaRespRespDLPCL', CarregarUsuarioAtual());
+    return PreencherPeoplePicker('peoplePickerAbaRespRespDLPCL', CarregarUsuarioAtual());
 }
 
 function RegistrarBindings() {
@@ -4178,7 +4202,7 @@ function ResetarAgendamento() {
         $this.change();
     });
 
-    PreencherResponsavelDlPcl();
+    return PreencherResponsavelDlPcl();
 }
 
 function SalvarAgendamento() {
@@ -4193,7 +4217,17 @@ function SalvarAgendamento() {
     return InserirAgendamento().then(function (response) {
         return CarregarAgendamento(response.record.attr('ows_ID'));
     });
+}
 
+function InserirEAgendarAgendamento() {
+    memoriaAgendamentoAtual = {};
+    bloquearBotoesAbaAnexo();
+    ModificarFormState(AGENDADO);
+    RegistrarHistoricoPendente(historicos.AGENDADO);
+
+    return InserirAgendamento().then(function (response) {
+        return CarregarAgendamento(response.record.attr('ows_ID'));
+    });
 }
 
 function InitializeAllPeoplePickers() {
@@ -4303,6 +4337,23 @@ function RegistrarBotoes() {
             RegistrarHistoricoPendente(historicos.AGENDADO);
             SalvarAgendamento();
         }
+    });
+
+    $('.btn-salvar-agendar').click(function () {
+        if (ValidarStatusECamposObrigatorios() && ValidarAgendamento()) {
+            InserirEAgendarAgendamento().then(function () {
+                window.history.pushState(
+                    'Object',
+                    '',
+                    _spPageContextInfo.siteAbsoluteUrl + '/Lists/Agendamentos/DispForm.aspx?ID=' + memoriaAgendamentoAtual.ID);
+
+                alert('Agendamento salvo');
+            }).fail(function (response) {
+                alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
+            });
+        }
+
+        return false;
     });
 
     $('.btn-executado').click(function () {
@@ -4800,21 +4851,23 @@ $(document).ready(function () {
     ).then(function () {
         InstanciarDateTimePicker();
         RegistrarBindings();
-        ResetarAgendamento();
-        RegistrarBotoes();
 
-        var id = getUrlParameter('loteid') == '' ? getUrlParameter('ID') : getUrlParameter('loteid');
+        return ResetarAgendamento().then(function () {
+            RegistrarBotoes();
 
-        if (id == '') {
-            ModificarFormState(EM_CRIACAO);
-        } else {
-            CarregarAgendamento(id);
-        }
+            var id = getUrlParameter('loteid') == '' ? getUrlParameter('ID') : getUrlParameter('loteid');
 
-        setTimeout(function () {
-            carregarBotoesAnexo();
-            CarregarPaineisDeAnexos();
-            bloquearBotoesAbaAnexo();
-        }, 3000);
+            if (id == '') {
+                ModificarFormState(EM_CRIACAO);
+            } else {
+                CarregarAgendamento(id);
+            }
+
+            setTimeout(function () {
+                carregarBotoesAnexo();
+                CarregarPaineisDeAnexos();
+                bloquearBotoesAbaAnexo();
+            }, 3000);
+        });
     });
 });
