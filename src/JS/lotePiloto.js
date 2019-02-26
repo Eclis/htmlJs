@@ -2599,26 +2599,23 @@ function CarregarListaMotivos() {
 function CarregarListaStatus() {
     var $promise = $.Deferred();
 
-    $().SPServices({
-        operation: 'GetList',
-        listName: 'Agendamentos',
-        completefunc: function (Data, Status) {
-            if (Status != 'success') {
-                $promise.reject({
-                    errorCode: '0x99999999',
-                    errorText: 'Erro Remoto'
-                });
+    var status = [
+        'Rascunho',
+        'Agendado',
+        'Lote Executado',
+        'Lote Não Executado',
+        'Cancelado',
+        'Registro das Análises',
+        'Aguardando Reagendamento',
+        'Aprovado',
+        'Reprovado',
+    ];
 
-                return;
-            }
+    for (var i = 0; i < status.length; i ++) {
+        $('select#status').append('<option value="' + status[i] + '">' + status[i] + '</option>');
+    }
 
-            $(Data.responseXML).find('Field[DisplayName="Status"] CHOICE').each(function () {
-                $('select#status').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
-            });
-
-            $promise.resolve();
-        }
-    });
+    $promise.resolve();
 
     return $promise;
 }
