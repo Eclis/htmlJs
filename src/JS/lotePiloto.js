@@ -4217,13 +4217,13 @@ function ResetarAgendamento() {
 }
 
 function SalvarAgendamento() {
-    var id = $('input[name="ID"]').val();
-
-    if (id) {
-        return AtualizarAgendamento(id).then(function (response) {
+    if (memoriaAgendamentoAtual && memoriaAgendamentoAtual.ID) {
+        return AtualizarAgendamento(memoriaAgendamentoAtual.ID).then(function (response) {
             return CarregarAgendamento(response.record.attr('ows_ID'));
         });
     }
+
+    ModificarFormState(RASCUNHO);
 
     return InserirAgendamento().then(function (response) {
         return CarregarAgendamento(response.record.attr('ows_ID'));
@@ -4332,11 +4332,10 @@ function RegistrarBotoes() {
             }
 
             SalvarAgendamento().then(function () {
-                var id = $('input[name="ID"]').val();
-                window.history.pushState('Object', '', _spPageContextInfo.siteAbsoluteUrl + '/Lists/Agendamentos/DispForm.aspx?ID=' + id);
+                window.history.pushState('Object', '', _spPageContextInfo.siteAbsoluteUrl + '/Lists/Agendamentos/DispForm.aspx?ID=' + memoriaAgendamentoAtual.ID);
                 bloquearBotoesAbaAnexo();
 
-                if (id) {
+                if (memoriaAgendamentoAntigo.ID) {
                     alert('Alterações salvas');
                 } else {
                     alert('Agendamento salvo');
