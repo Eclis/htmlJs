@@ -44,6 +44,7 @@ var historicos = {
     'LOTE_APROVADO':                'Lote aprovado em %s',
     'LOTE_REPROVADO':               'Lote reprovado em %s',
     'AGUARDANDO_REAGENDAMENTO':     'Lote aguardando reagendamento',
+    'LOTE_APROVADO_SIMILARIDADE':   'Lote aprovado por similaridade ao lote %d. Motivo: "%s"',
 };
 
 var historicosAreas = [
@@ -1750,7 +1751,7 @@ function AtualizarAgendamentoEmMemoria() {
     }
 }
 
-function RegistrarHistoricoPendente(historico, naoAtualizar, responsavelNome, responsavelAntigo, responsavelAtual) {
+function RegistrarHistoricoPendente(historico, naoAtualizar, responsavelNome, responsavelAntigo, responsavelAtual, responsavelObservacoes) {
     if (!naoAtualizar) {
         AtualizarAgendamentoEmMemoria();
     }
@@ -1762,7 +1763,8 @@ function RegistrarHistoricoPendente(historico, naoAtualizar, responsavelNome, re
             memoriaAgendamentoAtual,
             responsavelNome,
             responsavelAntigo,
-            responsavelAtual)
+            responsavelAtual,
+            responsavelObservacoes)
     });
 }
 
@@ -1829,7 +1831,7 @@ function InserirHistorico(codigoAgendamento, mensagem) {
     return $promise;
 }
 
-function GerarMensagemHistorico(historico, antigo, novo, responsavelNome, responsavelAntigo, responsavelAtual) {
+function GerarMensagemHistorico(historico, antigo, novo, responsavelNome, responsavelAntigo, responsavelAtual, responsavelObservacoes) {
     switch (historico) {
         case historicos.CRIADO:                      return sprintf(historicos.CRIADO, novo.CodigoAgendamento);
         case historicos.AGENDADO:                    return sprintf(historicos.AGENDADO, novo.InicioProgramado);
@@ -1850,6 +1852,7 @@ function GerarMensagemHistorico(historico, antigo, novo, responsavelNome, respon
         case historicos.LOTE_APROVADO:               return sprintf(historicos.LOTE_APROVADO, moment(new Date(), 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm'));
         case historicos.LOTE_REPROVADO:              return sprintf(historicos.LOTE_REPROVADO, moment(new Date(), 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm'));
         case historicos.AGUARDANDO_REAGENDAMENTO:    return sprintf(historicos.AGUARDANDO_REAGENDAMENTO);
+        case historicos.LOTE_APROVADO_SIMILARIDADE:  return sprintf(historicos.LOTE_APROVADO_SIMILARIDADE, novo.CodigoAgendamento, responsavelObservacoes);
         default:                                     return '';
     }
 }
@@ -2235,6 +2238,12 @@ function AtualizarAprovacaoEmMemoria(responsavel) {
 
     if (!usuarioDoPeoplePicker) {
         return $.when(memoriaAprovacoesAtual[responsavel.nome]);
+    }
+
+    if (['Pendente', 'Rascunho'].indexOf(memoriaAprovacoesAntigo[responsavel.nome].Resultado) > -1 &&
+            memoriaAprovacoesAntigo[responsavel.nome].Resultado != memoriaAprovacoesAtual[responsavel.nome].Resultado &&
+            memoriaAprovacoesAtual[responsavel.nome].Resultado == 'Aprovado por Similaridade') {
+        RegistrarHistoricoPendente(historicos.LOTE_APROVADO_SIMILARIDADE, null, null, null, null, memoriaAprovacoesAtual[responsavel.nome].Observacoes);
     }
 
     return CarregarUsuarioPorLoginName(usuarioDoPeoplePicker.loginName).then(function (usuario) {
