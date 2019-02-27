@@ -60,6 +60,8 @@ var historicosAreas = [
     'Área - Meio Ambiente',
 ];
 
+var botoesStatus = {};
+
 /* global window, exports, define */
 
 !function() {
@@ -4320,8 +4322,15 @@ function ValidarQtdPecas() {
 
 function RegistrarBotoes() {
     var $btnSalvar = $('.btn-salvar');
+
     $btnSalvar.click(function () {
         if (ValidarStatusECamposObrigatorios()) {
+            if (botoesStatus['salvar']) {
+                return false;
+            } else {
+                botoesStatus['salvar'] = true;
+            }
+
             SalvarAgendamento().then(function () {
                 var id = $('input[name="ID"]').val();
                 window.history.pushState('Object', '', _spPageContextInfo.siteAbsoluteUrl + '/Lists/Agendamentos/DispForm.aspx?ID=' + id);
@@ -4332,24 +4341,44 @@ function RegistrarBotoes() {
                 } else {
                     alert('Agendamento salvo');
                 }
+
+                botoesStatus['salvar'] = false;
             }).fail(function (response) {
                 alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
+                botoesStatus['salvar'] = false;
             });
-
-            return false;
         }
+
+        return false;
     });
 
     $('.btn-agendar').click(function () {
+        if (botoesStatus['agendar']) {
+            return false;
+        } else {
+            botoesStatus['agendar'] = true;
+        }
+
         if (ValidarAgendamento()) {
             ModificarFormState(AGENDADO);
             RegistrarHistoricoPendente(historicos.AGENDADO);
-            SalvarAgendamento();
+
+            SalvarAgendamento().then(function () {
+                botoesStatus['agendar'] = false;
+            }).fail(function () {
+                botoesStatus['agendar'] = false;
+            });
         }
     });
 
     $('.btn-salvar-agendar').click(function () {
         if (ValidarStatusECamposObrigatorios() && ValidarAgendamento()) {
+            if (botoesStatus['salvar-agendar']) {
+                return false;
+            } else {
+                botoesStatus['salvar-agendar'] = true;
+            }
+
             InserirEAgendarAgendamento().then(function () {
                 window.history.pushState(
                     'Object',
@@ -4357,8 +4386,10 @@ function RegistrarBotoes() {
                     _spPageContextInfo.siteAbsoluteUrl + '/Lists/Agendamentos/DispForm.aspx?ID=' + memoriaAgendamentoAtual.ID);
 
                 alert('Agendamento salvo');
+                botoesStatus['salvar-agendar'] = false;
             }).fail(function (response) {
                 alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
+                botoesStatus['salvar-agendar'] = false;
             });
         }
 
@@ -4366,28 +4397,67 @@ function RegistrarBotoes() {
     });
 
     $('.btn-executado').click(function () {
+        if (botoesStatus['executado']) {
+            return false;
+        } else {
+            botoesStatus['executado'] = true;
+        }
+
         var $registroAnalisesInicio = $('[name=RegistroAnalisesInicio]');
         $registroAnalisesInicio.val(moment(new Date(), 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm'));
         ModificarFormState(REGISTRO_DE_ANALISE);
         RegistrarHistoricoPendente(historicos.EXECUTADO);
-        SalvarAgendamento();
+
+        SalvarAgendamento().then(function () {
+            botoesStatus['executado'] = false;
+        }).fail(function () {
+            botoesStatus['executado'] = false;
+        });
     });
 
     $('.btn-derivar').click(function () {
+        if (botoesStatus['derivar']) {
+            return false;
+        } else {
+            botoesStatus['derivar'] = true;
+        }
+
         $btnSalvar.show();
         DerivarAgendamento();
+        botoesStatus['derivar'] = false;
     });
 
     $('.btn-cancelar-agendamento').click(function () {
+        if (botoesStatus['cancelar-agendamento']) {
+            return false;
+        } else {
+            botoesStatus['cancelar-agendamento'] = true;
+        }
+
         ModificarFormState(EM_CANCELAMENTO);
+        botoesStatus['cancelar-agendamento'] = false;
     });
 
     $('.btn-nao-executado').click(function () {
+        if (botoesStatus['nao-executado']) {
+            return false;
+        } else {
+            botoesStatus['nao-executado'] = true;
+        }
+
         ModificarFormState(EM_NAO_EXECUCAO);
+        botoesStatus['nao-executado'] = false;
     });
 
     $('.btn-editar').click(function () {
+        if (botoesStatus['editar']) {
+            return false;
+        } else {
+            botoesStatus['editar'] = true;
+        }
+
         let status = $('select#status').val();
+
         if (status == RASCUNHO) {
             ModificarFormState(RASCUNHO_EM_EDICAO);
         } else if (status == AGENDADO) {
@@ -4395,19 +4465,42 @@ function RegistrarBotoes() {
         } else if(status == REGISTRO_DE_ANALISE) {
             ModificarFormState(EM_REGISTRO_DE_ANALISE);
         }
+
+        botoesStatus['editar'] = false;
     });
 
     $('.btn-editar-resp-acomp').click(function () {
+        if (botoesStatus['editar-resp-acomp']) {
+            return false;
+        } else {
+            botoesStatus['editar-resp-acomp'] = true;
+        }
+
         ModificarFormState(RESP_ACOMP_AGENDADO_EM_EDICAO);
+        botoesStatus['editar-resp-acomp'] = false;
     });
 
     $('.btn-abandonar').click(function () {
+        if (botoesStatus['abandonar']) {
+            return false;
+        } else {
+            botoesStatus['abandonar'] = true;
+        }
+
         ModificarFormState($('select#status').val());
+        botoesStatus['abandonar'] = false;
     });
 
     $('.btn-reagendar').click(function () {
+        if (botoesStatus['reagendar']) {
+            return false;
+        } else {
+            botoesStatus['reagendar'] = true;
+        }
+
         RegistrarHistoricoPendente(historicos.REAGENDADO);
         ModificarFormState(RASCUNHO_EM_EDICAO);
+        botoesStatus['reagendar'] = false;
     });
 }
 
