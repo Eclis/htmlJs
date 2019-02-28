@@ -4877,14 +4877,14 @@ function getListItemAttachments(listTitle, itemId, tableAnexo) {
 
     ctx.executeQueryAsync(function () {
         var hasAttachments = item.get_fieldValues()['Attachments'];
+        tableAnexo.show();
+        tableAnexo.empty();
+        tableAnexo.append('<thead class="thead-dark"><tr><th scope="col" width="10%">#</th><th scope="col" colspan="2">Anexos</th></tr></thead>');
+        tableAnexo.append('<tbody>');
 
         if (hasAttachments) {
             getAttachmentFiles(item).then(function (attachments) {
-                tableAnexo.show();
-                tableAnexo.empty();
                 var contador = 1;
-                tableAnexo.append('<thead class="thead-dark"><tr><th scope="col" width="10%">#</th><th scope="col" colspan="2">Anexos</th></tr></thead>');
-                tableAnexo.append('<tbody>');
                 var table = '';
 
                 attachments.forEach(function (attachment) {
@@ -4894,11 +4894,11 @@ function getListItemAttachments(listTitle, itemId, tableAnexo) {
                         '   <td><a href="' + _spPageContextInfo.siteAbsoluteUrl + '/Lists/AgendamentosResponsaveis/Attachments/' + itemId + '/' + attachment['name'] + '?web=1" target="_blank">' + attachment['name'] + '</a></td>' +
                         '   <td><a name="ExcluirAnexo" href="#" onclick="DeleteAttachmentFile(this, \'Agendamentos - Responsáveis\', \'' + itemId + '\', \'' + attachment['name'] + '\'); return false;" style="display: none;">Excluir</a></td>' +
                         '</tr>';
-                    contador = contador +1;
+                    contador = contador + 1;
                 });
 
                 tableAnexo.find('tbody').append(table);
-                // $promise.resolve(attachments);
+                $promise.resolve(attachments);
             }).fail($promise.reject);
         } else {
             $promise.resolve([]);
