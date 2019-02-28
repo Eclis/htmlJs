@@ -1835,18 +1835,18 @@ function InserirHistorico(codigoAgendamento, mensagem) {
 
 function GerarMensagemHistorico(historico, antigo, novo, responsavelNome, responsavelAntigo, responsavelAtual, responsavelObservacoes) {
     switch (historico) {
-        case historicos.CRIADO:                      return sprintf(historicos.CRIADO, novo.CodigoAgendamento);
-        case historicos.AGENDADO:                    return sprintf(historicos.AGENDADO, novo.InicioProgramado);
-        case historicos.REAGENDADO:                  return sprintf(historicos.REAGENDADO, novo.InicioProgramado);
-        case historicos.EXECUTADO:                   return sprintf(historicos.EXECUTADO, novo.RegistroAnalisesInicio);
-        case historicos.NAO_EXECUTADO:               return sprintf(historicos.NAO_EXECUTADO, novo.NaoExecutadoMotivo);
-        case historicos.STATUS_ALTERADO:             return sprintf(historicos.STATUS_ALTERADO, novo.Status);
-        case historicos.CANCELADO:                   return sprintf(historicos.CANCELADO, novo.CodigoAgendamento, novo.CanceladoMotivo);
-        case historicos.TIPO_LOTE_ALTERADO:          return sprintf(historicos.TIPO_LOTE_ALTERADO, (antigo.TipoLote) ? antigo.TipoLote : '', (novo.TipoLote) ? novo.TipoLote : '');
-        case historicos.MOTIVO_ALTERADO:             return sprintf(historicos.MOTIVO_ALTERADO, (antigo.Motivo) ? antigo.Motivo : '', (novo.Motivo) ? novo.Motivo : '');
-        case historicos.CATEGORIA_PROJETO_ALTERADA:  return sprintf(historicos.CATEGORIA_PROJETO_ALTERADA, (antigo.CategoriaProjeto) ? antigo.CategoriaProjeto : '', (novo.CategoriaProjeto) ? novo.CategoriaProjeto : '');
-        case historicos.LINHA_EQUIPAMENTO_ALTERADA:  return sprintf(historicos.LINHA_EQUIPAMENTO_ALTERADA, (antigo.LinhaEquipamento) ? $('#linhaEquipamento option[value=' + antigo.LinhaEquipamento + ']').text() : '', (novo.LinhaEquipamento) ? $('#linhaEquipamento option[value=' + novo.LinhaEquipamento + ']').text() : '');
-        case historicos.GRAU_COMPLEXIDADE_ALTERADO:  return sprintf(historicos.GRAU_COMPLEXIDADE_ALTERADO, (antigo.GrauComplexidade) ? antigo.GrauComplexidade : '', (novo.GrauComplexidade) ? novo.GrauComplexidade : '');
+        case historicos.CRIADO:                      return sprintf(historicos.CRIADO, memoriaAgendamentoAtual.CodigoAgendamento);
+        case historicos.AGENDADO:                    return sprintf(historicos.AGENDADO, memoriaAgendamentoAtual.InicioProgramado);
+        case historicos.REAGENDADO:                  return sprintf(historicos.REAGENDADO, memoriaAgendamentoAtual.InicioProgramado);
+        case historicos.EXECUTADO:                   return sprintf(historicos.EXECUTADO, memoriaAgendamentoAtual.RegistroAnalisesInicio);
+        case historicos.NAO_EXECUTADO:               return sprintf(historicos.NAO_EXECUTADO, memoriaAgendamentoAtual.NaoExecutadoMotivo);
+        case historicos.STATUS_ALTERADO:             return sprintf(historicos.STATUS_ALTERADO, memoriaAgendamentoAtual.Status);
+        case historicos.CANCELADO:                   return sprintf(historicos.CANCELADO, memoriaAgendamentoAtual.CodigoAgendamento, memoriaAgendamentoAtual.CanceladoMotivo);
+        case historicos.TIPO_LOTE_ALTERADO:          return sprintf(historicos.TIPO_LOTE_ALTERADO, (antigo.TipoLote) ? antigo.TipoLote : '', (memoriaAgendamentoAtual.TipoLote) ? memoriaAgendamentoAtual.TipoLote : '');
+        case historicos.MOTIVO_ALTERADO:             return sprintf(historicos.MOTIVO_ALTERADO, (antigo.Motivo) ? antigo.Motivo : '', (memoriaAgendamentoAtual.Motivo) ? memoriaAgendamentoAtual.Motivo : '');
+        case historicos.CATEGORIA_PROJETO_ALTERADA:  return sprintf(historicos.CATEGORIA_PROJETO_ALTERADA, (antigo.CategoriaProjeto) ? antigo.CategoriaProjeto : '', (memoriaAgendamentoAtual.CategoriaProjeto) ? memoriaAgendamentoAtual.CategoriaProjeto : '');
+        case historicos.LINHA_EQUIPAMENTO_ALTERADA:  return sprintf(historicos.LINHA_EQUIPAMENTO_ALTERADA, (antigo.LinhaEquipamento) ? $('#linhaEquipamento option[value=' + antigo.LinhaEquipamento + ']').text() : '', (memoriaAgendamentoAtual.LinhaEquipamento) ? $('#linhaEquipamento option[value=' + memoriaAgendamentoAtual.LinhaEquipamento + ']').text() : '');
+        case historicos.GRAU_COMPLEXIDADE_ALTERADO:  return sprintf(historicos.GRAU_COMPLEXIDADE_ALTERADO, (antigo.GrauComplexidade) ? antigo.GrauComplexidade : '', (memoriaAgendamentoAtual.GrauComplexidade) ? memoriaAgendamentoAtual.GrauComplexidade : '');
         case historicos.OBSERVACOES_ADICIONADAS:     return sprintf(historicos.OBSERVACOES_ADICIONADAS);
         case historicos.FABRICA_ADICIONADA:          return sprintf(historicos.FABRICA_ADICIONADA, $('#fabrica option:selected').text());
         case historicos.RESPONSAVEL_ALTERADO:        return sprintf(historicos.RESPONSAVEL_ALTERADO, responsavelNome, responsavelAntigo, responsavelAtual);
@@ -1854,7 +1854,7 @@ function GerarMensagemHistorico(historico, antigo, novo, responsavelNome, respon
         case historicos.LOTE_APROVADO:               return sprintf(historicos.LOTE_APROVADO, moment(new Date(), 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm'));
         case historicos.LOTE_REPROVADO:              return sprintf(historicos.LOTE_REPROVADO, moment(new Date(), 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm'));
         case historicos.AGUARDANDO_REAGENDAMENTO:    return sprintf(historicos.AGUARDANDO_REAGENDAMENTO);
-        case historicos.LOTE_APROVADO_SIMILARIDADE:  return sprintf(historicos.LOTE_APROVADO_SIMILARIDADE, novo.CodigoAgendamento, responsavelObservacoes);
+        case historicos.LOTE_APROVADO_SIMILARIDADE:  return sprintf(historicos.LOTE_APROVADO_SIMILARIDADE, memoriaAgendamentoAtual.CodigoAgendamento, responsavelObservacoes);
         default:                                     return '';
     }
 }
@@ -2992,7 +2992,9 @@ function InserirAgendamento() {
     return $promise.then(function (response) {
         return GravarCodigoAgendamento(response.record).then(function (response) {
             memoriaAgendamentoAtual.ID = response.record.attr('ows_ID');
+            $('input[name="ID"]').val(memoriaAgendamentoAtual.ID);
             memoriaAgendamentoAtual.CodigoAgendamento = response.record.attr('ows_CodigoAgendamento');
+            $('input[name="CodigoAgendamento"]').val(memoriaAgendamentoAtual.CodigoAgendamento);
             let $TipoLote = $('[name=TipoLote]');
             let promises = [];
             let responsaveis = GetResponsaveisPorTipoDeLote($TipoLote.val());
@@ -4631,8 +4633,7 @@ function verificarErros() {
         grauComplexidade,
         agendamentoDataInicioProgramado,
         agendamentoDuracaoHoras,
-        agendamentoDuracaoMinutos,
-        agendamentoFim
+        agendamentoDuracaoMinutos
     };
 
     var erro = 0;
