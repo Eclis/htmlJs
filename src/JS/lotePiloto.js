@@ -2169,6 +2169,22 @@ function CarregarAgendamentoResponsaveis(agendamento) {
                     _abaAcompanhanteId: responsavel.abaAcompanhanteId,
                 };
 
+                if (responsavel.abaAnaliseId) {
+                    if (memoriaAprovacoesAtual[this.attributes.ows_TipoResponsavel.value].Resultado.startsWith('Aprovado')) {
+                        $('a[href="#' + responsavel.abaAnaliseId + '"]').css('background-color', '#008000');
+                        $('a[href="#' + responsavel.abaAnaliseId + '"]').css('color', 'white');
+                        $('a[href="#' + responsavel.abaAnaliseId + '"]').css('border-color', 'white');
+                    } else if (memoriaAprovacoesAtual[this.attributes.ows_TipoResponsavel.value].Resultado == 'Reprovado') {
+                        $('a[href="#' + responsavel.abaAnaliseId + '"]').css('background-color', '#f95834');
+                        $('a[href="#' + responsavel.abaAnaliseId + '"]').css('color', 'white');
+                        $('a[href="#' + responsavel.abaAnaliseId + '"]').css('border-color', 'white');
+                    } else {
+                        $('a[href="#' + responsavel.abaAnaliseId + '"]').css('background-color', '#ffbc00');
+                        $('a[href="#' + responsavel.abaAnaliseId + '"]').css('color', 'white');
+                        $('a[href="#' + responsavel.abaAnaliseId + '"]').css('border-color', 'white');
+                    }
+                }
+
                 memoriaAprovacoesAntigo[this.attributes.ows_TipoResponsavel.value] = $.extend({}, memoriaAprovacoesAtual[this.attributes.ows_TipoResponsavel.value]);
 
                 var usuarioNome = FiltrarNomeUsuarioPorPessoaId(this.attributes.ows_Pessoa.value);
