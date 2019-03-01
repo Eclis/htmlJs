@@ -894,10 +894,6 @@ function ValidarAgendamentosResponsaveis(tipoDeLote) {
         }
         case 'Picking': {
             errorAgendamentosResponsaveis = ValidarAgendamentosResponsaveisPicking();
-            return errorAgendamentosResponsaveis;
-        }
-        default: {
-            return errorAgendamentosResponsaveis;
         }
     }
 
@@ -1347,14 +1343,26 @@ function ValidarStatusECamposObrigatorios() {
                 if (aprovacao._abaAnaliseId != null) {
                     var $abaAnalise = $('#' + aprovacao._abaAnaliseId);
                     if (CarregarUsuarioAtual().id == FiltrarIdPorPessoaId(aprovacao.Pessoa)) {
-                        var resultado = $abaAnalise.find('[name=Resultado]');
-
+                        var $Resultado = $abaAnalise.find('[name=Resultado]');
                         var reprovadoMotivo = $abaAnalise.find('[name=ReprovadoMotivo]');
-                        if (resultado.children('option:selected').val() === 'Reprovado'
+
+                        if ($Resultado.children('option:selected').val() === 'Reprovado'
                             && reprovadoMotivo.children('option:selected').val() === 'Selecione uma opção') {
                             erros++;
                             NotificarErroValidacao('name', reprovadoMotivo, '', '');
                             alert("Favor preencher motivo da reprovação");
+                        }
+
+                        var $ObservacoesAnalise = $abaAnalise.find('[name=ObservacoesAnalise]');
+                        var responsavel = GetResponsavelPorAbaAnaliseId(aprovacao._abaAnaliseId);
+
+                        if (['Pendente', 'Rascunho'].indexOf(memoriaAprovacoesAntigo[responsavel.nome].Resultado) > -1 &&
+                                memoriaAprovacoesAntigo[responsavel.nome].Resultado != $Resultado.children('option:selected').val() &&
+                                $Resultado.children('option:selected').val() == 'Aprovado por Similaridade' &&
+                                !$ObservacoesAnalise.val()) {
+                            erros++;
+                            NotificarErroValidacao('name', $ObservacoesAnalise, '', '');
+                            alert("Favor preencher o campo Observações da reprovação");
                         }
                     }
                 }
@@ -3104,6 +3112,16 @@ function GetResponsaveisPorTipoDeLote(tipoDeLote) {
 function GetResponsavelPorNomeETipoDeLote(nome, tipoDeLote) {
     for (var i = 0; i < SetoresResponsaveis.length; i ++) {
         if (SetoresResponsaveis[i].nome == nome && SetoresResponsaveis[i].tipoDeLote == tipoDeLote) {
+            return SetoresResponsaveis[i];
+        }
+    }
+
+    return null;
+}
+
+function GetResponsavelPorAbaAnaliseId(abaAnaliseId) {
+    for (var i = 0; i < SetoresResponsaveis.length; i ++) {
+        if (SetoresResponsaveis[i].abaAnaliseId == abaAnaliseId) {
             return SetoresResponsaveis[i];
         }
     }
