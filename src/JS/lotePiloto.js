@@ -51,8 +51,9 @@ var historicosAreas = [
     'Administradores Lote Piloto',
     'Área - Engenharia de Fabricação',
     'Área - Engenharia de Envase',
-    'Área - DL PCL',
+    'Agendamento - DLL',
     'Agendamento - Planta Piloto',
+    'Área - DL PCL',
     'Área - Fábrica',
     'Área - Inovação DF',
     'Área - Inovação DE',
@@ -2016,7 +2017,7 @@ function CarregarAgendamento(id) {
         operation: 'GetListItems',
         listName: 'Agendamentos',
         CAMLQuery: '<Query><Where><Eq><FieldRef Name="ID" /><Value Type="Number">' + id + '</Value></Eq></Where></Query>',
-        CAMLViewFields: '<ViewFields><FieldRef Name="Title" /><FieldRef Name="CodigoProduto" /><FieldRef Name="LinhaProduto" /><FieldRef Name="DescricaoProduto" /><FieldRef Name="Projeto" /><FieldRef Name="CategoriaProjeto" /><FieldRef Name="Motivo" /><FieldRef Name="TipoLote" /><FieldRef Name="QuantidadePecas" /><FieldRef Name="Formula" /><FieldRef Name="EnvioAmostras" /><FieldRef Name="ResponsavelAmostra" /><FieldRef Name="QuantidadeAmostra" /><FieldRef Name="InicioProgramado" /><FieldRef Name="DuracaoEstimadaHoras" /><FieldRef Name="DuracaoEstimadaMinutos" /><FieldRef Name="FimProgramado" /><FieldRef Name="Fabrica" /><FieldRef Name="LinhaEquipamento" /><FieldRef Name="CentroCusto" /><FieldRef Name="GrauComplexidade" /><FieldRef Name="MaoObra" /><FieldRef Name="Observacoes" /><FieldRef Name="Status" /><FieldRef Name="EngenhariaFabricacaoAcompanhamen" /><FieldRef Name="EngenhariaEnvaseAcompanhamento" /><FieldRef Name="InovacaoDfAcompanhamento" /><FieldRef Name="InovacaoDeAcompanhamento" /><FieldRef Name="QualidadeAcompanhamento" /><FieldRef Name="FabricaAcompanhamento" /><FieldRef Name="CodigoAgendamento" /><FieldRef Name="NaoExecutadoMotivo" /><FieldRef Name="NaoExecutadoComentarios" /><FieldRef Name="CanceladoMotivo" /><FieldRef Name="CanceladoComentarios" /><FieldRef Name="ReagendamentoContador" /><FieldRef Name="CalendarioTitulo" /><FieldRef Name="CalendarioSubtitulo" /><FieldRef Name="Executado" /><FieldRef Name="MeioAmbienteAcompanhamento" /><FieldRef Name="RegistroAnalisesInicio" /><FieldRef Name="Modified" /><FieldRef Name="Created" /><FieldRef Name="Author" /><FieldRef Name="Editor" /></ViewFields>',
+        CAMLViewFields: '<ViewFields><FieldRef Name="Title" /><FieldRef Name="CodigoProduto" /><FieldRef Name="LinhaProduto" /><FieldRef Name="DescricaoProduto" /><FieldRef Name="Projeto" /><FieldRef Name="CategoriaProjeto" /><FieldRef Name="Motivo" /><FieldRef Name="TipoLote" /><FieldRef Name="QuantidadePecas" /><FieldRef Name="Formula" /><FieldRef Name="EnvioAmostras" /><FieldRef Name="ResponsavelAmostra" /><FieldRef Name="QuantidadeAmostra" /><FieldRef Name="InicioProgramado" /><FieldRef Name="DuracaoEstimadaHoras" /><FieldRef Name="DuracaoEstimadaMinutos" /><FieldRef Name="FimProgramado" /><FieldRef Name="Fabrica" /><FieldRef Name="LinhaEquipamento" /><FieldRef Name="CentroCusto" /><FieldRef Name="GrauComplexidade" /><FieldRef Name="MaoObra" /><FieldRef Name="Observacoes" /><FieldRef Name="Status" /><FieldRef Name="EngenhariaFabricacaoAcompanhamen" /><FieldRef Name="EngenhariaEnvaseAcompanhamento" /><FieldRef Name="InovacaoDfAcompanhamento" /><FieldRef Name="InovacaoDeAcompanhamento" /><FieldRef Name="QualidadeAcompanhamento" /><FieldRef Name="FabricaAcompanhamento" /><FieldRef Name="CodigoAgendamento" /><FieldRef Name="NaoExecutadoMotivo" /><FieldRef Name="NaoExecutadoComentarios" /><FieldRef Name="CanceladoMotivo" /><FieldRef Name="CanceladoComentarios" /><FieldRef Name="ReagendamentoContador" /><FieldRef Name="CalendarioTitulo" /><FieldRef Name="CalendarioSubtitulo" /><FieldRef Name="Executado" /><FieldRef Name="MeioAmbienteAcompanhamento" /><FieldRef Name="RegistroAnalisesInicio" /><FieldRef Name="Modified" /><FieldRef Name="Created" /><FieldRef Name="Author" /><FieldRef Name="Editor" /><FieldRef Name="Migrado_x0020_Notes_x003f_" /></ViewFields>',
         completefunc: function (Data, Status) {
             if (Status != 'success') {
                 $promise.reject({
@@ -2042,6 +2043,40 @@ function CarregarAgendamento(id) {
             var selectsACarregar = [];
             memoriaAgendamentoAtual = {};
             memoriaAgendamentoAtual.CodigoAgendamento = atributos.ows_CodigoAgendamento.value;
+
+            if (atributos.ows_Migrado_x0020_Notes_x003f_.value == '1') {
+                $('#pills-responsaveis-migrados-tab').parent().removeClass('d-none');
+                $('#pills-responsaveis-tab').parent().addClass('d-none');
+                $('#pills-acompanhamento-tab').parent().addClass('d-none');
+                $('#pills-analises-tab').parent().addClass('d-none');
+
+                var $historicoIframe = $('<iframe width="100%" height="400"></iframe>');
+
+                $historicoIframe.on('load', function () {
+                    var frameWindow = $historicoIframe[0].contentWindow;
+                    var frameDocument = frameWindow.document;
+
+                    $(frameDocument).ready(function () {
+                        $(frameDocument).find('body').css('overflow', 'auto');
+                    });
+                });
+
+                $().SPServices({
+                    operation: 'GetListItems',
+                    listName: 'Agendamentos - Responsáveis Migrados',
+                    CAMLQuery: '<Query><Where><Eq><FieldRef Name="Num" /><Value Type="Text">' + memoriaAgendamentoAtual.CodigoAgendamento + '</Value></Eq></Where></Query>',
+                    CAMLViewFields: '<ViewFields><FieldRef Name="ID" /></ViewFields>',
+                    completefunc: function (Data, Status) {
+                        var $registro2 = $(Data.responseText).find('z\\:row:first');
+
+                        $('#pills-responsaveis-migrados')
+                            .empty()
+                            .append($historicoIframe);
+
+                        $historicoIframe[0].contentWindow.document.location.href = _spPageContextInfo.siteAbsoluteUrl + '/Lists/Agendamentos%20%20Responsveis%20Migrados/DispForm.aspx?ID=' + $registro2.get(0).attributes.ows_ID.value + '&IsDlg=1';
+                    }
+                });
+            }
 
             $.each(atributos, function () {
                 if (this.value.startsWith('datetime;#')) {
