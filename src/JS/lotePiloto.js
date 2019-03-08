@@ -2044,7 +2044,7 @@ function CarregarAgendamento(id) {
             memoriaAgendamentoAtual = {};
             memoriaAgendamentoAtual.CodigoAgendamento = atributos.ows_CodigoAgendamento.value;
 
-            if (atributos.ows_Migrado_x0020_Notes_x003f_.value == '1') {
+            if (atributos.ows_Migrado_x0020_Notes_x003f_ && atributos.ows_Migrado_x0020_Notes_x003f_.value == '1') {
                 $('#pills-responsaveis-migrados-tab').parent().removeClass('d-none');
                 $('#pills-responsaveis-tab').parent().addClass('d-none');
                 $('#pills-acompanhamento-tab').parent().addClass('d-none');
