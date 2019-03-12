@@ -2611,12 +2611,6 @@ function CarregarLinhasEquipamentosById(linhaEquipamentoId) {
 
 function CarregarListaGrauComplexidade() {
     var $promise = $.Deferred();
-    var mensagem = {
-        1: "1 - Sem modificação",
-        2: "2 - Leve ",
-        3: "3 - Avançado",
-        4: "4 - Inovador"
-    };
 
     $().SPServices({
         operation: 'GetList',
@@ -2632,9 +2626,7 @@ function CarregarListaGrauComplexidade() {
             }
 
             $(Data.responseXML).find('Field[DisplayName="Grau de complexidade"] CHOICE').each(function () {
-                if(this.innerHTML > 0) {
-                    $('select#grauComplexidade').append('<option value="' + this.innerHTML + '">' + mensagem[this.innerHTML] + '</option>');
-                }
+                $('select#grauComplexidade').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
             });
 
             $promise.resolve();
