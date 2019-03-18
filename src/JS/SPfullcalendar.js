@@ -4,7 +4,7 @@ var TASK_LIST = "Agendamentos";
 var Fabrica_LIST = "Fábricas Internas e Armazenamento de Fábricas Terceiras";
 //var coresFabricas = new Array();
 var coresTipoLote = new Array();
-var cores = ["#446AC1", "#E40000", "#B2B208", "#FFA565", "#88D73C", "#2A9983", "#EDA700", "#8B2F9E", "#999090", "#E490AE"];
+var cores = ["#E40000", "#446AC1", "#B2B208", "#FFA565", "#88D73C", "#2A9983", "#EDA700", "#8B2F9E", "#999090", "#E490AE"];
 var events;
 
 var tiposLote = ["Brinde","Envase","Fabricação","Picking"];

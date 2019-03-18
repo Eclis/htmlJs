@@ -4373,6 +4373,9 @@ function DerivarAgendamento() {
     $('#inputId').val("");
     $('#codigoProduto').val("");
     $('#produtoDescricao').val("");
+    $('input[name=CodigoAgendamento]').val("");
+    memoriaAgendamentoAntigo = {};
+    memoriaAgendamentoAtual = {};
     ModificarStatusPorFormState(EM_CRIACAO);
     ModificarFormState(EM_CRIACAO);
     window.history.pushState("object", '', _spPageContextInfo.siteAbsoluteUrl + "/Lists/Agendamentos/NewForm.aspx");
