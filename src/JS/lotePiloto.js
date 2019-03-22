@@ -27,7 +27,7 @@ var historicosPendentes = [];
 var historicos = {
     'CRIADO':                       'Agendamento criado - lote id %d',
     'AGENDADO':                     'Execução agendada para %s',
-    'REAGENDADO':                   'Execução reagendada para %s',
+    'REAGENDADO':                   'Execução reagendada',
     'EXECUTADO':                    'Lote executado em %s',
     'NAO_EXECUTADO':                'Lote não executado\nJustificativa: %s',
     'STATUS_ALTERADO':              'Lote em %s',
@@ -525,6 +525,10 @@ function ValidarAbaJustificativa() {
         NotificarErroValidacao('text', 'textarea#inicioProgramadoComentarios', '', '');
     } else {
         LimparValidacao('text', 'textarea#inicioProgramadoComentarios', '');
+    }
+
+    if (errosAbaJustificativa > 0) {
+        R.LinkAbaJustificativa.tab('show');
     }
 
     return errosAbaJustificativa;
@@ -1888,7 +1892,7 @@ function GerarMensagemHistorico(historico, antigo, novo, responsavelNome, respon
     switch (historico) {
         case historicos.CRIADO:                      return sprintf(historicos.CRIADO, memoriaAgendamentoAtual.CodigoAgendamento);
         case historicos.AGENDADO:                    return sprintf(historicos.AGENDADO, memoriaAgendamentoAtual.InicioProgramado);
-        case historicos.REAGENDADO:                  return sprintf(historicos.REAGENDADO, memoriaAgendamentoAtual.InicioProgramado);
+        case historicos.REAGENDADO:                  return sprintf(historicos.REAGENDADO);
         case historicos.EXECUTADO:                   return sprintf(historicos.EXECUTADO, memoriaAgendamentoAtual.RegistroAnalisesInicio);
         case historicos.NAO_EXECUTADO:               return sprintf(historicos.NAO_EXECUTADO, memoriaAgendamentoAtual.NaoExecutadoMotivo);
         case historicos.STATUS_ALTERADO:             return sprintf(historicos.STATUS_ALTERADO, memoriaAgendamentoAtual.Status);
@@ -4353,6 +4357,8 @@ function desabilitarJustificativaInicioProgramado() {
     abandonarJustificativaInicioProgramado();
     R.LinkAbaJustificativa.addClass("disabled");
     $('#pills-produto-tab').tab('show');
+    R.InicioProgramadoMotivo.val('');
+    R.InicioProgramadoComentarios.val('');
 }
 
 function espelharCheckBox(checkA, checkB) {
