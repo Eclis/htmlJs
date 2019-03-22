@@ -45,6 +45,7 @@ var historicos = {
     'LOTE_REPROVADO':               'Lote reprovado em %s',
     'AGUARDANDO_REAGENDAMENTO':     'Lote aguardando reagendamento',
     'LOTE_APROVADO_SIMILARIDADE':   'Lote aprovado por similaridade ao lote %d. Motivo: "%s"',
+    'EXECUCAO_REAGENDADA':          'Execução reagendada para %s.\n Motivo: %s\n Justificativa: %s',
 };
 
 var historicosAreas = [
@@ -62,6 +63,18 @@ var historicosAreas = [
 ];
 
 var botoesStatus = {};
+
+var R = {
+    InicioProgramado: function () { return $('input[name=InicioProgramado]') },
+    LinkAbaJustificativa: function () { return $('#pills-justificativa-tab') },
+    AbaJustificativa: function () { return $('#pills-justificativa') },
+    CamposJustificativaInicioProgramado: function () { return $('#justificativaInicioProgramado') },
+    InicioProgramadoMotivo: function () { return $('select[name="InicioProgramadoMotivo"]') },
+    InicioProgramadoComentarios: function () { return $('textarea[name="InicioProgramadoComentarios"]') },
+    Status: function () { return $('select#status'); },
+};
+
+var JustificandoInicioProgramado = false;
 
 /* global window, exports, define */
 
@@ -494,6 +507,27 @@ function ValidarAgendamentosAgendamento() {
     // }
 
     return errorAgendamentosAgendamento;
+}
+
+function ValidarAbaJustificativa() {
+    var errosAbaJustificativa = 0;
+    LimparValidacoes();
+
+    if (JustificandoInicioProgramado && (R.InicioProgramadoMotivo.val() === null || R.InicioProgramadoMotivo.val() == '')) {
+        errosAbaJustificativa ++;
+        NotificarErroValidacao('select', 'select#inicioProgramadoMotivo', '', '');
+    } else {
+        LimparValidacao('select', 'select#inicioProgramadoMotivo', '');
+    }
+
+    if (JustificandoInicioProgramado && (R.InicioProgramadoComentarios.val() === null || R.InicioProgramadoComentarios.val() == '')) {
+        errosAbaJustificativa ++;
+        NotificarErroValidacao('text', 'textarea#inicioProgramadoComentarios', '', '');
+    } else {
+        LimparValidacao('text', 'textarea#inicioProgramadoComentarios', '');
+    }
+
+    return errosAbaJustificativa;
 }
 
 function ValidarAgendamentosResponsaveisBrinde() {
@@ -1322,6 +1356,8 @@ function ValidarAgendamentosAcompanhamentos(tipoDeLote) {
 
 function ValidarStatusECamposObrigatorios() {
     var erros = 0;
+    erros += ValidarAbaJustificativa();
+
     switch (state) {
         case EM_CANCELAMENTO:
             if ($('select#canceladoMotivo').children('option:selected').val() === 'Selecione uma opção') {
@@ -1385,11 +1421,12 @@ function ValidarAgendamento() {
     var errosPnlGeral = ValidarAgendamentosGeral();
     var errosAbaProduto = ValidarAgendamentosProduto();
     var errorAbaAgendamento = ValidarAgendamentosAgendamento();
+    var errosAbaJustificativa = ValidarAbaJustificativa();
 
     var errorAgendamentosResponsaveis = ValidarAgendamentosResponsaveis($("select#tipoDeLote").val());
     var errorAgendamentosAcompanhamentos = ValidarAgendamentosAcompanhamentos($("select#tipoDeLote").val());
 
-    erroTotal = errosPnlGeral + errosAbaProduto + errorAbaAgendamento + errorAgendamentosResponsaveis; //+ errorAgendamentosAcompanhamentos;
+    erroTotal = errosPnlGeral + errosAbaProduto + errorAbaAgendamento + errosAbaJustificativa + errorAgendamentosResponsaveis; //+ errorAgendamentosAcompanhamentos;
 
     if (erroTotal > 0) {
         alert("Favor preencher os campos obrigatórios");
@@ -1629,6 +1666,11 @@ function AtributoNumber(number) {
 function AtualizarAgendamento(id) {
     var $promise = $.Deferred();
     CalcularCamposCalculaveis();
+
+    if (JustificandoInicioProgramado) {
+        RegistrarHistoricoPendente(historicos.EXECUCAO_REAGENDADA);
+    }
+
     ModificarStatusPorFormState(state);
     AtualizarAgendamentoEmMemoria();
 
@@ -1864,6 +1906,7 @@ function GerarMensagemHistorico(historico, antigo, novo, responsavelNome, respon
         case historicos.LOTE_REPROVADO:              return sprintf(historicos.LOTE_REPROVADO, moment(new Date(), 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm'));
         case historicos.AGUARDANDO_REAGENDAMENTO:    return sprintf(historicos.AGUARDANDO_REAGENDAMENTO);
         case historicos.LOTE_APROVADO_SIMILARIDADE:  return sprintf(historicos.LOTE_APROVADO_SIMILARIDADE, memoriaAgendamentoAtual.CodigoAgendamento, responsavelObservacoes);
+        case historicos.EXECUCAO_REAGENDADA:         return sprintf(historicos.EXECUCAO_REAGENDADA, memoriaAgendamentoAtual.InicioProgramado, R.InicioProgramadoMotivo.val(), R.InicioProgramadoComentarios.val());
         default:                                     return '';
     }
 }
@@ -2500,8 +2543,8 @@ function CarregarFabricas() {
             }
 
             $(Data.responseXML).SPFilterNode("z:row").each(function () {
-                $('select#fabrica').append('<option value="' + $(this).attr("ows_ID") + '">' + $(this).attr("ows_Title") + ' - ' + $(this).attr("ows_Numero") + '</option>')
-                $('select#maoObra').append('<option value="' + $(this).attr("ows_ID") + '">' + $(this).attr("ows_Title") + ' - ' + $(this).attr("ows_Numero") + '</option>')
+                $('select#fabrica').append('<option value="' + $(this).attr("ows_ID") + '">' + $(this).attr("ows_Title") + ' - ' + $(this).attr("ows_Numero") + '</option>');
+                $('select#maoObra').append('<option value="' + $(this).attr("ows_ID") + '">' + $(this).attr("ows_Title") + ' - ' + $(this).attr("ows_Numero") + '</option>');
             });
 
             $promise.resolve();
@@ -2680,6 +2723,32 @@ function CarregarListaStatus() {
 
     for (var i = 0; i < status.length; i ++) {
         $('select#status').append('<option value="' + status[i] + '">' + status[i] + '</option>');
+    }
+
+    $promise.resolve();
+
+    return $promise;
+}
+
+function CarregarMotivoInicioProgramado() {
+    var $promise = $.Deferred();
+
+    var motivos = [
+        'Falta de insumos',
+        'Atendimento a demanda',
+        'Data incorreta',
+        'Recursos não disponibilizados pela fábrica',
+        'Problema de cadastro',
+        'Problema de TI',
+        'Priorização de projetos',
+        'Outros (detalhar)',
+        'Indisponibilidade do time',
+        'Bulk indisponível',
+        'Alterada agenda terceiro',
+    ];
+
+    for (var i = 0; i < motivos.length; i ++) {
+        R.InicioProgramadoMotivo.append('<option value="' + motivos[i] + '">' + motivos[i] + '</option>');
     }
 
     $promise.resolve();
@@ -3162,7 +3231,7 @@ function PegarPeoplePickerPorId(peoplePickerId) {
     return SPClientPeoplePicker.SPClientPeoplePickerDict[peoplePickerName];
 }
 
-function PegarUsuarioDoPeoplePicker(peoplePickerId) {
+function PegarUsuarioDoPeoplePicker(peoplePickerId, ignorarErros) {
     var peoplePickerUser = PegarPeoplePickerPorId(peoplePickerId).GetAllUserInfo().pop();
 
     if (peoplePickerUser == undefined) {
@@ -3172,7 +3241,7 @@ function PegarUsuarioDoPeoplePicker(peoplePickerId) {
     return {
         loginName: peoplePickerUser.Key,
         nome: peoplePickerUser.DisplayText,
-        email: peoplePickerUser.EntityData.Email
+        email: (ignorarErros && !peoplePickerUser.EntityData) ? null : peoplePickerUser.EntityData.Email
     };
 }
 
@@ -3916,6 +3985,23 @@ function ModificarAbasPorFormState(formState) {
     }
 }
 
+function ListarPeoplePicker() {
+    var res = [];
+
+    $.each(GetResponsaveisPorTipoDeLote($('#tipoDeLote').val()), function (i, it) {
+        try {
+            var usuario = $.extend({}, PegarUsuarioDoPeoplePicker(it.peoplePickerId, true));
+            usuario.setor = it.nome;
+            res.push(usuario);
+        } catch (e) {
+            console.log("Usuário com problema encontrado.", it);
+            console.error(e);
+        }
+    });
+
+    return res;
+}
+
 function ModificarAbasPorTipoDeLote(tipoDeLote) {
     $('#pills-tab-qualidade-resp').hide();
     $('#pills-tab-eng-envase-resp').hide();
@@ -4238,6 +4324,35 @@ function RegistrarBindings() {
             $tab.find('[name="ReprovadoMotivo"]').prop('disabled', true);
         }
     });
+
+    R.InicioProgramado.change(function () {
+        if (state == AGENDAMENTO_EM_EDICAO || (R.Status.val() == LOTE_NAO_EXECUTADO && state == RASCUNHO_EM_EDICAO)) {
+            if (memoriaAgendamentoAtual.InicioProgramado != R.InicioProgramado.val()) {
+                habilitarJustificativaInicioProgramado();
+            } else if (R.Status.val() == LOTE_NAO_EXECUTADO && state == RASCUNHO_EM_EDICAO) {
+                abandonarJustificativaInicioProgramado();
+            } else {
+                desabilitarJustificativaInicioProgramado();
+            }
+        }
+    });
+}
+
+function habilitarJustificativaInicioProgramado() {
+    JustificandoInicioProgramado = true;
+    R.CamposJustificativaInicioProgramado.removeClass('d-md-none');
+    R.LinkAbaJustificativa.removeClass("disabled");
+}
+
+function abandonarJustificativaInicioProgramado() {
+    JustificandoInicioProgramado = false;
+    R.CamposJustificativaInicioProgramado.addClass('d-md-none');
+}
+
+function desabilitarJustificativaInicioProgramado() {
+    abandonarJustificativaInicioProgramado();
+    R.LinkAbaJustificativa.addClass("disabled");
+    $('#pills-produto-tab').tab('show');
 }
 
 function espelharCheckBox(checkA, checkB) {
@@ -4261,6 +4376,8 @@ function espelharCheckBox(checkA, checkB) {
 function ResetarAgendamento() {
     var $labelQuantidadePecas = $('label[for="produtoQuantidade"]');
     $labelQuantidadePecas.text("Quantidade (peças)");
+    R.InicioProgramadoMotivo.val('');
+    R.InicioProgramadoComentarios.val('');
 
     $('#main [name].salvar-campo').each(function () {
         var $this = $(this);
@@ -4282,6 +4399,10 @@ function ResetarAgendamento() {
 function SalvarAgendamento() {
     if (memoriaAgendamentoAtual && memoriaAgendamentoAtual.ID) {
         return AtualizarAgendamento(memoriaAgendamentoAtual.ID).then(function (response) {
+            if (JustificandoInicioProgramado) {
+                desabilitarJustificativaInicioProgramado();
+            }
+
             return CarregarAgendamento(response.record.attr('ows_ID'));
         });
     }
@@ -4412,6 +4533,8 @@ function RegistrarBotoes() {
                 alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
                 botoesStatus['salvar'] = false;
             });
+        } else {
+            botoesStatus['salvar'] = false;
         }
 
         return false;
@@ -4433,6 +4556,8 @@ function RegistrarBotoes() {
             }).fail(function () {
                 botoesStatus['agendar'] = false;
             });
+        } else {
+            botoesStatus['agendar'] = false;
         }
     });
 
@@ -4456,6 +4581,8 @@ function RegistrarBotoes() {
                 alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
                 botoesStatus['salvar-agendar'] = false;
             });
+        } else {
+            botoesStatus['salvar-agendar'] = false;
         }
 
         return false;
@@ -4553,6 +4680,7 @@ function RegistrarBotoes() {
         }
 
         ModificarFormState($('select#status').val());
+        abandonarJustificativaInicioProgramado();
         botoesStatus['abandonar'] = false;
     });
 
@@ -4784,7 +4912,7 @@ function CarregarHistorico(codigoAgendamento) {
 
             $(Data.responseXML).SPFilterNode("z:row").each(function () {
                 var $this = $(this);
-                $table.find('tbody').append('<tr><th scope="row">' + moment($this.attr("ows_Created"), 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm') + '</th><td scope="row">' + $this.attr("ows_Area") + '</td><td scope="row">' + FiltrarNomeUsuarioPorPessoaId($this.attr("ows_Author")) + '</td><td scope="row">' + $this.attr("ows_Mensagem") + '</td></tr>');
+                $table.find('tbody').append('<tr><th scope="row">' + moment($this.attr("ows_Created"), 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm') + '</th><td scope="row">' + $this.attr("ows_Area") + '</td><td scope="row">' + FiltrarNomeUsuarioPorPessoaId($this.attr("ows_Author")) + '</td><td scope="row"><pre>' + $this.attr("ows_Mensagem") + '</pre></td></tr>');
             });
 
             $promise.resolve();
@@ -4998,6 +5126,11 @@ function getAttachmentFiles(listItem) {
 }
 
 $(document).ready(function () {
+    // Carregando refeferências
+    Object.keys(R).forEach(function (key) {
+        R[key] = R[key].call();
+    });
+
     $('#onetIDListForm').css('width', '100%');
 
     $.when(
@@ -5009,11 +5142,12 @@ $(document).ready(function () {
         CarregarListaStatus(),
         CarregarListaTiposLotes(),
         CarregarMotivoCancelamento(),
+        CarregarMotivoInicioProgramado(),
         CarregarMotivoNaoExecutado(),
         InitializeAllPeoplePickers(),
         CarregarListaMotivoAnalise(),
         CarregarListasDeMeioAmbiente(),
-        CarregarGruposDoUsuarioAtual()
+        CarregarGruposDoUsuarioAtual(),
     ).then(function () {
         InstanciarDateTimePicker();
         RegistrarBindings();
