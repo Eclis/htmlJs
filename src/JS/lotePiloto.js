@@ -17,6 +17,7 @@ var EM_NAO_EXECUCAO = 'emNaoExecucao';
 var EM_REGISTRO_DE_ANALISE = 'emRegistroDeAnalise';
 
 var state;
+var memoriaStatusAnterior;
 var memoriaAprovacoesAntigo = {};
 var memoriaAprovacoesAtual = {};
 var memoriaAgendamentoAntigo = null;
@@ -75,6 +76,7 @@ var R = {
 };
 
 var JustificandoInicioProgramado = false;
+var UsuarioLogado = null;
 
 /* global window, exports, define */
 
@@ -529,6 +531,7 @@ function ValidarAbaJustificativa() {
 
     if (errosAbaJustificativa > 0) {
         R.LinkAbaJustificativa.tab('show');
+        alert('Favor incluir Motivo e Justificativa da alteração da data início programada');
     }
 
     return errosAbaJustificativa;
@@ -1383,7 +1386,7 @@ function ValidarStatusECamposObrigatorios() {
 
                 if (aprovacao._abaAnaliseId != null) {
                     var $abaAnalise = $('#' + aprovacao._abaAnaliseId);
-                    if (CarregarUsuarioAtual().id == FiltrarIdPorPessoaId(aprovacao.Pessoa)) {
+                    if (UsuarioLogado.id == FiltrarIdPorPessoaId(aprovacao.Pessoa)) {
                         var $Resultado = $abaAnalise.find('[name=Resultado]');
                         var reprovadoMotivo = $abaAnalise.find('[name=ReprovadoMotivo]');
 
@@ -1728,7 +1731,14 @@ function AtualizarAgendamento(id) {
     return $promise.then(function (response) {
         let $TipoLote = $('[name=TipoLote]');
         let promises = [];
-        let responsaveis = GetResponsaveisPorTipoDeLote($TipoLote.val());
+        let responsaveis;
+
+        if (memoriaStatusAnterior == REGISTRO_DE_ANALISE && memoriaGrupos.indexOf(listDemaisGrupos[0]) < 0) {
+            responsaveis = GetMeusResponsaveisPorTipoDeLote($TipoLote.val());
+        } else {
+            responsaveis = GetResponsaveisPorTipoDeLote($TipoLote.val());
+        }
+
         memoriaAprovacoesAntigo = $.extend(true, {}, memoriaAprovacoesAtual);
 
         $.each(responsaveis, function (i, responsavel) {
@@ -3197,6 +3207,15 @@ var SetoresResponsaveis = [
     {tipoDeLote: 'Fabricação', nome: 'Meio Ambiente - Responsável',    peoplePickerId: 'peoplePickerAbaAcRespMeioAmbiente',    abaAcompanhanteId: 'pills-meioambiente-acomp',   abaAnaliseId: 'tab-meio-ambiente-resp'},
 ];
 
+function GetMeusResponsaveisPorTipoDeLote(tipoDeLote) {
+    return $.grep(SetoresResponsaveis, function (responsavel) {
+        return responsavel.tipoDeLote == tipoDeLote &&
+            memoriaAprovacoesAtual[responsavel.nome] &&
+            PegarUsuarioDoPeoplePicker(responsavel.peoplePickerId) &&
+            UsuarioLogado.id == FiltrarIdPorPessoaId(memoriaAprovacoesAtual[responsavel.nome].Pessoa);
+    });
+}
+
 function GetResponsavelPorNome(nome) {
     return $.grep(SetoresResponsaveis, function (responsavel) {
         return responsavel.nome == nome;
@@ -3866,7 +3885,7 @@ function ModificarCamposPorFormState(formState) {
 
                 if (aprovacao._abaAnaliseId != null) {
                     var $abaAnalise = $('#' + aprovacao._abaAnaliseId);
-                    if (CarregarUsuarioAtual().id == FiltrarIdPorPessoaId(aprovacao.Pessoa) &&
+                    if (UsuarioLogado.id == FiltrarIdPorPessoaId(aprovacao.Pessoa) &&
                             ['Pendente', 'Rascunho'].indexOf(aprovacao.Resultado) != -1) {
                         $abaAnalise.find('[name=ExecucaoLoteAcompanhada]').attr('disabled', false);
                         $abaAnalise.find('[name=Resultado]').attr('disabled', false);
@@ -3899,6 +3918,7 @@ function ModificarCamposPorFormState(formState) {
 
 function ModificarStatusPorFormState(formState) {
     var $status = $('select#status');
+    memoriaStatusAnterior = $status.val();
 
     switch (formState) {
         case AGENDADO:
@@ -4209,7 +4229,7 @@ function PreencherPeoplePicker(peoplePickerId, usuario) {
 }
 
 function PreencherResponsavelDlPcl() {
-    return PreencherPeoplePicker('peoplePickerAbaRespRespDLPCL', CarregarUsuarioAtual());
+    return PreencherPeoplePicker('peoplePickerAbaRespRespDLPCL', UsuarioLogado);
 }
 
 function RegistrarBindings() {
@@ -4704,7 +4724,7 @@ function RegistrarBotoes() {
 }
 
 function CarregarGruposDoUsuarioAtual() {
-    return CarregarGruposPorLoginName(CarregarUsuarioAtual().loginName).then(function (grupos) {
+    return CarregarGruposPorLoginName(UsuarioLogado.loginName).then(function (grupos) {
         memoriaGrupos = grupos;
     });
 }
@@ -5138,6 +5158,7 @@ $(document).ready(function () {
     });
 
     $('#onetIDListForm').css('width', '100%');
+    UsuarioLogado = CarregarUsuarioAtual();
 
     $.when(
         CarregarCategoriaProjeto(),
