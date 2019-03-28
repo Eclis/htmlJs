@@ -1690,6 +1690,8 @@ function AtualizarAgendamento(id) {
             campos.push([this.name, $this.prop('checked') ? "1" : "0"]);
         } else if ($this.is('.date-time-picker') && $this.val()) {
             campos.push([this.name, moment($this.val(), 'DD/MM/YYYY HH:mm').format('YYYY-MM-DDTHH:mm:ss[-00:00]')]);
+        } else if ($this.is('.rich-text')) {
+            campos.push([this.name, $('<div />').text($this.summernote('code')).html()]);
         } else if ($this.val() != undefined) {
             campos.push([this.name, $this.val()]);
         }
@@ -1775,6 +1777,8 @@ function AtualizarAgendamentoEmMemoria() {
             memoriaAgendamentoAtual[this.name] = $this.prop('checked');
         } else if ($this.is('.date-time-picker')) {
             memoriaAgendamentoAtual[this.name] = $this.val();
+        } else if ($this.is('.rich-text')) {
+            memoriaAgendamentoAtual[this.name] = $this.summernote('code');
         } else if ($this.val() != undefined) {
             memoriaAgendamentoAtual[this.name] = $this.val();
         }
@@ -1851,7 +1855,7 @@ function InserirHistoricosPendentes() {
 
 function InserirHistorico(codigoAgendamento, mensagem) {
     var $promise = $.Deferred();
-    var area = '';
+    var area = '-';
 
     for (var i = 0; i < historicosAreas.length; i ++) {
         if (memoriaGrupos.indexOf(historicosAreas[i]) > -1) {
@@ -2173,6 +2177,10 @@ function CarregarAgendamento(id) {
                         elemento: $elemento,
                         valor: this.value
                     };
+                } else if ($elemento.is('.rich-text')) {
+                    $elemento.summernote('code', this.value);
+                    memoriaAgendamentoAtual[$elemento.attr('name')] = this.value;
+                    $elemento.change();
                 } else if ($elemento.is('div')) {
                     $elemento.text(this.value);
                     memoriaAgendamentoAtual[$elemento.attr('name')] = this.value;
@@ -3085,6 +3093,8 @@ function InserirAgendamento() {
             campos.push([this.name, $this.prop('checked') ? '1' : '0']);
         } else if ($this.is('.date-time-picker') && $this.val()) {
             campos.push([this.name, moment($this.val(), 'DD/MM/YYYY HH:mm').format('YYYY-MM-DDTHH:mm:ss[-00:00]')]);
+        } else if ($this.is('.rich-text')) {
+            campos.push([this.name, $('<div />').text($this.summernote('code')).html()]);
         } else if ($this.val() != undefined) {
             campos.push([this.name, $this.val()]);
         }
@@ -3633,7 +3643,7 @@ function ModificarCamposPorFormState(formState) {
     $InicioProgramado.attr('disabled', true);
     $DuracaoEstimadaHoras.attr('disabled', true);
     $DuracaoEstimadaMinutos.attr('disabled', true);
-    $Observacoes.attr('disabled', true);
+    $Observacoes.summernote('disable');
     $motivoCancelamento.attr('disabled', true);
     $motivoComentarios.attr('disabled', true);
     $motivoNaoExecutado.attr('disabled', true);
@@ -3734,7 +3744,7 @@ function ModificarCamposPorFormState(formState) {
             $InicioProgramado.attr('disabled', false);
             $DuracaoEstimadaHoras.attr('disabled', false);
             $DuracaoEstimadaMinutos.attr('disabled', false);
-            $Observacoes.attr('disabled', false);
+            $Observacoes.summernote('enable');
             $dlpclResponsavelPP.attr('disabled', false);
             $envaseResponsavelAcompanhamento.attr('disabled', false);
             $envaseResponsavelPPResp.attr('disabled', false);
@@ -3795,14 +3805,14 @@ function ModificarCamposPorFormState(formState) {
                         $envaseResponsavelPPResp.attr('disabled', false);
                         $envaseResponsavelPPGer.attr('disabled', false);
                         $LinhaEquipamento.attr('disabled', false);
-                        $Observacoes.attr('disabled', false);
+                        $Observacoes.summernote('enable');
                     }
                     if (usuarioPertenceAoGrupo($xml, engFabricacao)) {
                         $engFabResponsavelAcompanhamento.attr('disabled', false);
                         $engFabResponsavelPPResp.attr('disabled', false);
                         $engFabResponsavelGer.attr('disabled', false);
                         $LinhaEquipamento.attr('disabled', false);
-                        $Observacoes.attr('disabled', false);
+                        $Observacoes.summernote('enable');
                     }
 
                     if (usuarioPertenceAoGrupo($xml, inovDf)) {
@@ -4412,6 +4422,8 @@ function ResetarAgendamento() {
             $this.prop('checked', false);
         } else if ($this.is('select') && !$this.is('select#status')) {
             $this.val('Selecione uma opção');
+        } else if ($this.is('.rich-text')) {
+            $this.summernote('code', '');
         } else {
             $this.val('');
         }
@@ -5157,6 +5169,10 @@ $(document).ready(function () {
         R[key] = R[key].call();
     });
 
+    $('#agendamentoObservacoes').summernote({
+        minHeight: 288
+    });
+
     $('#onetIDListForm').css('width', '100%');
     UsuarioLogado = CarregarUsuarioAtual();
 
@@ -5196,5 +5212,7 @@ $(document).ready(function () {
                 bloquearBotoesAbaAnexo();
             }, 3000);
         });
+    }).fail(function () {
+        alert('Ops., algo deu errado.');
     });
 });
