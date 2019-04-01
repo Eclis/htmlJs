@@ -1,5 +1,13 @@
 'use strict';
 
+var jqueryInit = jQuery.prototype.init;
+
+jQuery.prototype.init = function (selector, context, root) {
+    var obj = new jqueryInit(selector, context, root);
+    obj.selector = selector;
+    return obj;
+};
+
 var RASCUNHO = 'Rascunho';
 var AGENDADO = 'Agendado';
 var REGISTRO_DE_ANALISE = 'Registro das Análises';
@@ -47,6 +55,17 @@ var historicos = {
     'AGUARDANDO_REAGENDAMENTO':     'Lote aguardando reagendamento',
     'LOTE_APROVADO_SIMILARIDADE':   'Lote aprovado por similaridade ao lote %d. Motivo: "%s"',
     'EXECUCAO_REAGENDADA':          'Execução reagendada para %s.\n Motivo: %s\n Justificativa: %s',
+    'CODIGO_PRODUTO_ALTERADO':      'Código do Produto alterado de "%s" para "%s"',
+    'LINHA_PRODUTO_ALTERADO':       'Linha do Produto alterado de "%s" para "%s"',
+    'DESCRICAO_PRODUTO_ALTERADO':   'Descrição do Produto alterado de "%s" para "%s"',
+    'PROJETO_ALTERADO':             'Projeto alterado de "%s" para "%s"',
+    'FORMULA_ALTERADO':             'Fórmula alterado de "%s" para "%s"',
+    'QUANTIDADE_PECAS_ALTERADO':          'Quantidade alterado de "%s" para "%s"',
+    'RESPONSAVEL_AMOSTRA_ALTERADO': 'Responsável pela Amostra alterado de "%s" para "%s"',
+    'QUANTIDADE_AMOSTRAS_ALTERADO': 'Quantidade de Amostras alterado de "%s" para "%s"',
+    'CENTRO_CUSTO_ALTERADO':        'Centro de custo - PEP - NT alterado de "%s" para "%s"',
+    'MAO_OBRA_ALTERADO':            'Mão de Obra alterado de "%s" para "%s"',
+    'DURACAO_ALTERADO':             'Duração de execução alterado de "%s" para "%s"',
 };
 
 var historicosAreas = [
@@ -66,13 +85,13 @@ var historicosAreas = [
 var botoesStatus = {};
 
 var R = {
-    InicioProgramado: function () { return $('input[name=InicioProgramado]') },
-    LinkAbaJustificativa: function () { return $('#pills-justificativa-tab') },
-    AbaJustificativa: function () { return $('#pills-justificativa') },
-    CamposJustificativaInicioProgramado: function () { return $('#justificativaInicioProgramado') },
-    InicioProgramadoMotivo: function () { return $('select[name="InicioProgramadoMotivo"]') },
-    InicioProgramadoComentarios: function () { return $('textarea[name="InicioProgramadoComentarios"]') },
-    Status: function () { return $('select#status'); },
+    InicioProgramado: $('input[name=InicioProgramado]'),
+    LinkAbaJustificativa: $('#pills-justificativa-tab'),
+    AbaJustificativa: $('#pills-justificativa'),
+    CamposJustificativaInicioProgramado: $('#justificativaInicioProgramado'),
+    InicioProgramadoMotivo: $('select[name="InicioProgramadoMotivo"]'),
+    InicioProgramadoComentarios: $('textarea[name="InicioProgramadoComentarios"]'),
+    Status: $('select#status'),
 };
 
 var JustificandoInicioProgramado = false;
@@ -1791,33 +1810,24 @@ function AtualizarAgendamentoEmMemoria() {
         var valorNovo = memoriaAgendamentoAtual[chaves[i]];
 
         if (valorAntigo && valorNovo != valorAntigo) {
-            if (chaves[i] == 'TipoLote') {
-                RegistrarHistoricoPendente(historicos.TIPO_LOTE_ALTERADO, true);
-            }
-
-            if (chaves[i] == 'Motivo') {
-                RegistrarHistoricoPendente(historicos.MOTIVO_ALTERADO, true);
-            }
-
-            if (chaves[i] == 'CategoriaProjeto') {
-                RegistrarHistoricoPendente(historicos.CATEGORIA_PROJETO_ALTERADA, true);
-            }
-
-            if (chaves[i] == 'LinhaEquipamento') {
-                RegistrarHistoricoPendente(historicos.LINHA_EQUIPAMENTO_ALTERADA, true);
-            }
-
-            if (chaves[i] == 'GrauComplexidade') {
-                RegistrarHistoricoPendente(historicos.GRAU_COMPLEXIDADE_ALTERADO, true);
-            }
-
-            if (chaves[i] == 'Fabrica') {
-                RegistrarHistoricoPendente(historicos.FABRICA_ADICIONADA, true);
-            }
-
-            if (chaves[i] == 'Observacoes') {
-                RegistrarHistoricoPendente(historicos.OBSERVACOES_ADICIONADAS, true);
-            }
+            if (chaves[i] == 'TipoLote') { RegistrarHistoricoPendente(historicos.TIPO_LOTE_ALTERADO, true); }
+            if (chaves[i] == 'Motivo') { RegistrarHistoricoPendente(historicos.MOTIVO_ALTERADO, true); }
+            if (chaves[i] == 'CategoriaProjeto') { RegistrarHistoricoPendente(historicos.CATEGORIA_PROJETO_ALTERADA, true); }
+            if (chaves[i] == 'LinhaEquipamento') { RegistrarHistoricoPendente(historicos.LINHA_EQUIPAMENTO_ALTERADA, true); }
+            if (chaves[i] == 'GrauComplexidade') { RegistrarHistoricoPendente(historicos.GRAU_COMPLEXIDADE_ALTERADO, true); }
+            if (chaves[i] == 'Fabrica') { RegistrarHistoricoPendente(historicos.FABRICA_ADICIONADA, true); }
+            if (chaves[i] == 'Observacoes') { RegistrarHistoricoPendente(historicos.OBSERVACOES_ADICIONADAS, true); }
+            if (chaves[i] == 'CodigoProduto') { RegistrarHistoricoPendente(historicos.CODIGO_PRODUTO_ALTERADO, true); }
+            if (chaves[i] == 'LinhaProduto') { RegistrarHistoricoPendente(historicos.LINHA_PRODUTO_ALTERADO, true); }
+            if (chaves[i] == 'DescricaoProduto') { RegistrarHistoricoPendente(historicos.DESCRICAO_PRODUTO_ALTERADO, true); }
+            if (chaves[i] == 'Projeto') { RegistrarHistoricoPendente(historicos.PROJETO_ALTERADO, true); }
+            if (chaves[i] == 'Formula') { RegistrarHistoricoPendente(historicos.FORMULA_ALTERADO, true); }
+            if (chaves[i] == 'QuantidadePecas') { RegistrarHistoricoPendente(historicos.QUANTIDADE_PECAS_ALTERADO, true); }
+            if (chaves[i] == 'ResponsavelAmostra') { RegistrarHistoricoPendente(historicos.RESPONSAVEL_AMOSTRA_ALTERADO, true); }
+            if (chaves[i] == 'QuantidadeAmostra') { RegistrarHistoricoPendente(historicos.QUANTIDADE_AMOSTRAS_ALTERADO, true); }
+            if (chaves[i] == 'CentroCusto') { RegistrarHistoricoPendente(historicos.CENTRO_CUSTO_ALTERADO, true); }
+            if (chaves[i] == 'MaoObra') { RegistrarHistoricoPendente(historicos.MAO_OBRA_ALTERADO, true); }
+            if (chaves[i] == 'DuracaoEstimadaHoras' || chaves[i] == 'DuracaoEstimadaMinutos') { RegistrarHistoricoPendente(historicos.DURACAO_ALTERADO, true); }
         }
     }
 }
@@ -1904,28 +1914,39 @@ function InserirHistorico(codigoAgendamento, mensagem) {
 
 function GerarMensagemHistorico(historico, antigo, novo, responsavelNome, responsavelAntigo, responsavelAtual, responsavelObservacoes) {
     switch (historico) {
-        case historicos.CRIADO:                      return sprintf(historicos.CRIADO, memoriaAgendamentoAtual.CodigoAgendamento);
-        case historicos.AGENDADO:                    return sprintf(historicos.AGENDADO, memoriaAgendamentoAtual.InicioProgramado);
-        case historicos.REAGENDADO:                  return sprintf(historicos.REAGENDADO);
-        case historicos.EXECUTADO:                   return sprintf(historicos.EXECUTADO, memoriaAgendamentoAtual.RegistroAnalisesInicio);
-        case historicos.NAO_EXECUTADO:               return sprintf(historicos.NAO_EXECUTADO, memoriaAgendamentoAtual.NaoExecutadoMotivo);
-        case historicos.STATUS_ALTERADO:             return sprintf(historicos.STATUS_ALTERADO, memoriaAgendamentoAtual.Status);
-        case historicos.CANCELADO:                   return sprintf(historicos.CANCELADO, memoriaAgendamentoAtual.CodigoAgendamento, memoriaAgendamentoAtual.CanceladoMotivo);
-        case historicos.TIPO_LOTE_ALTERADO:          return sprintf(historicos.TIPO_LOTE_ALTERADO, (antigo.TipoLote) ? antigo.TipoLote : '', (memoriaAgendamentoAtual.TipoLote) ? memoriaAgendamentoAtual.TipoLote : '');
-        case historicos.MOTIVO_ALTERADO:             return sprintf(historicos.MOTIVO_ALTERADO, (antigo.Motivo) ? antigo.Motivo : '', (memoriaAgendamentoAtual.Motivo) ? memoriaAgendamentoAtual.Motivo : '');
-        case historicos.CATEGORIA_PROJETO_ALTERADA:  return sprintf(historicos.CATEGORIA_PROJETO_ALTERADA, (antigo.CategoriaProjeto) ? antigo.CategoriaProjeto : '', (memoriaAgendamentoAtual.CategoriaProjeto) ? memoriaAgendamentoAtual.CategoriaProjeto : '');
-        case historicos.LINHA_EQUIPAMENTO_ALTERADA:  return sprintf(historicos.LINHA_EQUIPAMENTO_ALTERADA, (antigo.LinhaEquipamento) ? $('#linhaEquipamento option[value=' + antigo.LinhaEquipamento + ']').text() : '', (memoriaAgendamentoAtual.LinhaEquipamento) ? $('#linhaEquipamento option[value=' + memoriaAgendamentoAtual.LinhaEquipamento + ']').text() : '');
-        case historicos.GRAU_COMPLEXIDADE_ALTERADO:  return sprintf(historicos.GRAU_COMPLEXIDADE_ALTERADO, (antigo.GrauComplexidade) ? antigo.GrauComplexidade : '', (memoriaAgendamentoAtual.GrauComplexidade) ? memoriaAgendamentoAtual.GrauComplexidade : '');
-        case historicos.OBSERVACOES_ADICIONADAS:     return sprintf(historicos.OBSERVACOES_ADICIONADAS);
-        case historicos.FABRICA_ADICIONADA:          return sprintf(historicos.FABRICA_ADICIONADA, $('#fabrica option:selected').text());
-        case historicos.RESPONSAVEL_ALTERADO:        return sprintf(historicos.RESPONSAVEL_ALTERADO, responsavelNome, responsavelAntigo, responsavelAtual);
-        case historicos.LOTE_CANCELADO:              return sprintf(historicos.LOTE_CANCELADO);
-        case historicos.LOTE_APROVADO:               return sprintf(historicos.LOTE_APROVADO, moment(new Date(), 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm'));
-        case historicos.LOTE_REPROVADO:              return sprintf(historicos.LOTE_REPROVADO, moment(new Date(), 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm'));
-        case historicos.AGUARDANDO_REAGENDAMENTO:    return sprintf(historicos.AGUARDANDO_REAGENDAMENTO);
-        case historicos.LOTE_APROVADO_SIMILARIDADE:  return sprintf(historicos.LOTE_APROVADO_SIMILARIDADE, memoriaAgendamentoAtual.CodigoAgendamento, responsavelObservacoes);
-        case historicos.EXECUCAO_REAGENDADA:         return sprintf(historicos.EXECUCAO_REAGENDADA, memoriaAgendamentoAtual.InicioProgramado, R.InicioProgramadoMotivo.val(), R.InicioProgramadoComentarios.val());
-        default:                                     return '';
+        case historicos.CRIADO:                       return sprintf(historicos.CRIADO, memoriaAgendamentoAtual.CodigoAgendamento);
+        case historicos.AGENDADO:                     return sprintf(historicos.AGENDADO, memoriaAgendamentoAtual.InicioProgramado);
+        case historicos.REAGENDADO:                   return sprintf(historicos.REAGENDADO);
+        case historicos.EXECUTADO:                    return sprintf(historicos.EXECUTADO, memoriaAgendamentoAtual.RegistroAnalisesInicio);
+        case historicos.NAO_EXECUTADO:                return sprintf(historicos.NAO_EXECUTADO, memoriaAgendamentoAtual.NaoExecutadoMotivo);
+        case historicos.STATUS_ALTERADO:              return sprintf(historicos.STATUS_ALTERADO, memoriaAgendamentoAtual.Status);
+        case historicos.CANCELADO:                    return sprintf(historicos.CANCELADO, memoriaAgendamentoAtual.CodigoAgendamento, memoriaAgendamentoAtual.CanceladoMotivo);
+        case historicos.TIPO_LOTE_ALTERADO:           return sprintf(historicos.TIPO_LOTE_ALTERADO, (antigo.TipoLote) ? antigo.TipoLote : '', (memoriaAgendamentoAtual.TipoLote) ? memoriaAgendamentoAtual.TipoLote : '');
+        case historicos.MOTIVO_ALTERADO:              return sprintf(historicos.MOTIVO_ALTERADO, (antigo.Motivo) ? antigo.Motivo : '', (memoriaAgendamentoAtual.Motivo) ? memoriaAgendamentoAtual.Motivo : '');
+        case historicos.CATEGORIA_PROJETO_ALTERADA:   return sprintf(historicos.CATEGORIA_PROJETO_ALTERADA, (antigo.CategoriaProjeto) ? antigo.CategoriaProjeto : '', (memoriaAgendamentoAtual.CategoriaProjeto) ? memoriaAgendamentoAtual.CategoriaProjeto : '');
+        case historicos.LINHA_EQUIPAMENTO_ALTERADA:   return sprintf(historicos.LINHA_EQUIPAMENTO_ALTERADA, (antigo.LinhaEquipamento) ? $('#linhaEquipamento option[value=' + antigo.LinhaEquipamento + ']').text() : '', (memoriaAgendamentoAtual.LinhaEquipamento) ? $('#linhaEquipamento option[value=' + memoriaAgendamentoAtual.LinhaEquipamento + ']').text() : '');
+        case historicos.GRAU_COMPLEXIDADE_ALTERADO:   return sprintf(historicos.GRAU_COMPLEXIDADE_ALTERADO, (antigo.GrauComplexidade) ? antigo.GrauComplexidade : '', (memoriaAgendamentoAtual.GrauComplexidade) ? memoriaAgendamentoAtual.GrauComplexidade : '');
+        case historicos.OBSERVACOES_ADICIONADAS:      return sprintf(historicos.OBSERVACOES_ADICIONADAS);
+        case historicos.FABRICA_ADICIONADA:           return sprintf(historicos.FABRICA_ADICIONADA, $('#fabrica option:selected').text());
+        case historicos.RESPONSAVEL_ALTERADO:         return sprintf(historicos.RESPONSAVEL_ALTERADO, responsavelNome, responsavelAntigo, responsavelAtual);
+        case historicos.LOTE_CANCELADO:               return sprintf(historicos.LOTE_CANCELADO);
+        case historicos.LOTE_APROVADO:                return sprintf(historicos.LOTE_APROVADO, moment(new Date(), 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm'));
+        case historicos.LOTE_REPROVADO:               return sprintf(historicos.LOTE_REPROVADO, moment(new Date(), 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm'));
+        case historicos.AGUARDANDO_REAGENDAMENTO:     return sprintf(historicos.AGUARDANDO_REAGENDAMENTO);
+        case historicos.LOTE_APROVADO_SIMILARIDADE:   return sprintf(historicos.LOTE_APROVADO_SIMILARIDADE, memoriaAgendamentoAtual.CodigoAgendamento, responsavelObservacoes);
+        case historicos.EXECUCAO_REAGENDADA:          return sprintf(historicos.EXECUCAO_REAGENDADA, memoriaAgendamentoAtual.InicioProgramado, R.InicioProgramadoMotivo.val(), R.InicioProgramadoComentarios.val());
+        case historicos.CODIGO_PRODUTO_ALTERADO:      return sprintf(historicos.CODIGO_PRODUTO_ALTERADO, memoriaAgendamentoAntigo.CodigoProduto, memoriaAgendamentoAtual.CodigoProduto);
+        case historicos.LINHA_PRODUTO_ALTERADO:       return sprintf(historicos.LINHA_PRODUTO_ALTERADO, memoriaAgendamentoAntigo.LinhaProduto, memoriaAgendamentoAtual.LinhaProduto);
+        case historicos.DESCRICAO_PRODUTO_ALTERADO:   return sprintf(historicos.DESCRICAO_PRODUTO_ALTERADO, memoriaAgendamentoAntigo.DescricaoProduto, memoriaAgendamentoAtual.DescricaoProduto);
+        case historicos.PROJETO_ALTERADO:             return sprintf(historicos.PROJETO_ALTERADO, memoriaAgendamentoAntigo.Projeto, memoriaAgendamentoAtual.Projeto);
+        case historicos.FORMULA_ALTERADO:             return sprintf(historicos.FORMULA_ALTERADO, memoriaAgendamentoAntigo.Formula, memoriaAgendamentoAtual.Formula);
+        case historicos.QUANTIDADE_PECAS_ALTERADO:    return sprintf(historicos.QUANTIDADE_PECAS_ALTERADO, memoriaAgendamentoAntigo.QuantidadePecas, memoriaAgendamentoAtual.QuantidadePecas);
+        case historicos.RESPONSAVEL_AMOSTRA_ALTERADO: return sprintf(historicos.RESPONSAVEL_AMOSTRA_ALTERADO, memoriaAgendamentoAntigo.ResponsavelAmostra, memoriaAgendamentoAtual.ResponsavelAmostra);
+        case historicos.QUANTIDADE_AMOSTRAS_ALTERADO: return sprintf(historicos.QUANTIDADE_AMOSTRAS_ALTERADO, memoriaAgendamentoAntigo.QuantidadeAmostra, memoriaAgendamentoAtual.QuantidadeAmostra);
+        case historicos.CENTRO_CUSTO_ALTERADO:        return sprintf(historicos.CENTRO_CUSTO_ALTERADO, memoriaAgendamentoAntigo.CentroCusto, memoriaAgendamentoAtual.CentroCusto);
+        case historicos.MAO_OBRA_ALTERADO:            return sprintf(historicos.MAO_OBRA_ALTERADO, memoriaAgendamentoAntigo.MaoObra, memoriaAgendamentoAtual.MaoObra);
+        case historicos.DURACAO_ALTERADO:             return sprintf(historicos.DURACAO_ALTERADO, memoriaAgendamentoAntigo.DuracaoEstimadaHoras + ':' + memoriaAgendamentoAntigo.DuracaoEstimadaMinutos, memoriaAgendamentoAtual.DuracaoEstimadaHoras + ':' + memoriaAgendamentoAtual.DuracaoEstimadaMinutos);
+        default:                                      return '';
     }
 }
 
@@ -1988,7 +2009,7 @@ function ReprovarAgendamentoPorCodigoAgendamento(id) {
             var errorCode = $response.find('ErrorCode').text();
 
             if (errorCode == '0x00000000') {
-                $('select#status').val(REPROVADO);
+                R.Status.val(REPROVADO);
                 RegistrarHistoricoPendente(historicos.LOTE_REPROVADO);
                 InserirHistoricosPendentes()
                     .then($promise.resolve)
@@ -2195,7 +2216,7 @@ function CarregarAgendamento(id) {
             PreencherSelectsConsiderandoDependencia(selectsACarregar);
 
             CarregarListaResultadoAnalise().then(function () {
-                ModificarFormState($('select#status').val());
+                ModificarFormState(R.Status.val());
 
                 return $.when(true);
             }).then(function () {
@@ -2744,7 +2765,7 @@ function CarregarListaStatus() {
     ];
 
     for (var i = 0; i < status.length; i ++) {
-        $('select#status').append('<option value="' + status[i] + '">' + status[i] + '</option>');
+        R.Status.append('<option value="' + status[i] + '">' + status[i] + '</option>');
     }
 
     $promise.resolve();
@@ -3100,7 +3121,7 @@ function InserirAgendamento() {
         }
     });
 
-    campos.push(['Status', $('select#status').val()]);
+    campos.push(['Status', R.Status.val()]);
 
     $().SPServices({
         operation: "UpdateListItems",
@@ -3927,7 +3948,7 @@ function ModificarCamposPorFormState(formState) {
 }
 
 function ModificarStatusPorFormState(formState) {
-    var $status = $('select#status');
+    var $status = R.Status;
     memoriaStatusAnterior = $status.val();
 
     switch (formState) {
@@ -3989,21 +4010,21 @@ function ModificarAbasPorFormState(formState) {
     switch (formState) {
         case EM_CANCELAMENTO:
             $('#justificativaCancelamento').removeClass('d-md-none');
-            $("#pills-justificativa-tab").removeClass("disabled");
-            $("#pills-justificativa-tab").tab('show');
+            R.LinkAbaJustificativa.removeClass("disabled");
+            R.LinkAbaJustificativa.tab('show');
             break;
         case CANCELADO:
             $('#justificativaCancelamento').removeClass('d-md-none');
-            $("#pills-justificativa-tab").removeClass("disabled");
+            R.LinkAbaJustificativa.removeClass("disabled");
             break;
         case EM_NAO_EXECUCAO:
             $('#justificativaNaoExecutado').removeClass('d-md-none');
-            $("#pills-justificativa-tab").removeClass("disabled");
-            $("#pills-justificativa-tab").tab('show');
+            R.LinkAbaJustificativa.removeClass("disabled");
+            R.LinkAbaJustificativa.tab('show');
             break;
         case LOTE_NAO_EXECUTADO:
             $('#justificativaNaoExecutado').removeClass('d-md-none');
-            $("#pills-justificativa-tab").removeClass("disabled");
+            R.LinkAbaJustificativa.removeClass("disabled");
             break;
         case EM_CRIACAO:
             break;
@@ -4686,7 +4707,7 @@ function RegistrarBotoes() {
             botoesStatus['editar'] = true;
         }
 
-        let status = $('select#status').val();
+        let status = R.Status.val();
 
         if (status == RASCUNHO) {
             ModificarFormState(RASCUNHO_EM_EDICAO);
@@ -4717,7 +4738,7 @@ function RegistrarBotoes() {
             botoesStatus['abandonar'] = true;
         }
 
-        ModificarFormState($('select#status').val());
+        ModificarFormState(R.Status.val());
         abandonarJustificativaInicioProgramado();
         botoesStatus['abandonar'] = false;
     });
@@ -5164,9 +5185,9 @@ function getAttachmentFiles(listItem) {
 }
 
 $(document).ready(function () {
-    // Carregando refeferências
+    // Recarregando refeferências
     Object.keys(R).forEach(function (key) {
-        R[key] = R[key].call();
+        R[key] = $(R[key].selector);
     });
 
     $('#agendamentoObservacoes').summernote({
