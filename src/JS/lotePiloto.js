@@ -40,7 +40,7 @@ var historicos = {
     'EXECUTADO':                    'Lote executado em %s',
     'NAO_EXECUTADO':                'Lote não executado\nJustificativa: %s',
     'STATUS_ALTERADO':              'Lote em %s',
-    'CANCELADO':                    'Agendamento do lote id %d cancelado \nJustificativa: %s',
+    'CANCELADO':                    'Agendamento do lote id %d cancelado. \nJustificativa: %s',
     'TIPO_LOTE_ALTERADO':           'Tipo de lote alterado de "%s" para "%s"',
     'MOTIVO_ALTERADO':              'Motivo alterado de "%s" para "%s"',
     'CATEGORIA_PROJETO_ALTERADA':   'Categoria alterada de "%s" para "%s"',
@@ -53,7 +53,7 @@ var historicos = {
     'LOTE_APROVADO':                'Lote aprovado em %s',
     'LOTE_REPROVADO':               'Lote reprovado em %s',
     'AGUARDANDO_REAGENDAMENTO':     'Lote aguardando reagendamento',
-    'LOTE_APROVADO_SIMILARIDADE':   'Lote aprovado por similaridade ao lote %d. Motivo: "%s"',
+    'LOTE_APROVADO_SIMILARIDADE':   'Lote aprovado por similaridade. Motivo: "%s"',
     'EXECUCAO_REAGENDADA':          'Execução reagendada para %s.\n Motivo: %s\n Justificativa: %s',
     'CODIGO_PRODUTO_ALTERADO':      'Código do Produto alterado de "%s" para "%s"',
     'LINHA_PRODUTO_ALTERADO':       'Linha do Produto alterado de "%s" para "%s"',
@@ -1933,7 +1933,7 @@ function GerarMensagemHistorico(historico, antigo, novo, responsavelNome, respon
         case historicos.LOTE_APROVADO:                return sprintf(historicos.LOTE_APROVADO, moment(new Date(), 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm'));
         case historicos.LOTE_REPROVADO:               return sprintf(historicos.LOTE_REPROVADO, moment(new Date(), 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm'));
         case historicos.AGUARDANDO_REAGENDAMENTO:     return sprintf(historicos.AGUARDANDO_REAGENDAMENTO);
-        case historicos.LOTE_APROVADO_SIMILARIDADE:   return sprintf(historicos.LOTE_APROVADO_SIMILARIDADE, memoriaAgendamentoAtual.CodigoAgendamento, responsavelObservacoes);
+        case historicos.LOTE_APROVADO_SIMILARIDADE:   return sprintf(historicos.LOTE_APROVADO_SIMILARIDADE, responsavelObservacoes);
         case historicos.EXECUCAO_REAGENDADA:          return sprintf(historicos.EXECUCAO_REAGENDADA, memoriaAgendamentoAtual.InicioProgramado, R.InicioProgramadoMotivo.val(), R.InicioProgramadoComentarios.val());
         case historicos.CODIGO_PRODUTO_ALTERADO:      return sprintf(historicos.CODIGO_PRODUTO_ALTERADO, memoriaAgendamentoAntigo.CodigoProduto, memoriaAgendamentoAtual.CodigoProduto);
         case historicos.LINHA_PRODUTO_ALTERADO:       return sprintf(historicos.LINHA_PRODUTO_ALTERADO, memoriaAgendamentoAntigo.LinhaProduto, memoriaAgendamentoAtual.LinhaProduto);
