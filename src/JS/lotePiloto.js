@@ -2199,8 +2199,9 @@ function CarregarAgendamento(id) {
                         valor: this.value
                     };
                 } else if ($elemento.is('.rich-text')) {
-                    $elemento.summernote('code', this.value);
-                    memoriaAgendamentoAtual[$elemento.attr('name')] = this.value;
+                    var decodedValue = decodeHtmlString(this.value);
+                    $elemento.summernote('code', decodedValue);
+                    memoriaAgendamentoAtual[$elemento.attr('name')] = decodedValue;
                     $elemento.change();
                 } else if ($elemento.is('div')) {
                     $elemento.text(this.value);
@@ -3100,6 +3101,14 @@ function GerarISPClientPeoplePickerEntityPorUsuario(usuario) {
     };
 }
 
+function encodeHtmlString(htmlString) {
+    return $('<div />').text(htmlString).html();
+}
+
+function decodeHtmlString(htmlString) {
+    return htmlString.replace(/&#58;/g, ':');
+}
+
 function InserirAgendamento() {
     var $promise = $.Deferred();
     CalcularCamposCalculaveis();
@@ -3115,7 +3124,7 @@ function InserirAgendamento() {
         } else if ($this.is('.date-time-picker') && $this.val()) {
             campos.push([this.name, moment($this.val(), 'DD/MM/YYYY HH:mm').format('YYYY-MM-DDTHH:mm:ss[-00:00]')]);
         } else if ($this.is('.rich-text')) {
-            campos.push([this.name, $('<div />').text($this.summernote('code')).html()]);
+            campos.push([this.name, encodeHtmlString($this.summernote('code'))]);
         } else if ($this.val() != undefined) {
             campos.push([this.name, $this.val()]);
         }
