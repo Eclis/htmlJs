@@ -118,6 +118,7 @@
 
         this.parentEl = (options.parentEl && $(options.parentEl).length) ? $(options.parentEl) : $(this.parentEl);
         this.container = $(options.template).appendTo(this.parentEl);
+        this.container.hide();
 
         //
         // handle all the possible options overriding defaults
