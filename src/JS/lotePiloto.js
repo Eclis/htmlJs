@@ -32,6 +32,7 @@ var memoriaAgendamentoAntigo = null;
 var memoriaAgendamentoAtual = null;
 var memoriaGrupos = null;
 var historicosPendentes = [];
+var anexosPendentes = [];
 
 var historicos = {
     'CRIADO':                       'Agendamento criado - lote id %d',
@@ -92,6 +93,9 @@ var R = {
     InicioProgramadoMotivo: $('select[name="InicioProgramadoMotivo"]'),
     InicioProgramadoComentarios: $('textarea[name="InicioProgramadoComentarios"]'),
     Status: $('select#status'),
+    AnalisesQualidadeResponsavelPainel: $('#tab-qualidade-resp'),
+    AnalisesQualidadeResponsavelAnexo: $('#txtAtt-tab-analise-qualidade'),
+    AnalisesQualidadeGerenteAnexo: $('#txtAtt-tab-analise-qualidade-ger'),
 };
 
 var JustificandoInicioProgramado = false;
@@ -1695,6 +1699,11 @@ function AtualizarAgendamento(id) {
 
     if (JustificandoInicioProgramado) {
         RegistrarHistoricoPendente(historicos.EXECUCAO_REAGENDADA);
+    }
+
+    if (anexosPendentes.length > 0) {
+        AtivarAnexosPorIds(anexosPendentes);
+        anexosPendentes = [];
     }
 
     ModificarStatusPorFormState(state);
@@ -4747,6 +4756,8 @@ function RegistrarBotoes() {
             botoesStatus['abandonar'] = true;
         }
 
+        anexosPendentes = [];
+        CarregarPaineisDeAnexos();
         ModificarFormState(R.Status.val());
         abandonarJustificativaInicioProgramado();
         botoesStatus['abandonar'] = false;
@@ -4993,53 +5004,23 @@ function CarregarHistorico(codigoAgendamento) {
 }
 
 function carregarBotoesAnexo() {
-    var tableName = 'Agendamentos - Responsáveis';
-    var qualidResp = document.getElementById('txtAtt-tab-analise-qualidade');
-
-    qualidResp.addEventListener('change', function () {
-        AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(qualidResp).closest('div.tab-pane').attr('id')).ID,qualidResp);
-    });
-
-    var qualidGer = document.getElementById('txtAtt-tab-analise-qualidade-ger');
-
-    qualidGer.addEventListener('change', function () {
-        AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(qualidGer).closest('div.tab-pane').attr('id')).ID, qualidGer);
-    });
-
-    var envaseR = document.getElementById('txtAtt-tab-analise-envase');
-
-    envaseR.addEventListener('change', function () {
-        AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(envaseR).closest('div.tab-pane').attr('id')).ID, envaseR);
-    });
-
-    var fabricacao = document.getElementById('txtAtt-tab-analise-fabricacao');
-
-    fabricacao.addEventListener('change', function () {
-        AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(fabricacao).closest('div.tab-pane').attr('id')).ID, fabricacao);
-    });
-
-    var fabrica = document.getElementById('txtAtt-tab-analise-fabrica');
-
-    fabrica.addEventListener('change', function () {
-        AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(fabrica).closest('div.tab-pane').attr('id')).ID, fabrica);
-    });
-
-    var inovde = document.getElementById('txtAtt-tab-analise-inovDe');
-
-    inovde.addEventListener('change', function () {
-        AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(inovde).closest('div.tab-pane').attr('id')).ID, inovde);
-    });
-
-    var inovdfResp = document.getElementById('txtAtt-tab-analise-inovDf');
-
-    inovdfResp.addEventListener('change', function () {
-        AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(inovdfResp).closest('div.tab-pane').attr('id')).ID, inovdfResp);
-    });
-
-    var meioAmbiente = document.getElementById('txtAtt-tab-analise-meio-ambiente');
-
-    meioAmbiente.addEventListener('change', function () {
-        AddAttachments(tableName, ProcurarAprovacaoPorAbaAnaliseId($(meioAmbiente).closest('div.tab-pane').attr('id')).ID, meioAmbiente);
+    $.each([
+        R.AnalisesQualidadeResponsavelAnexo,
+        R.AnalisesQualidadeGerenteAnexo,
+        $('#txtAtt-tab-analise-envase'),
+        $('#txtAtt-tab-analise-fabricacao'),
+        $('#txtAtt-tab-analise-fabrica'),
+        $('#txtAtt-tab-analise-inovDe'),
+        $('#txtAtt-tab-analise-inovDf'),
+        $('#txtAtt-tab-analise-meio-ambiente'),
+    ], function (i, $anexo) {
+        $anexo.change(function () {
+            SalvarAnexo($anexo, 'responsavel', ProcurarAprovacaoPorAbaAnaliseId($anexo.closest('div.tab-pane').attr('id')).ID)
+                .then(function ($registro) {
+                    ExibirAnexoNaLista($anexo, $registro);
+                    anexosPendentes.push($registro.get(0).attributes.ows_ID.value);
+                });
+        });
     });
 }
 
@@ -5064,108 +5045,23 @@ function bloquearBotoesAbaAnexo(){
 }
 
 function CarregarPaineisDeAnexos() {
-    var tabAnexoVisible = ProcurarAprovacaoPorAbaAnaliseId($('#txtAtt-tab-analise-qualidade').closest('div.tab-pane').attr('id'));
+    $.each([
+        R.AnalisesQualidadeResponsavelAnexo,
+        R.AnalisesQualidadeGerenteAnexo,
+        $('#txtAtt-tab-analise-envase'),
+        $('#txtAtt-tab-analise-fabricacao'),
+        $('#txtAtt-tab-analise-fabrica'),
+        $('#txtAtt-tab-analise-inovDe'),
+        $('#txtAtt-tab-analise-inovDf'),
+        $('#txtAtt-tab-analise-meio-ambiente'),
+    ], function (i, $anexo) {
+        var aprovacao = ProcurarAprovacaoPorAbaAnaliseId($anexo.closest('div.tab-pane').attr('id'));
 
-    if (tabAnexoVisible != null) {
-        var table = $("#data-table-anexo-qualidade");
-        table.empty();
-        getListItemAttachments("Agendamentos - Responsáveis", tabAnexoVisible.ID, table);
-    }
-
-    var tabAnexoEnvase = ProcurarAprovacaoPorAbaAnaliseId($('#txtAtt-tab-analise-envase').closest('div.tab-pane').attr('id'));
-
-    if (tabAnexoEnvase != null) {
-        var table = $("#data-table-anexo-envase");
-        table.empty();
-        getListItemAttachments("Agendamentos - Responsáveis", tabAnexoEnvase.ID, table);
-    }
-
-    var tabAnexoGerente = ProcurarAprovacaoPorAbaAnaliseId($('#txtAtt-tab-analise-qualidade-ger').closest('div.tab-pane').attr('id'));
-
-    if (tabAnexoGerente != null) {
-        var table = $("#data-table-anexo-qualid-ger");
-        table.empty();
-        getListItemAttachments("Agendamentos - Responsáveis", tabAnexoGerente.ID, table);
-    }
-
-    var tabAnexoFabricacao = ProcurarAprovacaoPorAbaAnaliseId($('#txtAtt-tab-analise-fabricacao').closest('div.tab-pane').attr('id'));
-
-    if (tabAnexoFabricacao != null) {
-        var table = $("#data-table-anexo-fabricacao");
-        table.empty();
-        getListItemAttachments("Agendamentos - Responsáveis", tabAnexoFabricacao.ID, table );
-    }
-
-    var tabAnexoFabrica = ProcurarAprovacaoPorAbaAnaliseId($('#txtAtt-tab-analise-fabrica').closest('div.tab-pane').attr('id'));
-
-    if (tabAnexoFabrica != null) {
-        var table = $("#data-table-anexo-fabrica");
-        table.empty();
-        getListItemAttachments("Agendamentos - Responsáveis", tabAnexoFabrica.ID, table);
-    }
-
-    var tabAnexoInovDe = ProcurarAprovacaoPorAbaAnaliseId($('#txtAtt-tab-analise-inovDe').closest('div.tab-pane').attr('id'));
-
-    if (tabAnexoInovDe != null) {
-        var table = $("#data-table-anexo-inovDe");
-        table.empty();
-        getListItemAttachments("Agendamentos - Responsáveis", tabAnexoInovDe.ID, table);
-    }
-
-    var tabAnexoInovDfResp = ProcurarAprovacaoPorAbaAnaliseId($('#txtAtt-tab-analise-inovDf').closest('div.tab-pane').attr('id'));
-    if (tabAnexoInovDfResp != null) {
-        var table = $("#data-table-anexo-inov-df-resp");
-        table.empty();
-        getListItemAttachments("Agendamentos - Responsáveis", tabAnexoInovDfResp.ID, table);
-    }
-
-    var tabAnexoMeioAmbiente = ProcurarAprovacaoPorAbaAnaliseId($('#txtAtt-tab-analise-meio-ambiente').closest('div.tab-pane').attr('id'));
-
-    if (tabAnexoMeioAmbiente != null) {
-        var table = $("#data-table-anexo-meio-ambiente");
-        table.empty();
-        getListItemAttachments("Agendamentos - Responsáveis", tabAnexoMeioAmbiente.ID, table );
-    }
-}
-
-function getListItemAttachments(listTitle, itemId, tableAnexo) {
-    var $promise = $.Deferred();
-    var ctx = SP.ClientContext.get_current();
-    var list = ctx.get_web().get_lists().getByTitle(listTitle);
-    var item = list.getItemById(itemId);
-    ctx.load(item);
-
-    ctx.executeQueryAsync(function () {
-        var hasAttachments = item.get_fieldValues()['Attachments'];
-        tableAnexo.show();
-        tableAnexo.empty();
-        tableAnexo.append('<thead class="thead-dark"><tr><th scope="col" width="10%">#</th><th scope="col" colspan="2">Anexos</th></tr></thead>');
-        tableAnexo.append('<tbody>');
-
-        if (hasAttachments) {
-            getAttachmentFiles(item).then(function (attachments) {
-                var contador = 1;
-                var table = '';
-
-                attachments.forEach(function (attachment) {
-                    table = table +
-                        '<tr>' +
-                        '   <th scope="row" width="10%">' + contador + '</th>' +
-                        '   <td><a href="' + _spPageContextInfo.siteAbsoluteUrl + '/Lists/AgendamentosResponsaveis/Attachments/' + itemId + '/' + attachment['name'] + '?web=1" target="_blank">' + attachment['name'] + '</a></td>' +
-                        '   <td><a name="ExcluirAnexo" href="#" onclick="DeleteAttachmentFile(this, \'Agendamentos - Responsáveis\', \'' + itemId + '\', \'' + attachment['name'] + '\'); return false;" style="display: none;">Excluir</a></td>' +
-                        '</tr>';
-                    contador = contador + 1;
-                });
-
-                tableAnexo.find('tbody').append(table);
-                $promise.resolve(attachments);
-            }).fail($promise.reject);
-        } else {
-            $promise.resolve([]);
+        if (aprovacao != null) {
+            var $tabelaAnexos = $anexo.closest('div.tab-pane').find('.row .table.table-hover table');
+            ExibirAnexosNaLista(aprovacao.ID, $tabelaAnexos);
         }
-    }, $promise.reject);
-
-    return $promise;
+    });
 }
 
 function getAttachmentFiles(listItem) {
@@ -5191,6 +5087,302 @@ function getAttachmentFiles(listItem) {
     }, $promise.reject);
 
     return $promise;
+}
+
+function GetListItems(parametros) {
+    var $promise = $.Deferred();
+
+    $().SPServices($.extend({}, {
+        operation: 'GetListItems',
+        completefunc: function (Data, Status) {
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
+                });
+
+                return;
+            }
+
+            $promise.resolve({
+                records: $(Data.responseText).find('z\\:row')
+            });
+        }
+    }, parametros));
+
+    return $promise;
+}
+
+function UpdateListItems(parametros) {
+    var $promise = $.Deferred();
+
+    $().SPServices($.extend({}, {
+        operation: "UpdateListItems",
+        completefunc: function (xData, Status) {
+            if (Status != 'success') {
+                $promise.reject({
+                    errorCode: '0x99999999',
+                    errorText: 'Erro Remoto'
+                });
+
+                return;
+            }
+
+            var $response = $(xData.responseText);
+            var errorCode = $response.find('ErrorCode').text();
+
+            if (errorCode == '0x00000000') {
+                $promise.resolve({
+                    record: $response.find('z\\:row:first')
+                });
+            } else {
+                $promise.reject({
+                    errorCode: errorCode,
+                    errorText: $response.find('ErrorText').text()
+                });
+            }
+        }
+    }, parametros));
+
+    return $promise;
+}
+
+function UpdateMultipleListItems(parametros) {
+    var $promise = $.Deferred();
+
+    $().SPServices.SPUpdateMultipleListItems($.extend({}, {
+        completefunc: function (xData) {
+            var $response = $(xData.responseText);
+            var errorCode = $response.find('ErrorCode');
+
+            if (errorCode.length == 0 || errorCode.text() == '0x00000000') {
+                $promise.resolve({
+                    records: $response.find('z\\:row')
+                });
+            } else {
+                $promise.reject({
+                    errorCode: errorCode,
+                    errorText: $response.find('ErrorText').text()
+                });
+            }
+        }
+    }, parametros));
+
+    return $promise;
+}
+
+function ListarRegistros(lista, campos, query) {
+    var view = '';
+
+    $.each(campos, function (i, campo) {
+        view += '<FieldRef Name="' + campo + '" />';
+    });
+
+    return GetListItems({
+        listName: lista,
+        CAMLViewFields: '<ViewFields>' + view + '</ViewFields>',
+        CAMLQuery: '<Query><Where>' + query + '</Where></Query>'
+    });
+}
+
+function InserirRegistro(lista, campos) {
+    return UpdateListItems({
+        batchCmd: 'New',
+        listName: lista,
+        valuepairs: campos,
+    });
+}
+
+function AtualizarRegistro(id, lista, campos) {
+    return UpdateListItems({
+        ID: id,
+        batchCmd: 'Update',
+        listName: lista,
+        valuepairs: campos,
+    });
+}
+
+function DeletarRegistro(id, lista) {
+    return UpdateListItems({
+        ID: id,
+        batchCmd: 'Delete',
+        listName: lista,
+    });
+}
+
+function AtualizarRegistros(lista, campos, query) {
+    return UpdateMultipleListItems({
+        listName: lista,
+        valuepairs: campos,
+        CAMLQuery: '<Query><Where>' + query + '</Where></Query>'
+    });
+}
+
+function SalvarAnexo($fileInput, tipo, id) {
+    return RegistrarAnexo(tipo, id, $fileInput[0].files[0].name).then(function ($registro) {
+        return SubirAnexo($fileInput, $registro);
+    });
+}
+
+function RegistrarAnexo(tipo, id, nome) {
+    var campos = [
+        ['Title', tipo],
+        ['nome', nome],
+        ['status', 'Pendente']
+    ];
+
+    if (tipo == 'responsavel') {
+        campos.push(['responsavel_id', id]);
+    } else if(tipo == 'agendamento') {
+        campos.push(['agendamento_id', id]);
+    }
+
+    return InserirRegistro('AgendamentosAnexos', campos).then(function(result) {
+        return result.record;
+    });
+}
+
+function SubirAnexo($fileInput, $registro) {
+    var $promise = $.Deferred();
+    var itemId = $registro.attr('ows_ID');
+    var fileName = $fileInput[0].files[0].name;
+    var reader = new FileReader();
+
+    reader.onload = function (e) {
+        var fileData = e.target.result;
+
+        if (fileData.byteLength == 0) {
+            return $promise.reject({
+                errorCode: '0x2147024883',
+                errorMessage: 'Não é possível carregar arquivos vazios. Tente novamente'
+            });
+        }
+
+        RequestRestDigest().then(function (digest) {
+            $.ajax({
+                url: _spPageContextInfo.siteAbsoluteUrl + "/_api/web/lists/getbytitle('AgendamentosAnexos')/items(" + itemId + ")/AttachmentFiles/add(FileName='" + fileName + "')",
+                method: "POST",
+                binaryStringRequestBody: true,
+                data: fileData,
+                processData: false,
+                headers: {
+                    "ACCEPT": "application/json;odata=verbose",
+                    "X-RequestDigest": digest,
+                    "Content-Length": fileData.byteLength
+                },
+                success: function () {
+                    LimparAnexo($fileInput);
+                    $promise.resolve($registro);
+                },
+                error: function (data) {
+                    $promise.reject({
+                        errorCode: data.responseJSON.error.code,
+                        errorMessage: data.responseJSON.error.message.value
+                    });
+                }
+            });
+        }).fail($promise.reject);
+    };
+
+    reader.readAsArrayBuffer($fileInput[0].files[0]);
+
+    return $promise;
+}
+
+function LimparAnexo($fileInput) {
+    $fileInput.get(0).value = '';
+}
+
+function AtivarAnexosPorIds(ids) {
+    var campos = [
+        ['status', 'Ativo']
+    ];
+
+    var query = '';
+    var queryIds = '';
+
+    $.each(ids, function(i, id) {
+        queryIds += '<Value Type="Integer">' + id + '</Value>'
+    });
+
+    queryIds = '<Values>' + queryIds + '</Values>';
+    query = '' +
+        '<And>' +
+        '   <Eq>' +
+        '       <FieldRef Name="status" />' +
+        '       <Value Type="Text">Pendente</Value>' +
+        '   </Eq>' +
+        '   <In>' +
+        '       <FieldRef Name="ID" />' +
+        '       ' + queryIds +
+        '   </In>' +
+        '</And>';
+
+    return AtualizarRegistros('AgendamentosAnexos', campos, query);
+}
+
+function ListarAnexos(tipo, id, status) {
+    var query = '';
+
+    if (tipo == 'responsavel') {
+        query = '<And><And><Eq><FieldRef Name="Title" /><Value Type="Text">responsavel</Value></Eq><Eq><FieldRef Name="responsavel_id" /><Value Type="Text">' + id + '</Value></Eq></And><Eq><FieldRef Name="status" /><Value Type="Text">' + status + '</Value></Eq></And>';
+    } else if(tipo == 'agendamento') {
+        query = '<And><And><Eq><FieldRef Name="Title" /><Value Type="Text">agendamento</Value></Eq><Eq><FieldRef Name="agendamento_id" /><Value Type="Text">' + id + '</Value></Eq></And><Eq><FieldRef Name="status" /><Value Type="Text">' + status + '</Value></Eq></And>';
+    }
+
+    return ListarRegistros('AgendamentosAnexos', ['ID', 'Title', 'agendamento_id', 'responsavel_id', 'nome', 'status'], query).then(function (resultado) {
+        return resultado.records;
+    });
+}
+
+function DeletarAnexo(id) {
+    return DeletarRegistro(id, 'AgendamentosAnexos');
+}
+
+function ExibirAnexoNaLista($fileInput, $registro) {
+    var id = $registro.get(0).attributes.ows_ID.value;
+    var nome = $registro.get(0).attributes.ows_nome.value;
+    var $tabelaAnexos = $fileInput.closest('div.tab-pane').find('.row .table.table-hover table tbody');
+    var contador = $tabelaAnexos.find('tr').length + 1;
+
+    $tabelaAnexos.append('<tr>' +
+        '   <th scope="row" width="10%">' + contador + '</th>' +
+        '   <td><a href="' + _spPageContextInfo.siteAbsoluteUrl + '/Lists/AgendamentosAnexos/Attachments/' + id + '/' + nome + '?web=1" target="_blank">' + nome + '</a></td>' +
+        '   <td><a name="ExcluirAnexo" href="#" onclick="RemoverAnexoDaLista(\'' + id + '\', this); return false;">Excluir</a></td>' +
+        '</tr>');
+}
+
+function RemoverAnexoDaLista(id, element) {
+    DeletarAnexo(id).then(function () {
+        $(element).closest('tr').remove();
+    });
+}
+
+function ExibirAnexosNaLista(itemId, $tabelaAnexos) {
+    ListarAnexos('responsavel', itemId, 'Ativo').then(function ($registros) {
+        var contador = 1;
+        var table = '';
+
+        $tabelaAnexos.show();
+        $tabelaAnexos.empty();
+        $tabelaAnexos.append('<thead class="thead-dark"><tr><th scope="col" width="10%">#</th><th scope="col" colspan="2">Anexos</th></tr></thead>');
+        $tabelaAnexos.append('<tbody></tbody>');
+
+        $registros.each(function () {
+            var id = this.attributes.ows_ID.value;
+            var nome = this.attributes.ows_nome.value;
+
+            table = table +
+                '<tr>' +
+                '   <th scope="row" width="10%">' + contador + '</th>' +
+                '   <td><a href="' + _spPageContextInfo.siteAbsoluteUrl + '/Lists/AgendamentosAnexos/Attachments/' + id + '/' + nome + '?web=1" target="_blank">' + nome + '</a></td>' +
+                '   <td><a name="ExcluirAnexo" href="#" onclick="RemoverAnexoDaLista(\'' + id + '\', this); return false;" style="display: none;">Excluir</a></td>' +
+                '</tr>';
+            contador = contador + 1;
+        });
+
+        $tabelaAnexos.find('tbody').append(table);
+    });
 }
 
 $(document).ready(function () {
