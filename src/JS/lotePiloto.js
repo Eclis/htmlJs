@@ -85,6 +85,17 @@ var historicosAreas = [
 
 var botoesStatus = {};
 
+var M = {
+    antigo: {
+        agendamento: {},
+        aprovacoes: {}
+    },
+    atual: {
+        agendamento: {},
+        aprovacoes: {}
+    }
+};
+
 var R = {
     InicioProgramado: $('input[name=InicioProgramado]'),
     LinkAbaJustificativa: $('#pills-justificativa-tab'),
@@ -93,6 +104,7 @@ var R = {
     InicioProgramadoMotivo: $('select[name="InicioProgramadoMotivo"]'),
     InicioProgramadoComentarios: $('textarea[name="InicioProgramadoComentarios"]'),
     Status: $('select#status'),
+    TipoLote: $('[name=TipoLote]'),
     AnalisesQualidadeResponsavelPainel: $('#tab-qualidade-resp'),
     AnalisesQualidadeResponsavelAnexo: $('#txtAtt-tab-analise-qualidade'),
     AnalisesQualidadeGerenteAnexo: $('#txtAtt-tab-analise-qualidade-ger'),
@@ -495,32 +507,18 @@ function ValidarAgendamentosAgendamento() {
         }
     }
 
-    if ($('input#agendamentoDuracaoHoras').val() === null || $('input#agendamentoDuracaoHoras').val() == '') {
+    if ($('input#agendamentoDuracaoHoras').val() === null || $('input#agendamentoDuracaoHoras').val() == '' || $('input#agendamentoDuracaoHoras').val() < 0 || $('input#agendamentoDuracaoHoras').val() > 24) {
         errorAgendamentosAgendamento++;
         NotificarErroValidacao('text', 'input#agendamentoDuracaoHoras', '', '');
-    }
-    else {
-        if ($('input#agendamentoDuracaoHoras').val() < 0 || $('input#agendamentoDuracaoHoras').val() > 24) {
-            errorAgendamentosAgendamento++;
-            NotificarErroValidacao('text', 'input#agendamentoDuracaoHoras', '', '');
-        }
-        else {
-            LimparValidacao('text', 'input#agendamentoDuracaoHoras', '');
-        }
+    } else {
+        LimparValidacao('text', 'input#agendamentoDuracaoHoras', '');
     }
 
-    if ($('input#agendamentoDuracaoMinutos').val() === null || $('input#agendamentoDuracaoMinutos').val() == '') {
+    if ($('input#agendamentoDuracaoMinutos').val() === null || $('input#agendamentoDuracaoMinutos').val() == '' || $('input#agendamentoDuracaoMinutos').val() < 0 || $('input#agendamentoDuracaoMinutos').val() > 59) {
         errorAgendamentosAgendamento++;
         NotificarErroValidacao('text', 'input#agendamentoDuracaoMinutos', '', '');
-    }
-    else {
-        if ($('input#agendamentoDuracaoMinutos').val() < 0 || $('input#agendamentoDuracaoMinutos').val() > 59) {
-            errorAgendamentosAgendamento++;
-            NotificarErroValidacao('text', 'input#agendamentoDuracaoMinutos', '', '');
-        }
-        else {
+    } else {
             LimparValidacao('text', 'input#agendamentoDuracaoMinutos', '');
-        }
     }
 
     // if ($('textarea#agendamentoObservacoes').val() === null || $('textarea#agendamentoObservacoes').val() == '') {
@@ -1759,14 +1757,13 @@ function AtualizarAgendamento(id) {
     });
 
     return $promise.then(function (response) {
-        let $TipoLote = $('[name=TipoLote]');
         let promises = [];
         let responsaveis;
 
         if (memoriaStatusAnterior == REGISTRO_DE_ANALISE && memoriaGrupos.indexOf(listDemaisGrupos[0]) < 0) {
-            responsaveis = GetMeusResponsaveisPorTipoDeLote($TipoLote.val());
+            responsaveis = GetMeusResponsaveisPorTipoDeLote(R.TipoLote.val());
         } else {
-            responsaveis = GetResponsaveisPorTipoDeLote($TipoLote.val());
+            responsaveis = GetResponsaveisPorTipoDeLote(R.TipoLote.val());
         }
 
         memoriaAprovacoesAntigo = $.extend(true, {}, memoriaAprovacoesAtual);
@@ -1788,8 +1785,10 @@ function AtualizarAgendamento(id) {
         return $.when.apply($, promises).then(function () {
             return response;
         }).then(function (response) {
-            return InserirHistoricosPendentes().then(function () {
-                return response;
+            return AtualizarM().then(function () {
+                return InserirHistoricosPendentes().then(function () {
+                    return response;
+                });
             });
         });
     });
@@ -1887,6 +1886,7 @@ function InserirHistorico(codigoAgendamento, mensagem) {
         operation: "UpdateListItems",
         batchCmd: "New",
         listName: "Agendamentos - Histórico",
+        async: false,
         valuepairs: [
             ['CodigoAgendamento', codigoAgendamento],
             ['Mensagem', mensagem],
@@ -1924,11 +1924,11 @@ function InserirHistorico(codigoAgendamento, mensagem) {
 function GerarMensagemHistorico(historico, antigo, novo, responsavelNome, responsavelAntigo, responsavelAtual, responsavelObservacoes) {
     switch (historico) {
         case historicos.CRIADO:                       return sprintf(historicos.CRIADO, memoriaAgendamentoAtual.CodigoAgendamento);
-        case historicos.AGENDADO:                     return sprintf(historicos.AGENDADO, memoriaAgendamentoAtual.InicioProgramado);
+        case historicos.AGENDADO:                     return sprintf(historicos.AGENDADO, M.atual.agendamento.InicioProgramado);
         case historicos.REAGENDADO:                   return sprintf(historicos.REAGENDADO);
         case historicos.EXECUTADO:                    return sprintf(historicos.EXECUTADO, memoriaAgendamentoAtual.RegistroAnalisesInicio);
         case historicos.NAO_EXECUTADO:                return sprintf(historicos.NAO_EXECUTADO, memoriaAgendamentoAtual.NaoExecutadoMotivo);
-        case historicos.STATUS_ALTERADO:              return sprintf(historicos.STATUS_ALTERADO, memoriaAgendamentoAtual.Status);
+        case historicos.STATUS_ALTERADO:              return sprintf(historicos.STATUS_ALTERADO, M.atual.agendamento.Status);
         case historicos.CANCELADO:                    return sprintf(historicos.CANCELADO, memoriaAgendamentoAtual.CodigoAgendamento, memoriaAgendamentoAtual.CanceladoMotivo);
         case historicos.TIPO_LOTE_ALTERADO:           return sprintf(historicos.TIPO_LOTE_ALTERADO, (antigo.TipoLote) ? antigo.TipoLote : '', (memoriaAgendamentoAtual.TipoLote) ? memoriaAgendamentoAtual.TipoLote : '');
         case historicos.MOTIVO_ALTERADO:              return sprintf(historicos.MOTIVO_ALTERADO, (antigo.Motivo) ? antigo.Motivo : '', (memoriaAgendamentoAtual.Motivo) ? memoriaAgendamentoAtual.Motivo : '');
@@ -2363,7 +2363,7 @@ function AtualizarAprovacaoEmMemoria(responsavel) {
         memoriaAprovacoesAtual[responsavel.nome].ReprovadoMotivo = $abaAnalise.find('[name=ReprovadoMotivo]').val();
 
         if (responsavel.nome == 'Meio Ambiente - Responsável') {
-            switch ($('[name=TipoLote]').val()) {
+            switch (R.TipoLote.val()) {
                 case 'Brinde':
                     var $brinde = $('#brindeMeioAmbiente');
                     memoriaAprovacoesAtual[responsavel.nome].ExecucaoLoteAcompanhada = $brinde.find('[name=ExecucaoLoteAcompanhada]').prop('checked') ? '1' : '0';
@@ -2397,10 +2397,15 @@ function AtualizarAprovacaoEmMemoria(responsavel) {
         return $.when(memoriaAprovacoesAtual[responsavel.nome]);
     }
 
+    // Aprovação Registrada
     if (['Pendente', 'Rascunho'].indexOf(memoriaAprovacoesAntigo[responsavel.nome].Resultado) > -1 &&
-            memoriaAprovacoesAntigo[responsavel.nome].Resultado != memoriaAprovacoesAtual[responsavel.nome].Resultado &&
-            memoriaAprovacoesAtual[responsavel.nome].Resultado == 'Aprovado por Similaridade') {
-        RegistrarHistoricoPendente(historicos.LOTE_APROVADO_SIMILARIDADE, null, null, null, null, memoriaAprovacoesAtual[responsavel.nome].Observacoes);
+            memoriaAprovacoesAntigo[responsavel.nome].Resultado != memoriaAprovacoesAtual[responsavel.nome].Resultado) {
+        memoriaAprovacoesAtual[responsavel.nome].Avaliado = moment(new Date(), 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DDTHH:mm:ss[-00:00]');
+        memoriaAprovacoesAtual[responsavel.nome].Avaliador = UsuarioLogado.id;
+
+        if (memoriaAprovacoesAtual[responsavel.nome].Resultado == 'Aprovado por Similaridade') {
+            RegistrarHistoricoPendente(historicos.LOTE_APROVADO_SIMILARIDADE, null, null, null, null, memoriaAprovacoesAtual[responsavel.nome].Observacoes);
+        }
     }
 
     return CarregarUsuarioPorLoginName(usuarioDoPeoplePicker.loginName).then(function (usuario) {
@@ -3178,9 +3183,8 @@ function InserirAgendamento() {
             $('input[name="ID"]').val(memoriaAgendamentoAtual.ID);
             memoriaAgendamentoAtual.CodigoAgendamento = response.record.attr('ows_CodigoAgendamento');
             $('input[name="CodigoAgendamento"]').val(memoriaAgendamentoAtual.CodigoAgendamento);
-            let $TipoLote = $('[name=TipoLote]');
             let promises = [];
-            let responsaveis = GetResponsaveisPorTipoDeLote($TipoLote.val());
+            let responsaveis = GetResponsaveisPorTipoDeLote(R.TipoLote.val());
 
             $.each(responsaveis, function (i, responsavel) {
                 var usuarioDoPeoplePicker = PegarUsuarioDoPeoplePicker(responsavel.peoplePickerId);
@@ -3200,13 +3204,128 @@ function InserirAgendamento() {
                 return response;
             });
         }).then(function (response) {
-            RegistrarHistoricoPendente(historicos.CRIADO);
-
-            return InserirHistoricosPendentes().then(function () {
-                return response;
+            return AtualizarM().then(function () {
+                return InserirHistoricosPendentes().then(function () {
+                    return response;
+                });
             });
         });
     });
+}
+
+function AtualizarM() {
+    AgendamentoAtual();
+
+    return ResponsaveisAtual().then(function () {
+        GerarHistoricos();
+        M.antigo.agendamento = M.atual.agendamento;
+        M.antigo.aprovacoes = M.atual.aprovacoes;
+    });
+}
+
+function AgendamentoAtual() {
+    M.atual.agendamento = {};
+
+    $('#main [name].salvar-campo').each(function () {
+        var $this = $(this);
+
+        if ($this.is('[type=checkbox]')) {
+            M.atual.agendamento[this.name] = $this.prop('checked');
+        } else if ($this.is('.date-time-picker')) {
+            M.atual.agendamento[this.name] = $this.val();
+        } else if ($this.is('.rich-text')) {
+            M.atual.agendamento[this.name] = $this.summernote('code');
+        } else if ($this.val() != undefined) {
+            M.atual.agendamento[this.name] = $this.val();
+        }
+    });
+}
+
+function ResponsaveisAtual() {
+    M.atual.aprovacoes = {};
+    var promises = [];
+
+    $.each(GetResponsaveisPorTipoDeLote(M.atual.TipoLote), function (i, responsavel) {
+        promises.push(ResponsavelAtual(responsavel));
+    });
+
+    return $.when.apply($, promises);
+}
+
+function ResponsavelAtual(responsavel) {
+    M.atual.aprovacoes[responsavel.nome].Pessoa = null;
+
+    if (!responsavel.abaAnaliseId) {
+        return;
+    }
+
+    var $abaAnalise = $('#' + responsavel.abaAnaliseId);
+    M.atual.aprovacoes[responsavel.nome].ExecucaoLoteAcompanhada = $abaAnalise.find('[name=ExecucaoLoteAcompanhada]').prop('checked') ? '1' : '0';
+    M.atual.aprovacoes[responsavel.nome].Resultado = $abaAnalise.find('[name=Resultado]').val();
+    M.atual.aprovacoes[responsavel.nome].Observacoes = $abaAnalise.find('[name=ObservacoesAnalise]').val();
+    M.atual.aprovacoes[responsavel.nome].ReprovadoMotivo = $abaAnalise.find('[name=ReprovadoMotivo]').val();
+
+    if (responsavel.nome == 'Meio Ambiente - Responsável') {
+        ResponsavelAtualMeioAmbiente(responsavel);
+    }
+
+    if (AprovacaoAntigaEstaPendente() &&
+            M.antigo.aprovacoes[responsavel.nome].Resultado != M.atual.aprovacoes[responsavel.nome].Resultado) {
+        ResponsavelAtualAprovacaoRegistrada();
+    }
+
+    var usuarioDoPeoplePicker = PegarUsuarioDoPeoplePicker(responsavel.peoplePickerId);
+
+    if (!usuarioDoPeoplePicker) {
+        return $.when();
+    }
+
+    return CarregarUsuarioPorLoginName(usuarioDoPeoplePicker.loginName).then(function (usuario) {
+        M.atual.aprovacoes[responsavel.nome].Pessoa = usuario.id;
+    });
+}
+
+function AprovacaoAntigaEstaPendente() {
+    return ['Pendente', 'Rascunho'].indexOf(M.antigo.aprovacoes[responsavel.nome].Resultado) > -1;
+}
+
+function ResponsavelAtualMeioAmbiente(responsavel) {
+    switch (M.atual.TipoLote) {
+        case 'Brinde':
+            var $brinde = $('#brindeMeioAmbiente');
+            M.atual.aprovacoes[responsavel.nome].ExecucaoLoteAcompanhada = $brinde.find('[name=ExecucaoLoteAcompanhada]').prop('checked') ? '1' : '0';
+            break;
+        case 'Envase':
+            var $envase = $('#envaseMeioAmbiente');
+            M.atual.aprovacoes[responsavel.nome].ExecucaoLoteAcompanhada = $envase.find('[name=ExecucaoLoteAcompanhada]').prop('checked') ? '1' : '0';
+            M.atual.aprovacoes[responsavel.nome].MeioAmbienteAumentoGeracaoResidu = $envase.find('[name=MeioAmbienteAumentoGeracaoResidu]').prop('checked') ? '1' : '0';
+            M.atual.aprovacoes[responsavel.nome].MeioAmbienteTipoResiduosGeradosJ = $envase.find('[name=MeioAmbienteTipoResiduosGeradosJ]').prop('checked') ? '1' : '0';
+            M.atual.aprovacoes[responsavel.nome].MeioAmbienteAumentoConsumoAguaLi = $envase.find('[name=MeioAmbienteAumentoConsumoAguaLi]').prop('checked') ? '1' : '0';
+            M.atual.aprovacoes[responsavel.nome].MeioAmbienteAcondicionamentoMate = $envase.find('[name=MeioAmbienteAcondicionamentoMate]').val();
+            M.atual.aprovacoes[responsavel.nome].MeioAmbienteAcondicionamentoReci = $envase.find('[name=MeioAmbienteAcondicionamentoReci]').val();
+            break;
+        case 'Fabricação':
+            var $fabricacao = $('#fabricacaoMeioAmbiente');
+            M.atual.aprovacoes[responsavel.nome].ExecucaoLoteAcompanhada = $fabricacao.find('[name=ExecucaoLoteAcompanhada]').prop('checked') ? '1' : '0';
+            M.atual.aprovacoes[responsavel.nome].MeioAmbienteAumentoConsumoAguaLi = $fabricacao.find('[name=MeioAmbienteAumentoConsumoAguaLi]').prop('checked') ? '1' : '0';
+            M.atual.aprovacoes[responsavel.nome].MeioAmbienteAumentoConsumoEnergi = $fabricacao.find('[name=MeioAmbienteAumentoConsumoEnergi]').val();
+            M.atual.aprovacoes[responsavel.nome].MeioAmbienteAumentoConsumoAguaFa = $fabricacao.find('[name=MeioAmbienteAumentoConsumoAguaFa]').val();
+            M.atual.aprovacoes[responsavel.nome].MeioAmbienteAbastecimentoGranel = $fabricacao.find('[name=MeioAmbienteAbastecimentoGranel]').val();
+            M.atual.aprovacoes[responsavel.nome].MeioAmbienteAbastecimentoManual = $fabricacao.find('[name=MeioAmbienteAbastecimentoManual]').val();
+            M.atual.aprovacoes[responsavel.nome].MeioAmbienteAbastecimentoVacuo = $fabricacao.find('[name=MeioAmbienteAbastecimentoVacuo]').val();
+            break;
+    }
+}
+
+function ResponsavelAtualAprovacaoRegistrada(responsavel) {
+    M.atual.aprovacoes[responsavel.nome].Avaliado = moment(new Date(), 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DDTHH:mm:ss[-00:00]');
+    M.atual.aprovacoes[responsavel.nome].Avaliador = UsuarioLogado.id;
+}
+
+function GerarHistoricos() {
+    if (M.antigo.agendamento.CodigoAgendamento != M.atual.agendamento.CodigoAgendamento) RegistrarHistoricoPendente(historicos.CRIADO, true);
+    if (M.antigo.agendamento.Status != M.atual.agendamento.Status && M.atual.agendamento.Status == AGENDADO) RegistrarHistoricoPendente(historicos.AGENDADO, true);
+    if (M.antigo.agendamento.Status != M.atual.agendamento.Status && [AGENDADO, REGISTRO_DE_ANALISE].indexOf(M.atual.agendamento.Status) >= 0) RegistrarHistoricoPendente(historicos.STATUS_ALTERADO, true);
 }
 
 var SetoresResponsaveis = [
@@ -3589,7 +3708,6 @@ function usuarioPertenceAoGrupo($xml, grupo) {
 }
 
 function ModificarCamposPorFormState(formState) {
-    var $TipoLote = $('[name=TipoLote]');
     var $Fabrica = $('[name=Fabrica]');
     var $MaoObra = $('[name=MaoObra]');
     var $LinhaEquipamento = $('[name=LinhaEquipamento]');
@@ -3657,11 +3775,11 @@ function ModificarCamposPorFormState(formState) {
     var $meioAmbienteAcompAcompanhamento = $('#acRespMeioAmbienteAcomp');
     var $meioAmbienteAcompPPResp = $('#peoplePickerAbaAcRespMeioAmbiente_TopSpan_EditorInput');
 
-    $TipoLote.attr('disabled', true);
+    R.TipoLote.attr('disabled', true);
     $Fabrica.attr('disabled', true);
     $MaoObra.attr('disabled', true);
 
-    if ($TipoLote.val() != 'Fabricação') {
+    if (R.TipoLote.val() != 'Fabricação') {
         $MaoObra.val('');
     }
 
@@ -3759,10 +3877,10 @@ function ModificarCamposPorFormState(formState) {
         case EM_CRIACAO:
         case RASCUNHO_EM_EDICAO:
         case AGENDAMENTO_EM_EDICAO:
-            $TipoLote.attr('disabled', false);
+            R.TipoLote.attr('disabled', false);
             $Fabrica.attr('disabled', false);
 
-            if ($TipoLote.val() == 'Fabricação') {
+            if (R.TipoLote.val() == 'Fabricação') {
                 $MaoObra.attr('disabled', false);
             }
 
@@ -3972,11 +4090,9 @@ function ModificarStatusPorFormState(formState) {
     switch (formState) {
         case AGENDADO:
             $status.val(AGENDADO);
-            RegistrarHistoricoPendente(historicos.STATUS_ALTERADO);
             break;
         case REGISTRO_DE_ANALISE:
             $status.val(REGISTRO_DE_ANALISE);
-            RegistrarHistoricoPendente(historicos.STATUS_ALTERADO);
             break;
         case EM_CANCELAMENTO:
             $status.val(CANCELADO);
@@ -4282,7 +4398,6 @@ function PreencherResponsavelDlPcl() {
 }
 
 function RegistrarBindings() {
-    var $tipoLote = $("select#tipoDeLote");
     var $fabrica = $("select#fabrica");
     var $linhaEquipamento = $("select#linhaEquipamento");
 
@@ -4293,11 +4408,11 @@ function RegistrarBindings() {
     var $acRespFabricaAcomp = $("input[type=checkbox]#acRespFabricaAcomp");
     var $acRespMeioAmbienteAcomp = $("input[type=checkbox]#acRespMeioAmbienteAcomp");
 
-    $tipoLote.change(function () {
+    R.TipoLote.change(function () {
         ModificarAbasPorTipoDeLote(this.value);
 
         if ([EM_CRIACAO, RASCUNHO_EM_EDICAO, AGENDAMENTO_EM_EDICAO].indexOf(state) > -1) {
-            if ($tipoLote.val() == 'Fabricação') {
+            if (R.TipoLote.val() == 'Fabricação') {
                 $('#maoObra').prop('disabled', false);
             } else {
                 $('#maoObra').prop('disabled', true);
@@ -4306,6 +4421,15 @@ function RegistrarBindings() {
         }
 
         DispararCarregarLinhasEquipamentos();
+    });
+
+    $('#agendamentoDuracaoHoras, #agendamentoDuracaoMinutos').change(function () {
+        if (this.value != '' && (this.value < this.min || this.value > this.max)) {
+            this.value = '';
+            NotificarErroValidacao('text', 'input#' + this.id, '', '');
+        } else {
+            LimparValidacao('text', 'input#' + this.id, '');
+        }
     });
 
     $acRespEngEnvaseAcomp.change(function () {
@@ -4495,7 +4619,6 @@ function InserirEAgendarAgendamento() {
     memoriaAgendamentoAtual = {};
     bloquearBotoesAbaAnexo();
     ModificarFormState(AGENDADO);
-    RegistrarHistoricoPendente(historicos.AGENDADO);
 
     return InserirAgendamento().then(function (response) {
         return CarregarAgendamento(response.record.attr('ows_ID'));
@@ -4626,7 +4749,6 @@ function RegistrarBotoes() {
 
         if (ValidarAgendamento()) {
             ModificarFormState(AGENDADO);
-            RegistrarHistoricoPendente(historicos.AGENDADO);
 
             SalvarAgendamento().then(function () {
                 botoesStatus['agendar'] = false;
@@ -4944,8 +5066,7 @@ function verificarErros() {
         }
     }
 
-    var $tipoLote = $("select#tipoDeLote");
-    var listaPeoplePicker = GetResponsaveisPorTipoDeLote($tipoLote.val());
+    var listaPeoplePicker = GetResponsaveisPorTipoDeLote(R.TipoLote.val());
 
     if (erro == 0) {
         for (var i = 0; i < listaPeoplePicker.length; i++) {
