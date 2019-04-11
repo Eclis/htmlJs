@@ -87,12 +87,12 @@ var botoesStatus = {};
 
 var M = {
     antigo: {
-        agendamento: {},
-        aprovacoes: {}
+        agendamento: null,
+        aprovacoes: null
     },
     atual: {
-        agendamento: {},
-        aprovacoes: {}
+        agendamento: null,
+        aprovacoes: null
     }
 };
 
@@ -1386,6 +1386,13 @@ function ValidarStatusECamposObrigatorios() {
     var erros = 0;
     erros += ValidarAbaJustificativa();
 
+    // Chrome hack para resetar a visualização dos campos inválidos do tipo number
+    $('[type=number]').each(function () {
+        if (this.value == '') {
+            this.value = '';
+        }
+    });
+
     switch (state) {
         case EM_CANCELAMENTO:
             if ($('select#canceladoMotivo').children('option:selected').val() === 'Selecione uma opção') {
@@ -2180,7 +2187,7 @@ function CarregarAgendamento(id) {
                     $elemento.prop('checked', this.value == "1");
                     memoriaAgendamentoAtual[$elemento.attr('name')] = this.value == "1";
                     $elemento.change();
-                } else if ($elemento.is('[type=number]')) {
+                } else if ($elemento.is('[type=number]') || $elemento.is('.input-number')) {
                     $elemento.val(AtributoNumber(this.value));
                     memoriaAgendamentoAtual[$elemento.attr('name')] = AtributoNumber(this.value);
                     $elemento.change();
@@ -2231,9 +2238,13 @@ function CarregarAgendamento(id) {
                 return $.when(true);
             }).then(function () {
                 return CarregarAgendamentoResponsaveis(atributos.ows_CodigoAgendamento.value).then(function () {
-                    CarregarHistorico(atributos.ows_CodigoAgendamento.value);
-                    CarregarPaineisDeAnexos();
-                    $promise.resolve();
+                    return AtualizarM().then(function () {
+                        CarregarHistorico(atributos.ows_CodigoAgendamento.value);
+                        CarregarPaineisDeAnexos();
+                        $promise.resolve();
+                    }).fail(function (response) {
+                        $promise.reject(response);
+                    });
                 }).fail(function (response) {
                     $promise.reject(response);
                 });
@@ -2453,6 +2464,7 @@ function PreencherAbaAnalises(responsavel) {
     $abaAnalise.find('[name="ExecucaoLoteAcompanhada"]').prop('checked', aprovacao.ExecucaoLoteAcompanhada == '1');
     $abaAnalise.find('[name="Pessoa"]').val(FiltrarNomeUsuarioPorPessoaId(aprovacao.Pessoa));
     $abaAnalise.find('[name="Resultado"]').val(aprovacao.Resultado);
+    if (aprovacao.Avaliado != null) $abaAnalise.find('[name="Avaliado"]').val(moment(aprovacao.Avaliado, 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm'));
     $abaAnalise.find('[name="ObservacoesAnalise"]').val(aprovacao.Observacoes);
     if (aprovacao.ReprovadoMotivo != null) $abaAnalise.find('[name="ReprovadoMotivo"]').val(aprovacao.ReprovadoMotivo);
     if (aprovacao.MeioAmbienteAbastecimentoVacuo != null) $abaAnalise.find('[name="MeioAmbienteAbastecimentoVacuo"]').val(aprovacao.MeioAmbienteAbastecimentoVacuo);
@@ -2469,6 +2481,7 @@ function PreencherAbaAnalises(responsavel) {
     $abaAnalise.find('[name=Pessoa]').attr('disabled', true);
     $abaAnalise.find('[name=ExecucaoLoteAcompanhada]').attr('disabled', true);
     $abaAnalise.find('[name=Resultado]').attr('disabled', true);
+    $abaAnalise.find('[name=Avaliado]').attr('disabled', true);
     $abaAnalise.find('[name=ObservacoesAnalise]').attr('disabled', true);
     $abaAnalise.find('[name=ReprovadoMotivo]').attr('disabled', true);
     $abaAnalise.find('[name="MeioAmbienteAbastecimentoVacuo"]').attr('disabled', true);
@@ -3120,7 +3133,16 @@ function encodeHtmlString(htmlString) {
 }
 
 function decodeHtmlString(htmlString) {
-    return htmlString.replace(/&#58;/g, ':');
+    var lista = {
+        '&#160;': '&nbsp;',
+        '&#58;': ':',
+    };
+
+    for (var key in lista) {
+        htmlString = htmlString.replace(new RegExp(key,"g"), lista[key]);
+    }
+
+    return htmlString;
 }
 
 function InserirAgendamento() {
@@ -3217,9 +3239,21 @@ function AtualizarM() {
     AgendamentoAtual();
 
     return ResponsaveisAtual().then(function () {
+        if (M.antigo.agendamento == null) {
+            var id = getUrlParameter('loteid') == '' ? getUrlParameter('ID') : getUrlParameter('loteid');
+
+            if (id == '') {
+                M.antigo.agendamento = {};
+                M.antigo.aprovacoes = {};
+            } else {
+                M.antigo.agendamento = $.extend({}, M.atual.agendamento);
+                M.antigo.aprovacoes = $.extend(true, {}, M.atual.aprovacoes);
+            }
+        }
+
         GerarHistoricos();
-        M.antigo.agendamento = M.atual.agendamento;
-        M.antigo.aprovacoes = M.atual.aprovacoes;
+        M.antigo.agendamento = $.extend({}, M.atual.agendamento);
+        M.antigo.aprovacoes = $.extend(true, {}, M.atual.aprovacoes);
     });
 }
 
@@ -3245,7 +3279,7 @@ function ResponsaveisAtual() {
     M.atual.aprovacoes = {};
     var promises = [];
 
-    $.each(GetResponsaveisPorTipoDeLote(M.atual.TipoLote), function (i, responsavel) {
+    $.each(GetResponsaveisPorTipoDeLote(M.atual.agendamento.TipoLote), function (i, responsavel) {
         promises.push(ResponsavelAtual(responsavel));
     });
 
@@ -3253,15 +3287,17 @@ function ResponsaveisAtual() {
 }
 
 function ResponsavelAtual(responsavel) {
-    M.atual.aprovacoes[responsavel.nome].Pessoa = null;
-
     if (!responsavel.abaAnaliseId) {
         return;
     }
 
+    M.atual.aprovacoes[responsavel.nome] = {};
+    M.atual.aprovacoes[responsavel.nome].Pessoa = null;
+
     var $abaAnalise = $('#' + responsavel.abaAnaliseId);
     M.atual.aprovacoes[responsavel.nome].ExecucaoLoteAcompanhada = $abaAnalise.find('[name=ExecucaoLoteAcompanhada]').prop('checked') ? '1' : '0';
     M.atual.aprovacoes[responsavel.nome].Resultado = $abaAnalise.find('[name=Resultado]').val();
+    M.atual.aprovacoes[responsavel.nome].Avaliado = $abaAnalise.find('[name=Avaliado]').val();
     M.atual.aprovacoes[responsavel.nome].Observacoes = $abaAnalise.find('[name=ObservacoesAnalise]').val();
     M.atual.aprovacoes[responsavel.nome].ReprovadoMotivo = $abaAnalise.find('[name=ReprovadoMotivo]').val();
 
@@ -3269,9 +3305,10 @@ function ResponsavelAtual(responsavel) {
         ResponsavelAtualMeioAmbiente(responsavel);
     }
 
-    if (AprovacaoAntigaEstaPendente() &&
+    if (M.antigo.aprovacoes != null &&
+            AprovacaoAntigaEstaPendente(responsavel) &&
             M.antigo.aprovacoes[responsavel.nome].Resultado != M.atual.aprovacoes[responsavel.nome].Resultado) {
-        ResponsavelAtualAprovacaoRegistrada();
+        ResponsavelAtualAprovacaoRegistrada(responsavel);
     }
 
     var usuarioDoPeoplePicker = PegarUsuarioDoPeoplePicker(responsavel.peoplePickerId);
@@ -3285,7 +3322,7 @@ function ResponsavelAtual(responsavel) {
     });
 }
 
-function AprovacaoAntigaEstaPendente() {
+function AprovacaoAntigaEstaPendente(responsavel) {
     return ['Pendente', 'Rascunho'].indexOf(M.antigo.aprovacoes[responsavel.nome].Resultado) > -1;
 }
 
@@ -3409,6 +3446,16 @@ function GetResponsavelPorNomeETipoDeLote(nome, tipoDeLote) {
 function GetResponsavelPorAbaAnaliseId(abaAnaliseId) {
     for (var i = 0; i < SetoresResponsaveis.length; i ++) {
         if (SetoresResponsaveis[i].abaAnaliseId == abaAnaliseId) {
+            return SetoresResponsaveis[i];
+        }
+    }
+
+    return null;
+}
+
+function GetResponsavelPorPeoplePickerId(peoplePickerId) {
+    for (var i = 0; i < SetoresResponsaveis.length; i ++) {
+        if (SetoresResponsaveis[i].peoplePickerId == peoplePickerId) {
             return SetoresResponsaveis[i];
         }
     }
@@ -3707,6 +3754,19 @@ function usuarioPertenceAoGrupo($xml, grupo) {
     return $xml.find("Group[Name='" + grupo + "']").length >= 1;
 }
 
+function desbloquearPeoplePickerResponsavelSeNecessario($peoplePickerResponsavel) {
+    var responsavel = GetResponsavelPorPeoplePickerId($peoplePickerResponsavel.closest('div.sp-peoplepicker-topLevel').parent().parent().attr('id'));
+
+    if (!M.atual.aprovacoes[responsavel.nome]) {
+        $peoplePickerResponsavel.attr('disabled', false);
+        return;
+    }
+
+    if (['Pendente', 'Rascunho'].indexOf(M.atual.aprovacoes[responsavel.nome].Resultado) >= 0) {
+        $peoplePickerResponsavel.attr('disabled', false);
+    }
+}
+
 function ModificarCamposPorFormState(formState) {
     var $Fabrica = $('[name=Fabrica]');
     var $MaoObra = $('[name=MaoObra]');
@@ -3857,6 +3917,7 @@ function ModificarCamposPorFormState(formState) {
             $abaAnalise.find('[name=Pessoa]').attr('disabled', true);
             $abaAnalise.find('[name=ExecucaoLoteAcompanhada]').attr('disabled', true);
             $abaAnalise.find('[name=Resultado]').attr('disabled', true);
+            $abaAnalise.find('[name=Avaliado]').attr('disabled', true);
             $abaAnalise.find('[name=ObservacoesAnalise]').attr('disabled', true);
             $abaAnalise.find('[name=ReprovadoMotivo]').attr('disabled', true);
             $abaAnalise.find('[name="MeioAmbienteAbastecimentoVacuo"]').attr('disabled', true);
@@ -4021,26 +4082,26 @@ function ModificarCamposPorFormState(formState) {
                     var $xml = $(xData.responseXML);
                     if (usuarioPertenceAoGrupo($xml, listDemaisGrupos[0])) {
                         $envaseResponsavelAcompanhamento.attr('disabled', false);
-                        $envaseResponsavelPPResp.attr('disabled', false);
-                        $envaseResponsavelPPGer.attr('disabled', false);
+                        desbloquearPeoplePickerResponsavelSeNecessario($envaseResponsavelPPResp);
+                        desbloquearPeoplePickerResponsavelSeNecessario($envaseResponsavelPPGer);
                         $engFabResponsavelAcompanhamento.attr('disabled', false);
-                        $engFabResponsavelPPResp.attr('disabled', false);
-                        $engFabResponsavelGer.attr('disabled', false);
+                        desbloquearPeoplePickerResponsavelSeNecessario($engFabResponsavelPPResp);
+                        desbloquearPeoplePickerResponsavelSeNecessario($engFabResponsavelGer);
                         $inovDfResponsavelAcompanhamento.attr('disabled', false);
-                        $inovDfResponsavelPPResp.attr('disabled', false);
-                        $inovDfResponsavelPPGer.attr('disabled', false);
+                        desbloquearPeoplePickerResponsavelSeNecessario($inovDfResponsavelPPResp);
+                        desbloquearPeoplePickerResponsavelSeNecessario($inovDfResponsavelPPGer);
                         $inovDeResponsavelAcompanhamento.attr('disabled', false);
-                        $inovDeResponsavelPPResp.attr('disabled', false);
-                        $inovDeResponsavelPPGer.attr('disabled', false);
+                        desbloquearPeoplePickerResponsavelSeNecessario($inovDeResponsavelPPResp);
+                        desbloquearPeoplePickerResponsavelSeNecessario($inovDeResponsavelPPGer);
                         $fabricaResponsavelAcompanhamento.attr('disabled', false);
-                        $fabricaResponsavelPPCoordProg.attr('disabled', false);
-                        $fabricaResponsavelPPCoordMan.attr('disabled', false);
-                        $fabricaResponsavelPPGer.attr('disabled', false);
+                        desbloquearPeoplePickerResponsavelSeNecessario($fabricaResponsavelPPCoordProg);
+                        desbloquearPeoplePickerResponsavelSeNecessario($fabricaResponsavelPPCoordMan);
+                        desbloquearPeoplePickerResponsavelSeNecessario($fabricaResponsavelPPGer);
                         $qualidadeResponsavelAcompanhamento.attr('disabled', false);
-                        $qualidadeResponsavelPPResp.attr('disabled', false);
-                        $qualidadeResponsavelPPGer.attr('disabled', false);
+                        desbloquearPeoplePickerResponsavelSeNecessario($qualidadeResponsavelPPResp);
+                        desbloquearPeoplePickerResponsavelSeNecessario($qualidadeResponsavelPPGer);
                         $meioAmbienteResponsavelAcompanhamento.attr('disabled', false);
-                        $meioAmbienteResponsavelPPResp.attr('disabled', false);
+                        desbloquearPeoplePickerResponsavelSeNecessario($meioAmbienteResponsavelPPResp);
                     }
                 }
             });
@@ -4423,9 +4484,8 @@ function RegistrarBindings() {
         DispararCarregarLinhasEquipamentos();
     });
 
-    $('#agendamentoDuracaoHoras, #agendamentoDuracaoMinutos').change(function () {
-        if (this.value != '' && (this.value < this.min || this.value > this.max)) {
-            this.value = '';
+    $('[type=number]').change(function () {
+        if (this.value != '' && ((this.min && this.value < this.min) || (this.max && this.value > this.max))) {
             NotificarErroValidacao('text', 'input#' + this.id, '', '');
         } else {
             LimparValidacao('text', 'input#' + this.id, '');

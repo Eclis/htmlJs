@@ -136,8 +136,7 @@
                 </div>
                 <div class="col-md-6">
                     <label for="produtoQuantidade">Quantidade</label>
-                    <input type="number" class="form-control salvar-campo" id="produtoQuantidade" name="QuantidadePecas" min="0"
-                     onfocusout="ValidarLinhaEquipamento()">
+                    <input type="number" class="form-control salvar-campo" id="produtoQuantidade" name="QuantidadePecas" min="0" onfocusout="ValidarLinhaEquipamento()">
                 </div>
             </div>
             <div class="row" style="margin-top: 10px;">
@@ -194,13 +193,11 @@
                 </div>
                 <div class="col-md-2">
                     <label for="agendamentoDuracaoHoras">Duração (HH)</label>
-                    <input type="number" min="0" max="24" class="form-control salvar-campo" id="agendamentoDuracaoHoras" name="DuracaoEstimadaHoras"
-                    />
+                    <input type="number" min="0" max="24" class="form-control salvar-campo" id="agendamentoDuracaoHoras" name="DuracaoEstimadaHoras" />
                 </div>
                 <div class="col-md-2">
                     <label for="agendamentoDuracaoMinutos">Duração (mm)</label>
-                    <input type="number" min="0" max="59" class="form-control salvar-campo" id="agendamentoDuracaoMinutos" name="DuracaoEstimadaMinutos"
-                    />
+                    <input type="number" min="0" max="59" class="form-control salvar-campo" id="agendamentoDuracaoMinutos" name="DuracaoEstimadaMinutos" />
                 </div>
                 <div class="col-md-4">
                     <label for="agendamentoFim">Fim programado</label>
@@ -589,14 +586,18 @@
                         </div>
                     </div>
                     <div class="row" style="margin-top: 10px;">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for="qualidadeRespPessoa">Pessoa</label>
                             <input id="qualidadeRespPessoa" name="Pessoa" class="form-control" type="text"/>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for="qualidadeRespResultado">Resultado</label>
                             <select class="custom-select select-enum" name="Resultado" id="qualidadeRespResultado">
                             </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="qualidadeRespAvaliado">Avaliado Em</label>
+                            <input id="qualidadeRespAvaliado" name="Avaliado" class="form-control" type="text" />
                         </div>
                     </div>
                     <div class="row" style="margin-top: 10px;">
@@ -635,14 +636,18 @@
                         </div>
                     </div>
                     <div class="row" style="margin-top: 10px;">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for="envaseRespPessoa">Pessoa</label>
                             <input id="envaseRespPessoa" name="Pessoa" class="form-control" type="text"/>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for="envaseRespResultado">Resultado</label>
                             <select class="custom-select select-enum" name="Resultado" id="envaseRespResultado">
                             </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="envaseRespAvaliado">Avaliado Em</label>
+                            <input id="envaseRespAvaliado" name="Avaliado" class="form-control" type="text" />
                         </div>
                     </div>
                     <div class="row" style="margin-top: 10px;">
@@ -682,14 +687,18 @@
                         </div>
                     </div>
                     <div class="row" style="margin-top: 10px;">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for="fabricacaoRespPessoa">Pessoa</label>
                             <input id="fabricacaoRespPessoa" name="Pessoa" class="form-control" type="text"/>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for="fabricacaoRespResultado">Resultado</label>
                             <select class="custom-select select-enum" name="Resultado" id="fabricacaoRespResultado">
                             </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="fabricacaoRespAvaliado">Avaliado Em</label>
+                            <input id="fabricacaoRespAvaliado" name="Avaliado" class="form-control" type="text" />
                         </div>
                     </div>
                     <div class="row" style="margin-top: 10px;">
@@ -728,14 +737,18 @@
                         </div>
                     </div>
                     <div class="row" style="margin-top: 10px;">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for="inovDfRespPessoa">Pessoa</label>
                             <input id="inovDfRespPessoa" name="Pessoa" class="form-control" type="text"/>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for="inovDfRespResultado">Resultado</label>
                             <select class="custom-select select-enum" name="Resultado" id="inovDfRespResultado">
                             </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="inovDfRespAvaliado">Avaliado Em</label>
+                            <input id="inovDfRespAvaliado" name="Avaliado" class="form-control" type="text" />
                         </div>
                     </div>
                     <div class="row" style="margin-top: 10px;">
@@ -774,14 +787,18 @@
                         </div>
                     </div>
                     <div class="row" style="margin-top: 10px;">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for="inovDeRespPessoa">Pessoa</label>
                             <input id="inovDeRespPessoa" name="Pessoa" class="form-control" type="text"/>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for="inovDeRespResultado">Resultado</label>
                             <select class="custom-select select-enum" name="Resultado" id="inovDeRespResultado">
                             </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="inovDeRespAvaliado">Avaliado Em</label>
+                            <input id="inovDeRespAvaliado" name="Avaliado" class="form-control" type="text" />
                         </div>
                     </div>
                     <div class="row" style="margin-top: 10px;">
@@ -820,14 +837,18 @@
                         </div>
                     </div>
                     <div class="row" style="margin-top: 10px;">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for="fabricaRespPessoa">Pessoa</label>
                             <input id="fabricaRespPessoa" name="Pessoa" class="form-control" type="text"/>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for="fabricaRespResultado">Resultado</label>
                             <select class="custom-select select-enum" name="Resultado" id="fabricaRespResultado">
                             </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="fabricaRespAvaliado">Avaliado Em</label>
+                            <input id="fabricaRespAvaliado" name="Avaliado" class="form-control" type="text" />
                         </div>
                     </div>
                     <div class="row" style="margin-top: 10px;">
@@ -962,14 +983,18 @@
                         </div>
                     </div>
                     <div class="row" style="margin-top: 10px;">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for="meioAmbientePessoa">Pessoa</label>
                             <input id="meioAmbientePessoa" name="Pessoa" class="form-control" type="text"/>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for="meioAmbienteResultado">Resultado</label>
                             <select class="custom-select select-enum" name="Resultado" id="meioAmbienteResultado">
                             </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="meioAmbienteAvaliado">Avaliado Em</label>
+                            <input id="meioAmbienteAvaliado" name="Avaliado" class="form-control" type="text" />
                         </div>
                     </div>
                     <div class="row" style="margin-top: 10px;">
@@ -1008,14 +1033,18 @@
                         </div>
                     </div>
                     <div class="row" style="margin-top: 10px;">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for="qualidadeGerPessoa">Pessoa</label>
                             <input id="qualidadeGerPessoa" name="Pessoa" class="form-control" type="text"/>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for="qualidadeGerResultado">Resultado</label>
                             <select class="custom-select select-enum" name="Resultado" id="qualidadeGerResultado">
                             </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="qualidadeGerAvaliado">Avaliado Em</label>
+                            <input id="qualidadeGerAvaliado" name="Avaliado" class="form-control" type="text" />
                         </div>
                     </div>
                     <div class="row" style="margin-top: 10px;">
