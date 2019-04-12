@@ -473,7 +473,7 @@ function ValidarAgendamentosAgendamento() {
     LimparValidacoes();
 
     $('input[type=number]').each(function () {
-        if (this.value != '' && ((this.min && this.value < this.min) || (this.max && this.value > this.max))) {
+        if (this.value != '' && ((this.min && AtributoNumber(this.value) < AtributoNumber(this.min)) || (this.max && AtributoNumber(this.value) > AtributoNumber(this.max)))) {
             errorAgendamentosAgendamento ++;
             NotificarErroValidacao('text', 'input#' + this.id, '', '');
         } else {
@@ -4557,7 +4557,7 @@ function RegistrarBindings() {
     });
 
     $('input[type=number]').change(function () {
-        if (this.value != '' && ((this.min && this.value < this.min) || (this.max && this.value > this.max))) {
+        if (this.value != '' && ((this.min && this.value < AtributoNumber(this.min)) || (this.max && AtributoNumber(this.value) > AtributoNumber(this.max)))) {
             this.value = '';
             NotificarErroValidacao('text', 'input#' + this.id, '', '');
         } else {
