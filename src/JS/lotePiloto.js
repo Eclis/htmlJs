@@ -1463,7 +1463,7 @@ function ValidarStatusECamposObrigatorios() {
                                 !$ObservacoesAnalise.val()) {
                             erros++;
                             NotificarErroValidacao('name', $ObservacoesAnalise, '', '');
-                            alert("Favor preencher o campo Observações da reprovação");
+                            alert("Favor preencher o campo Observações");
                         }
                     }
                 }
@@ -1857,7 +1857,6 @@ function AtualizarAgendamentoEmMemoria() {
             if (chaves[i] == 'TipoLote') { RegistrarHistoricoPendente(historicos.TIPO_LOTE_ALTERADO, true); }
             if (chaves[i] == 'Motivo') { RegistrarHistoricoPendente(historicos.MOTIVO_ALTERADO, true); }
             if (chaves[i] == 'CategoriaProjeto') { RegistrarHistoricoPendente(historicos.CATEGORIA_PROJETO_ALTERADA, true); }
-            if (chaves[i] == 'LinhaEquipamento') { RegistrarHistoricoPendente(historicos.LINHA_EQUIPAMENTO_ALTERADA, true); }
             if (chaves[i] == 'GrauComplexidade') { RegistrarHistoricoPendente(historicos.GRAU_COMPLEXIDADE_ALTERADO, true); }
             if (chaves[i] == 'Fabrica') { RegistrarHistoricoPendente(historicos.FABRICA_ADICIONADA, true); }
             if (chaves[i] == 'Observacoes') { RegistrarHistoricoPendente(historicos.OBSERVACOES_ADICIONADAS, true); }
@@ -1969,7 +1968,7 @@ function GerarMensagemHistorico(historico, antigo, novo, responsavelNome, respon
         case historicos.TIPO_LOTE_ALTERADO:           return sprintf(historicos.TIPO_LOTE_ALTERADO, (antigo.TipoLote) ? antigo.TipoLote : '', (memoriaAgendamentoAtual.TipoLote) ? memoriaAgendamentoAtual.TipoLote : '');
         case historicos.MOTIVO_ALTERADO:              return sprintf(historicos.MOTIVO_ALTERADO, (antigo.Motivo) ? antigo.Motivo : '', (memoriaAgendamentoAtual.Motivo) ? memoriaAgendamentoAtual.Motivo : '');
         case historicos.CATEGORIA_PROJETO_ALTERADA:   return sprintf(historicos.CATEGORIA_PROJETO_ALTERADA, (antigo.CategoriaProjeto) ? antigo.CategoriaProjeto : '', (memoriaAgendamentoAtual.CategoriaProjeto) ? memoriaAgendamentoAtual.CategoriaProjeto : '');
-        case historicos.LINHA_EQUIPAMENTO_ALTERADA:   return sprintf(historicos.LINHA_EQUIPAMENTO_ALTERADA, (antigo.LinhaEquipamento) ? $('#linhaEquipamento option[value=' + antigo.LinhaEquipamento + ']').text() : '', (memoriaAgendamentoAtual.LinhaEquipamento) ? $('#linhaEquipamento option[value=' + memoriaAgendamentoAtual.LinhaEquipamento + ']').text() : '');
+        case historicos.LINHA_EQUIPAMENTO_ALTERADA:   return sprintf(historicos.LINHA_EQUIPAMENTO_ALTERADA, M.antigo.agendamento.LinhaEquipamento.nome, M.atual.agendamento.LinhaEquipamento.nome);
         case historicos.GRAU_COMPLEXIDADE_ALTERADO:   return sprintf(historicos.GRAU_COMPLEXIDADE_ALTERADO, (antigo.GrauComplexidade) ? antigo.GrauComplexidade : '', (memoriaAgendamentoAtual.GrauComplexidade) ? memoriaAgendamentoAtual.GrauComplexidade : '');
         case historicos.OBSERVACOES_ADICIONADAS:      return sprintf(historicos.OBSERVACOES_ADICIONADAS);
         case historicos.FABRICA_ADICIONADA:           return sprintf(historicos.FABRICA_ADICIONADA, $('#fabrica option:selected').text());
@@ -3269,6 +3268,12 @@ function InserirAgendamento() {
 }
 
 function AtualizarM() {
+    var agendamento = {
+        CodigoAgendamento: null,
+        Status: null,
+        LinhaEquipamento: {id: null, nome: ''},
+    };
+
     AgendamentoAtual();
 
     return ResponsaveisAtual().then(function () {
@@ -3276,16 +3281,16 @@ function AtualizarM() {
             var id = getUrlParameter('loteid') == '' ? getUrlParameter('ID') : getUrlParameter('loteid');
 
             if (id == '') {
-                M.antigo.agendamento = {};
+                M.antigo.agendamento = $.extend(true, {}, agendamento);
                 M.antigo.aprovacoes = {};
             } else {
-                M.antigo.agendamento = $.extend({}, M.atual.agendamento);
+                M.antigo.agendamento = $.extend(true, {}, M.atual.agendamento);
                 M.antigo.aprovacoes = $.extend(true, {}, M.atual.aprovacoes);
             }
         }
 
         GerarHistoricos();
-        M.antigo.agendamento = $.extend({}, M.atual.agendamento);
+        M.antigo.agendamento = $.extend(true, {}, M.atual.agendamento);
         M.antigo.aprovacoes = $.extend(true, {}, M.atual.aprovacoes);
     });
 }
@@ -3302,6 +3307,18 @@ function AgendamentoAtual() {
             M.atual.agendamento[this.name] = $this.val();
         } else if ($this.is('.rich-text')) {
             M.atual.agendamento[this.name] = $this.summernote('code');
+        } else if ($this.is('.select-tabela')) {
+            if ($this.val()) {
+                M.atual.agendamento[this.name] = {
+                    id: $this.val(),
+                    nome: $this.find('option[value=' + $this.val() + ']').text()
+                };
+            } else {
+                M.atual.agendamento[this.name] = {
+                    id: null,
+                    nome: ''
+                };
+            }
         } else if ($this.val() != undefined) {
             M.atual.agendamento[this.name] = $this.val();
         }
@@ -3397,6 +3414,7 @@ function GerarHistoricos() {
     if (M.antigo.agendamento.CodigoAgendamento != M.atual.agendamento.CodigoAgendamento) RegistrarHistoricoPendente(historicos.CRIADO, true);
     if (M.antigo.agendamento.Status != M.atual.agendamento.Status && M.atual.agendamento.Status == AGENDADO) RegistrarHistoricoPendente(historicos.AGENDADO, true);
     if (M.antigo.agendamento.Status != M.atual.agendamento.Status && [AGENDADO, REGISTRO_DE_ANALISE].indexOf(M.atual.agendamento.Status) >= 0) RegistrarHistoricoPendente(historicos.STATUS_ALTERADO, true);
+    if (M.antigo.agendamento.LinhaEquipamento.id != null && M.antigo.agendamento.LinhaEquipamento.id != M.atual.agendamento.LinhaEquipamento.id) RegistrarHistoricoPendente(historicos.LINHA_EQUIPAMENTO_ALTERADA, true);
 }
 
 var SetoresResponsaveis = [
