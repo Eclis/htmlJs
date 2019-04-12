@@ -97,6 +97,7 @@ var M = {
 };
 
 var R = {
+    ID: $('input[name="ID"]'),
     InicioProgramado: $('input[name=InicioProgramado]'),
     LinkAbaJustificativa: $('#pills-justificativa-tab'),
     AbaJustificativa: $('#pills-justificativa'),
@@ -518,7 +519,7 @@ function ValidarAgendamentosAgendamento() {
         errorAgendamentosAgendamento++;
         NotificarErroValidacao('text', 'input#agendamentoDuracaoMinutos', '', '');
     } else {
-            LimparValidacao('text', 'input#agendamentoDuracaoMinutos', '');
+        LimparValidacao('text', 'input#agendamentoDuracaoMinutos', '');
     }
 
     // if ($('textarea#agendamentoObservacoes').val() === null || $('textarea#agendamentoObservacoes').val() == '') {
@@ -2255,6 +2256,10 @@ function CarregarAgendamento(id) {
     return $promise;
 }
 
+function RecarregarAgendamento() {
+    return CarregarAgendamento(R.ID.val());
+}
+
 function ProcurarAprovacaoPorAbaAnaliseId(abaAnaliseId) {
     var chaves = Object.keys(memoriaAprovacoesAtual);
 
@@ -3306,6 +3311,7 @@ function ResponsavelAtual(responsavel) {
     }
 
     if (M.antigo.aprovacoes != null &&
+            M.antigo.aprovacoes[responsavel.nome] != null &&
             AprovacaoAntigaEstaPendente(responsavel) &&
             M.antigo.aprovacoes[responsavel.nome].Resultado != M.atual.aprovacoes[responsavel.nome].Resultado) {
         ResponsavelAtualAprovacaoRegistrada(responsavel);
@@ -3754,15 +3760,41 @@ function usuarioPertenceAoGrupo($xml, grupo) {
     return $xml.find("Group[Name='" + grupo + "']").length >= 1;
 }
 
+function registrarBloqueadorPeoplePicker(e) {
+    var $target = $(e.target);
+
+    if ($target.parent().is('.sp-peoplepicker-delImage')) {
+        var $peoplePickerParent = $target.closest('div.sp-peoplepicker-topLevel').parent().parent();
+
+        if ($peoplePickerParent.is('.sp-peoplepicker-disabled')) {
+            e.stopPropagation();
+            e.preventDefault();
+        }
+    }
+}
+
+function bloquearPeoplePickerResponsavel($peoplePickerResponsavel) {
+    $peoplePickerResponsavel.attr('disabled', true);
+
+    var $peoplePickerParent = $peoplePickerResponsavel.closest('div.sp-peoplepicker-topLevel')
+        .parent()
+        .parent();
+
+    $peoplePickerParent.addClass('sp-peoplepicker-disabled');
+}
+
 function desbloquearPeoplePickerResponsavelSeNecessario($peoplePickerResponsavel) {
-    var responsavel = GetResponsavelPorPeoplePickerId($peoplePickerResponsavel.closest('div.sp-peoplepicker-topLevel').parent().parent().attr('id'));
+    var $peoplePickerParent = $peoplePickerResponsavel.closest('div.sp-peoplepicker-topLevel').parent().parent();
+    var responsavel = GetResponsavelPorPeoplePickerId($peoplePickerParent.attr('id'));
 
     if (!M.atual.aprovacoes[responsavel.nome]) {
         $peoplePickerResponsavel.attr('disabled', false);
+        $peoplePickerParent.removeClass('sp-peoplepicker-disabled');
         return;
     }
 
     if (['Pendente', 'Rascunho'].indexOf(M.atual.aprovacoes[responsavel.nome].Resultado) >= 0) {
+        $peoplePickerParent.removeClass('sp-peoplepicker-disabled');
         $peoplePickerResponsavel.attr('disabled', false);
     }
 }
@@ -3865,45 +3897,48 @@ function ModificarCamposPorFormState(formState) {
     $motivoComentarios.attr('disabled', true);
     $motivoNaoExecutado.attr('disabled', true);
     $motivoNaoExecutadoComentarios.attr('disabled', true);
-    $dlpclResponsavelPP.attr('disabled', true);
+    bloquearPeoplePickerResponsavel($dlpclResponsavelPP);
     $envaseResponsavelAcompanhamento.attr('disabled', true);
-    $envaseResponsavelPPResp.attr('disabled', true);
-    $envaseResponsavelPPGer.attr('disabled', true);
+    bloquearPeoplePickerResponsavel($envaseResponsavelPPResp);
+    bloquearPeoplePickerResponsavel($envaseResponsavelPPGer);
     $engFabResponsavelAcompanhamento.attr('disabled', true);
-    $engFabResponsavelPPResp.attr('disabled', true);
-    $engFabResponsavelGer.attr('disabled', true);
+    bloquearPeoplePickerResponsavel($engFabResponsavelPPResp);
+    bloquearPeoplePickerResponsavel($engFabResponsavelGer);
     $inovDfResponsavelAcompanhamento.attr('disabled', true);
-    $inovDfResponsavelPPResp.attr('disabled', true);
-    $inovDfResponsavelPPGer.attr('disabled', true);
+    bloquearPeoplePickerResponsavel($inovDfResponsavelPPResp);
+    bloquearPeoplePickerResponsavel($inovDfResponsavelPPGer);
     $inovDeResponsavelAcompanhamento.attr('disabled', true);
-    $inovDeResponsavelPPResp.attr('disabled', true);
-    $inovDeResponsavelPPGer.attr('disabled', true);
+    bloquearPeoplePickerResponsavel($inovDeResponsavelPPResp);
+    bloquearPeoplePickerResponsavel($inovDeResponsavelPPGer);
     $fabricaResponsavelAcompanhamento.attr('disabled', true);
-    $fabricaResponsavelPPCoordProg.attr('disabled', true);
-    $fabricaResponsavelPPCoordMan.attr('disabled', true);
-    $fabricaResponsavelPPGer.attr('disabled', true);
+    bloquearPeoplePickerResponsavel($fabricaResponsavelPPCoordProg);
+    bloquearPeoplePickerResponsavel($fabricaResponsavelPPCoordMan);
+    bloquearPeoplePickerResponsavel($fabricaResponsavelPPGer);
     $qualidadeResponsavelAcompanhamento.attr('disabled', true);
-    $qualidadeResponsavelPPResp.attr('disabled', true);
-    $qualidadeResponsavelPPGer.attr('disabled', true);
+    bloquearPeoplePickerResponsavel($qualidadeResponsavelPPResp);
+    bloquearPeoplePickerResponsavel($qualidadeResponsavelPPGer);
     $meioAmbienteResponsavelAcompanhamento.attr('disabled', true);
-    $meioAmbienteResponsavelPPResp.attr('disabled', true);
+    bloquearPeoplePickerResponsavel($meioAmbienteResponsavelPPResp);
     $envaseAcompAcompanhamento.attr('disabled', true);
-    $envaseAcompPPResp.attr('disabled', true);
-    $envaseAcompPPGer.attr('disabled', true);
+    bloquearPeoplePickerResponsavel($envaseAcompPPResp);
+    bloquearPeoplePickerResponsavel($envaseAcompPPGer);
     $engFabAcompAcompanhamento.attr('disabled', true);
-    $engFabAcompPPResp.attr('disabled', true);
-    $engFabAcompPPGer.attr('disabled', true);
+    bloquearPeoplePickerResponsavel($engFabAcompPPResp);
+    bloquearPeoplePickerResponsavel($engFabAcompPPGer);
     $inovDfAcompAcompanhamento.attr('disabled', true);
-    $inovDfAcompPPResp.attr('disabled', true);
-    $inovDfAcompPPGer.attr('disabled', true);
+    bloquearPeoplePickerResponsavel($inovDfAcompPPResp);
+    bloquearPeoplePickerResponsavel($inovDfAcompPPGer);
     $inovDeAcompAcompanhamento.attr('disabled', true);
+    bloquearPeoplePickerResponsavel($inovDeAcompPPResp);
+    bloquearPeoplePickerResponsavel($inovDeAcompPPGer);
     $inovDeAcompPPResp.attr('disabled', true);
     $inovDeAcompPPGer.attr('disabled', true);
     $fabricaAcompAcompanhamento.attr('disabled', true);
-    $fabricaAcompPPCoordProg.attr('disabled', true);
-    $fabricaAcompPPCoordMan.attr('disabled', true);
-    $fabricaAcompPPGer.attr('disabled', true);
+    bloquearPeoplePickerResponsavel($fabricaAcompPPCoordProg);
+    bloquearPeoplePickerResponsavel($fabricaAcompPPCoordMan);
+    bloquearPeoplePickerResponsavel($fabricaAcompPPGer);
     $meioAmbienteAcompAcompanhamento.attr('disabled', true);
+    bloquearPeoplePickerResponsavel($meioAmbienteAcompPPResp);
     $meioAmbienteAcompPPResp.attr('disabled', true);
 
     $('#pills-analise-qualidade-ger').addClass('disabled');
@@ -3963,46 +3998,46 @@ function ModificarCamposPorFormState(formState) {
             $DuracaoEstimadaHoras.attr('disabled', false);
             $DuracaoEstimadaMinutos.attr('disabled', false);
             $Observacoes.summernote('enable');
-            $dlpclResponsavelPP.attr('disabled', false);
+            desbloquearPeoplePickerResponsavelSeNecessario($dlpclResponsavelPP);
             $envaseResponsavelAcompanhamento.attr('disabled', false);
-            $envaseResponsavelPPResp.attr('disabled', false);
-            $envaseResponsavelPPGer.attr('disabled', false);
+            desbloquearPeoplePickerResponsavelSeNecessario($envaseResponsavelPPResp);
+            desbloquearPeoplePickerResponsavelSeNecessario($envaseResponsavelPPGer);
             $engFabResponsavelAcompanhamento.attr('disabled', false);
-            $engFabResponsavelPPResp.attr('disabled', false);
-            $engFabResponsavelGer.attr('disabled', false);
+            desbloquearPeoplePickerResponsavelSeNecessario($engFabResponsavelPPResp);
+            desbloquearPeoplePickerResponsavelSeNecessario($engFabResponsavelGer);
             $inovDfResponsavelAcompanhamento.attr('disabled', false);
-            $inovDfResponsavelPPResp.attr('disabled', false);
-            $inovDfResponsavelPPGer.attr('disabled', false);
+            desbloquearPeoplePickerResponsavelSeNecessario($inovDfResponsavelPPResp);
+            desbloquearPeoplePickerResponsavelSeNecessario($inovDfResponsavelPPGer);
             $inovDeResponsavelAcompanhamento.attr('disabled', false);
-            $inovDeResponsavelPPResp.attr('disabled', false);
-            $inovDeResponsavelPPGer.attr('disabled', false);
+            desbloquearPeoplePickerResponsavelSeNecessario($inovDeResponsavelPPResp);
+            desbloquearPeoplePickerResponsavelSeNecessario($inovDeResponsavelPPGer);
             $fabricaResponsavelAcompanhamento.attr('disabled', false);
-            $fabricaResponsavelPPCoordProg.attr('disabled', false);
-            $fabricaResponsavelPPCoordMan.attr('disabled', false);
-            $fabricaResponsavelPPGer.attr('disabled', false);
+            desbloquearPeoplePickerResponsavelSeNecessario($fabricaResponsavelPPCoordProg);
+            desbloquearPeoplePickerResponsavelSeNecessario($fabricaResponsavelPPCoordMan);
+            desbloquearPeoplePickerResponsavelSeNecessario($fabricaResponsavelPPGer);
             $qualidadeResponsavelAcompanhamento.attr('disabled', false);
-            $qualidadeResponsavelPPResp.attr('disabled', false);
-            $qualidadeResponsavelPPGer.attr('disabled', false);
+            desbloquearPeoplePickerResponsavelSeNecessario($qualidadeResponsavelPPResp);
+            desbloquearPeoplePickerResponsavelSeNecessario($qualidadeResponsavelPPGer);
             $meioAmbienteResponsavelAcompanhamento.attr('disabled', false);
-            $meioAmbienteResponsavelPPResp.attr('disabled', false);
+            desbloquearPeoplePickerResponsavelSeNecessario($meioAmbienteResponsavelPPResp);
             $envaseAcompAcompanhamento.attr('disabled', false);
-            $envaseAcompPPResp.attr('disabled', false);
-            $envaseAcompPPGer.attr('disabled', false);
+            desbloquearPeoplePickerResponsavelSeNecessario($envaseAcompPPResp);
+            desbloquearPeoplePickerResponsavelSeNecessario($envaseAcompPPGer);
             $engFabAcompAcompanhamento.attr('disabled', false);
-            $engFabAcompPPResp.attr('disabled', false);
-            $engFabAcompPPGer.attr('disabled', false);
+            desbloquearPeoplePickerResponsavelSeNecessario($engFabAcompPPResp);
+            desbloquearPeoplePickerResponsavelSeNecessario($engFabAcompPPGer);
             $inovDfAcompAcompanhamento.attr('disabled', false);
-            $inovDfAcompPPResp.attr('disabled', false);
-            $inovDfAcompPPGer.attr('disabled', false);
+            desbloquearPeoplePickerResponsavelSeNecessario($inovDfAcompPPResp);
+            desbloquearPeoplePickerResponsavelSeNecessario($inovDfAcompPPGer);
             $inovDeAcompAcompanhamento.attr('disabled', false);
-            $inovDeAcompPPResp.attr('disabled', false);
-            $inovDeAcompPPGer.attr('disabled', false);
+            desbloquearPeoplePickerResponsavelSeNecessario($inovDeAcompPPResp);
+            desbloquearPeoplePickerResponsavelSeNecessario($inovDeAcompPPGer);
             $fabricaAcompAcompanhamento.attr('disabled', false);
-            $fabricaAcompPPCoordProg.attr('disabled', false);
-            $fabricaAcompPPCoordMan.attr('disabled', false);
-            $fabricaAcompPPGer.attr('disabled', false);
+            desbloquearPeoplePickerResponsavelSeNecessario($fabricaAcompPPCoordProg);
+            desbloquearPeoplePickerResponsavelSeNecessario($fabricaAcompPPCoordMan);
+            desbloquearPeoplePickerResponsavelSeNecessario($fabricaAcompPPGer);
             $meioAmbienteAcompAcompanhamento.attr('disabled', false);
-            $meioAmbienteAcompPPResp.attr('disabled', false);
+            desbloquearPeoplePickerResponsavelSeNecessario($meioAmbienteAcompPPResp);
             break;
         case RESP_ACOMP_AGENDADO_EM_EDICAO:
             $().SPServices({
@@ -4020,47 +4055,47 @@ function ModificarCamposPorFormState(formState) {
                     var qualidade = listDemaisGrupos[7];
                     if (usuarioPertenceAoGrupo($xml, envase)) {
                         $envaseResponsavelAcompanhamento.attr('disabled', false);
-                        $envaseResponsavelPPResp.attr('disabled', false);
-                        $envaseResponsavelPPGer.attr('disabled', false);
+                        desbloquearPeoplePickerResponsavelSeNecessario($envaseResponsavelPPResp);
+                        desbloquearPeoplePickerResponsavelSeNecessario($envaseResponsavelPPGer);
                         $LinhaEquipamento.attr('disabled', false);
                         $Observacoes.summernote('enable');
                     }
                     if (usuarioPertenceAoGrupo($xml, engFabricacao)) {
                         $engFabResponsavelAcompanhamento.attr('disabled', false);
-                        $engFabResponsavelPPResp.attr('disabled', false);
-                        $engFabResponsavelGer.attr('disabled', false);
+                        desbloquearPeoplePickerResponsavelSeNecessario($engFabResponsavelPPResp);
+                        desbloquearPeoplePickerResponsavelSeNecessario($engFabResponsavelGer);
                         $LinhaEquipamento.attr('disabled', false);
                         $Observacoes.summernote('enable');
                     }
 
                     if (usuarioPertenceAoGrupo($xml, inovDf)) {
                         $inovDfResponsavelAcompanhamento.attr('disabled', false);
-                        $inovDfResponsavelPPResp.attr('disabled', false);
-                        $inovDfResponsavelPPGer.attr('disabled', false);
+                        desbloquearPeoplePickerResponsavelSeNecessario($inovDfResponsavelPPResp);
+                        desbloquearPeoplePickerResponsavelSeNecessario($inovDfResponsavelPPGer);
                     }
 
                     if (usuarioPertenceAoGrupo($xml, inovDe)) {
                         $inovDeResponsavelAcompanhamento.attr('disabled', false);
-                        $inovDeResponsavelPPResp.attr('disabled', false);
-                        $inovDeResponsavelPPGer.attr('disabled', false);
+                        desbloquearPeoplePickerResponsavelSeNecessario($inovDeResponsavelPPResp);
+                        desbloquearPeoplePickerResponsavelSeNecessario($inovDeResponsavelPPGer);
                     }
 
                     if (usuarioPertenceAoGrupo($xml, fabrica)) {
                         $fabricaResponsavelAcompanhamento.attr('disabled', false);
-                        $fabricaResponsavelPPCoordProg.attr('disabled', false);
-                        $fabricaResponsavelPPCoordMan.attr('disabled', false);
-                        $fabricaResponsavelPPGer.attr('disabled', false);
+                        desbloquearPeoplePickerResponsavelSeNecessario($fabricaResponsavelPPCoordProg);
+                        desbloquearPeoplePickerResponsavelSeNecessario($fabricaResponsavelPPCoordMan);
+                        desbloquearPeoplePickerResponsavelSeNecessario($fabricaResponsavelPPGer);
                     }
 
                     if (usuarioPertenceAoGrupo($xml, qualidade)) {
                         $qualidadeResponsavelAcompanhamento.attr('disabled', false);
-                        $qualidadeResponsavelPPResp.attr('disabled', false);
-                        $qualidadeResponsavelPPGer.attr('disabled', false);
+                        desbloquearPeoplePickerResponsavelSeNecessario($qualidadeResponsavelPPResp);
+                        desbloquearPeoplePickerResponsavelSeNecessario($qualidadeResponsavelPPGer);
                     }
 
                     if (usuarioPertenceAoGrupo($xml, meioAmbiente)) {
                         $meioAmbienteResponsavelAcompanhamento.attr('disabled', false);
-                        $meioAmbienteResponsavelPPResp.attr('disabled', false);
+                        desbloquearPeoplePickerResponsavelSeNecessario($meioAmbienteResponsavelPPResp);
                     }
                 }
             });
@@ -4593,6 +4628,8 @@ function RegistrarBindings() {
             }
         }
     });
+
+    document.addEventListener('click', registrarBloqueadorPeoplePicker, true);
 }
 
 function habilitarJustificativaInicioProgramado() {
@@ -4909,15 +4946,19 @@ function RegistrarBotoes() {
 
         let status = R.Status.val();
 
-        if (status == RASCUNHO) {
-            ModificarFormState(RASCUNHO_EM_EDICAO);
-        } else if (status == AGENDADO) {
-            ModificarFormState(AGENDAMENTO_EM_EDICAO);
-        } else if(status == REGISTRO_DE_ANALISE) {
-            ModificarFormState(EM_REGISTRO_DE_ANALISE);
-        }
+        RecarregarAgendamento().then(function() {
+            if (status == RASCUNHO) {
+                ModificarFormState(RASCUNHO_EM_EDICAO);
+            } else if (status == AGENDADO) {
+                ModificarFormState(AGENDAMENTO_EM_EDICAO);
+            } else if(status == REGISTRO_DE_ANALISE) {
+                ModificarFormState(EM_REGISTRO_DE_ANALISE);
+            }
 
-        botoesStatus['editar'] = false;
+            botoesStatus['editar'] = false;
+        }).fail(function () {
+            botoesStatus['editar'] = false;
+        });
     });
 
     $('.btn-editar-resp-acomp').click(function () {
@@ -5072,21 +5113,21 @@ function BuscarMinimoEMaximoPecas(linhaEquipamentoId) {
 
 function verificarErros() {
     var $campos = {
-        tipoDeLote,
-        fabrica,
-        linhaEquipamento,
-        codigoProduto,
-        linhaDoProduto,
-        produtoDescricao,
-        produtoProjeto,
-        categoriaDoProjeto,
-        produtoQuantidade,
-        motivo,
-        agendamentoCentroCusto,
-        grauComplexidade,
-        agendamentoDataInicioProgramado,
-        agendamentoDuracaoHoras,
-        agendamentoDuracaoMinutos
+        'tipoDeLote' : null,
+        'fabrica' : null,
+        'linhaEquipamento' : null,
+        'codigoProduto' : null,
+        'linhaDoProduto' : null,
+        'produtoDescricao' : null,
+        'produtoProjeto' : null,
+        'categoriaDoProjeto' : null,
+        'produtoQuantidade' : null,
+        'motivo' : null,
+        'agendamentoCentroCusto' : null,
+        'grauComplexidade' : null,
+        'agendamentoDataInicioProgramado' : null,
+        'agendamentoDuracaoHoras' : null,
+        'agendamentoDuracaoMinutos' : null,
     };
 
     var erro = 0;
@@ -5098,8 +5139,7 @@ function verificarErros() {
         return CurrentDate > SelectedDate;
     }
 
-    var itens;
-    for (itens in $campos) {
+    for (var itens in $campos) {
         var $atributo =  $('#'+itens);
         var $classe = $atributo.attr('class');
 
