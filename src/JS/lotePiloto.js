@@ -471,6 +471,25 @@ function ValidarAgendamentosProduto() {
 function ValidarAgendamentosAgendamento() {
     var errorAgendamentosAgendamento = 0;
     LimparValidacoes();
+
+    $('input[type=number]').each(function () {
+        if (this.value != '' && ((this.min && this.value < this.min) || (this.max && this.value > this.max))) {
+            errorAgendamentosAgendamento ++;
+            NotificarErroValidacao('text', 'input#' + this.id, '', '');
+        } else {
+            LimparValidacao('text', 'input#' + this.id, '');
+        }
+    });
+
+    $('input[maxlength]').each(function () {
+        if (this.value != '' && (this.maxLength && this.value.length > this.maxLength)) {
+            errorAgendamentosAgendamento ++;
+            NotificarErroValidacao('text', 'input#' + this.id, '', '');
+        } else {
+            LimparValidacao('text', 'input#' + this.id, '');
+        }
+    });
+
     if ($('input#agendamentoCentroCusto').val() === null || $('input#agendamentoCentroCusto').val() == '') {
         errorAgendamentosAgendamento++;
         NotificarErroValidacao('text', 'input#agendamentoCentroCusto', '', '');
@@ -1388,7 +1407,7 @@ function ValidarStatusECamposObrigatorios() {
     erros += ValidarAbaJustificativa();
 
     // Chrome hack para resetar a visualização dos campos inválidos do tipo number
-    $('[type=number]').each(function () {
+    $('input[type=number]').each(function () {
         if (this.value == '') {
             this.value = '';
         }
@@ -1407,6 +1426,11 @@ function ValidarStatusECamposObrigatorios() {
                 erros++;
                 NotificarErroValidacao('select', 'select#naoExecutadoMotivo', '', '');
                 alert("Favor preencher motivo da não execução");
+            }
+            break;
+        case AGENDAMENTO_EM_EDICAO:
+            if (!ValidarAgendamento()) {
+                erros += 1;
             }
             break;
         case EM_REGISTRO_DE_ANALISE:
@@ -2192,7 +2216,7 @@ function CarregarAgendamento(id) {
                     $elemento.prop('checked', this.value == "1");
                     memoriaAgendamentoAtual[$elemento.attr('name')] = this.value == "1";
                     $elemento.change();
-                } else if ($elemento.is('[type=number]') || $elemento.is('.input-number')) {
+                } else if ($elemento.is('input[type=number]') || $elemento.is('.input-number')) {
                     $elemento.val(AtributoNumber(this.value));
                     memoriaAgendamentoAtual[$elemento.attr('name')] = AtributoNumber(this.value);
                     $elemento.change();
@@ -4523,8 +4547,18 @@ function RegistrarBindings() {
         DispararCarregarLinhasEquipamentos();
     });
 
-    $('[type=number]').change(function () {
+    $('input[maxlength]').change(function () {
+        if (this.value != '' && (this.maxLength && this.value.length > this.maxLength)) {
+            this.value = '';
+            NotificarErroValidacao('text', 'input#' + this.id, '', '');
+        } else {
+            LimparValidacao('text', 'input#' + this.id, '');
+        }
+    });
+
+    $('input[type=number]').change(function () {
         if (this.value != '' && ((this.min && this.value < this.min) || (this.max && this.value > this.max))) {
+            this.value = '';
             NotificarErroValidacao('text', 'input#' + this.id, '', '');
         } else {
             LimparValidacao('text', 'input#' + this.id, '');

@@ -102,7 +102,7 @@
             <div class="row" style="margin-top: 10px;">
                 <div class="col-md-6">
                     <label for="codigoProduto">Código do produto</label>
-                    <input type="text" class="form-control salvar-campo" id="codigoProduto" name="CodigoProduto">
+                    <input type="text" class="form-control salvar-campo" id="codigoProduto" name="CodigoProduto" maxlength="255">
                 </div>
                 <div class="col-md-6">
                     <label for="linhaDoProduto">Linha do produto</label>
@@ -114,13 +114,13 @@
             <div class="row" style="margin-top: 10px;">
                 <div class="col-md-12">
                     <label for="produtoDescricao">Descrição do produto</label>
-                    <textarea class="form-control salvar-campo" id="produtoDescricao" name="DescricaoProduto" rows="3"></textarea>
+                    <textarea class="form-control salvar-campo" id="produtoDescricao" name="DescricaoProduto" rows="3" maxlength="255"></textarea>
                 </div>
             </div>
             <div class="row" style="margin-top: 10px;">
                 <div class="col-md-6">
                     <label for="produtoProjeto">Projeto</label>
-                    <input type="text" class="form-control salvar-campo" id="produtoProjeto" name="Projeto">
+                    <input type="text" class="form-control salvar-campo" id="produtoProjeto" name="Projeto" maxlength="255">
                 </div>
                 <div class="col-md-6">
                     <label for="categoriaDoProjeto">Categoria do projeto</label>
@@ -132,11 +132,11 @@
             <div class="row" style="margin-top: 10px;">
                 <div class="col-md-6">
                     <label for="produtoFormula">Fórmula</label>
-                    <input type="text" class="form-control salvar-campo" id="produtoFormula" name="Formula">
+                    <input type="text" class="form-control salvar-campo" id="produtoFormula" name="Formula" maxlength="255">
                 </div>
                 <div class="col-md-6">
                     <label for="produtoQuantidade">Quantidade</label>
-                    <input type="number" class="form-control salvar-campo" id="produtoQuantidade" name="QuantidadePecas" min="0" onfocusout="ValidarLinhaEquipamento()">
+                    <input type="number" class="form-control salvar-campo" id="produtoQuantidade" name="QuantidadePecas" min="0" max="999999" onfocusout="ValidarLinhaEquipamento()">
                 </div>
             </div>
             <div class="row" style="margin-top: 10px;">
@@ -158,11 +158,11 @@
             <div class="row" id="formResponsavelAmostra" style="margin-top: 10px;display:none">
                 <div class="col-md-6">
                     <label for="produtoResponsavelAmostra">Responsável pela amostra</label>
-                    <input type="text" class="form-control salvar-campo" id="produtoResponsavelAmostra" name="ResponsavelAmostra">
+                    <input type="text" class="form-control salvar-campo" id="produtoResponsavelAmostra" name="ResponsavelAmostra" maxlength="255">
                 </div>
                 <div class="col-md-6">
                     <label for="produtoQuantidadeAmostra">Quantidade de amostras</label>
-                    <input type="number" class="form-control salvar-campo" id="produtoQuantidadeAmostra" name="QuantidadeAmostra" min="0">
+                    <input type="number" class="form-control salvar-campo" id="produtoQuantidadeAmostra" name="QuantidadeAmostra" min="0" max="999999">
                 </div>
             </div>
         </div>
