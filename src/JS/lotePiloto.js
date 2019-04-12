@@ -1410,6 +1410,10 @@ function ValidarStatusECamposObrigatorios() {
             }
             break;
         case EM_REGISTRO_DE_ANALISE:
+            if (!ValidarAgendamento()) {
+                erros += 1;
+            }
+
             Object.keys(memoriaAprovacoesAtual).forEach(function (index) {
                 var aprovacao = memoriaAprovacoesAtual[index];
 
@@ -3317,7 +3321,7 @@ function ResponsavelAtual(responsavel) {
         ResponsavelAtualAprovacaoRegistrada(responsavel);
     }
 
-    var usuarioDoPeoplePicker = PegarUsuarioDoPeoplePicker(responsavel.peoplePickerId);
+    var usuarioDoPeoplePicker = PegarUsuarioDoPeoplePicker(responsavel.peoplePickerId, true);
 
     if (!usuarioDoPeoplePicker) {
         return $.when();
@@ -3422,7 +3426,7 @@ function GetMeusResponsaveisPorTipoDeLote(tipoDeLote) {
     return $.grep(SetoresResponsaveis, function (responsavel) {
         return responsavel.tipoDeLote == tipoDeLote &&
             memoriaAprovacoesAtual[responsavel.nome] &&
-            PegarUsuarioDoPeoplePicker(responsavel.peoplePickerId) &&
+            PegarUsuarioDoPeoplePicker(responsavel.peoplePickerId, true) &&
             UsuarioLogado.id == FiltrarIdPorPessoaId(memoriaAprovacoesAtual[responsavel.nome].Pessoa);
     });
 }
@@ -3787,15 +3791,15 @@ function desbloquearPeoplePickerResponsavelSeNecessario($peoplePickerResponsavel
     var $peoplePickerParent = $peoplePickerResponsavel.closest('div.sp-peoplepicker-topLevel').parent().parent();
     var responsavel = GetResponsavelPorPeoplePickerId($peoplePickerParent.attr('id'));
 
-    if (!M.atual.aprovacoes[responsavel.nome]) {
+    if (!M.atual.aprovacoes || !M.atual.aprovacoes[responsavel.nome]) {
         $peoplePickerResponsavel.attr('disabled', false);
         $peoplePickerParent.removeClass('sp-peoplepicker-disabled');
         return;
     }
 
     if (['Pendente', 'Rascunho'].indexOf(M.atual.aprovacoes[responsavel.nome].Resultado) >= 0) {
-        $peoplePickerParent.removeClass('sp-peoplepicker-disabled');
         $peoplePickerResponsavel.attr('disabled', false);
+        $peoplePickerParent.removeClass('sp-peoplepicker-disabled');
     }
 }
 
