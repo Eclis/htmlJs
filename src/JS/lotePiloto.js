@@ -5011,7 +5011,11 @@ function RegistrarBotoes() {
                 ModificarFormState(EM_REGISTRO_DE_ANALISE);
             }
 
-            botoesStatus['editar'] = false;
+            return CarregarPaineisDeAnexos().then(function () {
+                botoesStatus['editar'] = false;
+            }).fail(function () {
+                botoesStatus['editar'] = false;
+            });
         }).fail(function () {
             botoesStatus['editar'] = false;
         });
@@ -5322,6 +5326,7 @@ function bloquearBotoesAbaAnexo(){
 }
 
 function CarregarPaineisDeAnexos() {
+    var promises = [];
     $.each([
         R.AnalisesQualidadeResponsavelAnexo,
         R.AnalisesQualidadeGerenteAnexo,
@@ -5335,10 +5340,16 @@ function CarregarPaineisDeAnexos() {
         var aprovacao = ProcurarAprovacaoPorAbaAnaliseId($anexo.closest('div.tab-pane').attr('id'));
 
         if (aprovacao != null) {
+            var editavel = state == EM_REGISTRO_DE_ANALISE &&
+                UsuarioLogado.id == FiltrarIdPorPessoaId(aprovacao.Pessoa) &&
+                ['Pendente', 'Rascunho'].indexOf(aprovacao.Resultado) != -1;
+
             var $tabelaAnexos = $anexo.closest('div.tab-pane').find('.row .table.table-hover table');
-            ExibirAnexosNaLista(aprovacao.ID, $tabelaAnexos);
+            promises.push(ExibirAnexosNaLista(aprovacao.ID, $tabelaAnexos, editavel));
         }
     });
+
+    return $.when.apply($, promises);
 }
 
 function getAttachmentFiles(listItem) {
@@ -5635,8 +5646,8 @@ function RemoverAnexoDaLista(id, element) {
     });
 }
 
-function ExibirAnexosNaLista(itemId, $tabelaAnexos) {
-    ListarAnexos('responsavel', itemId, 'Ativo').then(function ($registros) {
+function ExibirAnexosNaLista(itemId, $tabelaAnexos, editavel) {
+    return ListarAnexos('responsavel', itemId, 'Ativo').then(function ($registros) {
         var contador = 1;
         var table = '';
 
@@ -5653,7 +5664,7 @@ function ExibirAnexosNaLista(itemId, $tabelaAnexos) {
                 '<tr>' +
                 '   <th scope="row" width="10%">' + contador + '</th>' +
                 '   <td><a href="' + _spPageContextInfo.siteAbsoluteUrl + '/Lists/AgendamentosAnexos/Attachments/' + id + '/' + nome + '?web=1" target="_blank">' + nome + '</a></td>' +
-                '   <td><a name="ExcluirAnexo" href="#" onclick="RemoverAnexoDaLista(\'' + id + '\', this); return false;" style="display: none;">Excluir</a></td>' +
+                '   <td><a name="ExcluirAnexo" href="#" onclick="RemoverAnexoDaLista(\'' + id + '\', this); return false;"' + (!editavel ? ' style="display: none;"' : '') + '>Excluir</a></td>' +
                 '</tr>';
             contador = contador + 1;
         });
