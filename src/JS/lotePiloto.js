@@ -2347,36 +2347,38 @@ function CarregarAgendamentoResponsaveis(agendamento) {
                     MeioAmbienteAumentoConsumoAguaLi: this.attributes.ows_MeioAmbienteAumentoConsumoAguaLi != undefined ? this.attributes.ows_MeioAmbienteAumentoConsumoAguaLi.value : null,
                     MeioAmbienteAumentoConsumoEnergi: this.attributes.ows_MeioAmbienteAumentoConsumoEnergi != undefined ? this.attributes.ows_MeioAmbienteAumentoConsumoEnergi.value : null,
                     MeioAmbienteAumentoConsumoAguaFa: this.attributes.ows_MeioAmbienteAumentoConsumoAguaFa != undefined ? this.attributes.ows_MeioAmbienteAumentoConsumoAguaFa.value : null,
-                    _abaAnaliseId: responsavel.abaAnaliseId,
-                    _abaAcompanhanteId: responsavel.abaAcompanhanteId,
+                    _abaAnaliseId: responsavel ? responsavel.abaAnaliseId : null,
+                    _abaAcompanhanteId: responsavel ? responsavel.abaAcompanhanteId : null,
                 };
-
-                if (responsavel.abaAnaliseId) {
-                    if (memoriaAprovacoesAtual[this.attributes.ows_TipoResponsavel.value].Resultado.startsWith('Aprovado')) {
-                        $('a[href="#' + responsavel.abaAnaliseId + '"]').css('background-color', '#008000');
-                        $('a[href="#' + responsavel.abaAnaliseId + '"]').css('color', 'white');
-                        $('a[href="#' + responsavel.abaAnaliseId + '"]').css('border-color', 'white');
-                    } else if (memoriaAprovacoesAtual[this.attributes.ows_TipoResponsavel.value].Resultado == 'Reprovado') {
-                        $('a[href="#' + responsavel.abaAnaliseId + '"]').css('background-color', '#f95834');
-                        $('a[href="#' + responsavel.abaAnaliseId + '"]').css('color', 'white');
-                        $('a[href="#' + responsavel.abaAnaliseId + '"]').css('border-color', 'white');
-                    } else {
-                        $('a[href="#' + responsavel.abaAnaliseId + '"]').css('background-color', '#ffbc00');
-                        $('a[href="#' + responsavel.abaAnaliseId + '"]').css('color', 'white');
-                        $('a[href="#' + responsavel.abaAnaliseId + '"]').css('border-color', 'white');
-                    }
-                }
 
                 memoriaAprovacoesAntigo[this.attributes.ows_TipoResponsavel.value] = $.extend({}, memoriaAprovacoesAtual[this.attributes.ows_TipoResponsavel.value]);
 
-                var usuarioNome = FiltrarNomeUsuarioPorPessoaId(this.attributes.ows_Pessoa.value);
+                if (responsavel) {
+                    if (responsavel.abaAnaliseId) {
+                        if (memoriaAprovacoesAtual[this.attributes.ows_TipoResponsavel.value].Resultado.startsWith('Aprovado')) {
+                            $('a[href="#' + responsavel.abaAnaliseId + '"]').css('background-color', '#008000');
+                            $('a[href="#' + responsavel.abaAnaliseId + '"]').css('color', 'white');
+                            $('a[href="#' + responsavel.abaAnaliseId + '"]').css('border-color', 'white');
+                        } else if (memoriaAprovacoesAtual[this.attributes.ows_TipoResponsavel.value].Resultado == 'Reprovado') {
+                            $('a[href="#' + responsavel.abaAnaliseId + '"]').css('background-color', '#f95834');
+                            $('a[href="#' + responsavel.abaAnaliseId + '"]').css('color', 'white');
+                            $('a[href="#' + responsavel.abaAnaliseId + '"]').css('border-color', 'white');
+                        } else {
+                            $('a[href="#' + responsavel.abaAnaliseId + '"]').css('background-color', '#ffbc00');
+                            $('a[href="#' + responsavel.abaAnaliseId + '"]').css('color', 'white');
+                            $('a[href="#' + responsavel.abaAnaliseId + '"]').css('border-color', 'white');
+                        }
+                    }
 
-                promessas.push(CarregarUsuarioPorLoginName(usuarioNome).then(function (usuario) {
-                    PreencherPeoplePicker(responsavel.peoplePickerId, usuario);
-                }));
+                    var usuarioNome = FiltrarNomeUsuarioPorPessoaId(this.attributes.ows_Pessoa.value);
 
-                if (responsavel.abaAnaliseId) {
-                    promessas.push(PreencherAbaAnalises(responsavel));
+                    promessas.push(CarregarUsuarioPorLoginName(usuarioNome).then(function (usuario) {
+                        PreencherPeoplePicker(responsavel.peoplePickerId, usuario);
+                    }));
+
+                    if (responsavel.abaAnaliseId) {
+                        promessas.push(PreencherAbaAnalises(responsavel));
+                    }
                 }
             });
 
