@@ -4852,6 +4852,16 @@ function DerivarAgendamento() {
     $('input[name=CodigoAgendamento]').val("");
     memoriaAgendamentoAntigo = {};
     memoriaAgendamentoAtual = {};
+    M = {
+        antigo: {
+            agendamento: null,
+            aprovacoes: null
+        },
+        atual: {
+            agendamento: null,
+            aprovacoes: null
+        }
+    };
     ModificarStatusPorFormState(EM_CRIACAO);
     ModificarFormState(EM_CRIACAO);
     window.history.pushState("object", '', _spPageContextInfo.siteAbsoluteUrl + "/Lists/Agendamentos/NewForm.aspx");
