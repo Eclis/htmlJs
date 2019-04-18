@@ -4666,7 +4666,7 @@ function RegistrarBindings() {
 
     $('[name="Resultado"]').change(function () {
         var $this = $(this);
-        var $tab = $this.parents('.tab-pane[role="tabpanel"]');
+        var $tab = $this.closest('.tab-pane[role="tabpanel"]');
 
         if ($this.val() == 'Reprovado') {
             $tab.find('[name="ReprovadoMotivo"]').prop('disabled', false);
