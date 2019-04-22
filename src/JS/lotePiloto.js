@@ -510,8 +510,7 @@ function ValidarAgendamentosAgendamento() {
         errorAgendamentosAgendamento++;
         $('input#agendamentoDataInicioProgramado').attr("title", "Data não pode ser inválida.");
         NotificarErroValidacao('text', 'input#agendamentoDataInicioProgramado', '', '');
-    }
-    else {
+    } else if ([EM_CRIACAO, RASCUNHO_EM_EDICAO, AGENDAMENTO_EM_EDICAO, RESP_ACOMP_AGENDADO_EM_EDICAO].indexOf(state) >= 0) {
         var SelectedDate = new Date($('input#agendamentoDataInicioProgramado').val().substring(6, 10), $('input#agendamentoDataInicioProgramado').val().substring(3, 5) - 1, $('input#agendamentoDataInicioProgramado').val().substring(0, 2));
         var CurrentDateTime = new Date();
         var CurrentDate = new Date(CurrentDateTime.getFullYear(), CurrentDateTime.getMonth(), CurrentDateTime.getDate());
@@ -3430,7 +3429,7 @@ var SetoresResponsaveis = [
     {tipoDeLote: 'Envase',     nome: 'Inovação DE - Gerente',          bloqueadoPor: 'Inovação DE - Responsável',      peoplePickerId: 'peoplePickerAbaRespGerInovDE',         abaAcompanhanteId: null,                         abaAnaliseId: null},
     {tipoDeLote: 'Envase',     nome: 'Qualidade - Responsável',        bloqueadoPor: 'Qualidade - Responsável',        peoplePickerId: 'peoplePickerAbaRespRespQualidade',     abaAcompanhanteId: null,                         abaAnaliseId: 'tab-qualidade-resp'},
     {tipoDeLote: 'Envase',     nome: 'Qualidade - Gerente',            bloqueadoPor: null,                             peoplePickerId: 'peoplePickerAbaRespGerQualidade',      abaAcompanhanteId: null,                         abaAnaliseId: 'tab-analise-qualidade-ger'},
-    {tipoDeLote: 'Envase',     nome: 'Fábrica - Coord. Programação',   bloqueadoPor: null,                             peoplePickerId: 'peoplePickerAbaRespCoordProgFabrica',  abaAcompanhanteId: null,                         abaAnaliseId: null},
+    {tipoDeLote: 'Envase',     nome: 'Fábrica - Coord. Programação',   bloqueadoPor: 'Fábrica - Coord. de Manufatura', peoplePickerId: 'peoplePickerAbaRespCoordProgFabrica',  abaAcompanhanteId: null,                         abaAnaliseId: null},
     {tipoDeLote: 'Envase',     nome: 'Fábrica - Coord. de Manufatura', bloqueadoPor: 'Fábrica - Coord. de Manufatura', peoplePickerId: 'peoplePickerAbaRespCoordManFabrica',   abaAcompanhanteId: null,                         abaAnaliseId: 'tab-fabrica-resp'},
     {tipoDeLote: 'Envase',     nome: 'Fábrica - Gerente',              bloqueadoPor: 'Fábrica - Coord. de Manufatura', peoplePickerId: 'peoplePickerAbaRespGerFabrica',        abaAcompanhanteId: null,                         abaAnaliseId: null},
     {tipoDeLote: 'Fabricação', nome: 'DL/PCL - Responsável',           bloqueadoPor: null,                             peoplePickerId: 'peoplePickerAbaRespRespDLPCL',         abaAcompanhanteId: null,                         abaAnaliseId: null},
@@ -3835,7 +3834,7 @@ function desbloquearPeoplePickerResponsavelSeNecessario($peoplePickerResponsavel
     var $peoplePickerParent = $peoplePickerResponsavel.closest('div.sp-peoplepicker-topLevel').parent().parent();
     var responsavel = GetResponsavelPorPeoplePickerId($peoplePickerParent.attr('id'));
 
-    if (!M.atual.aprovacoes || !M.atual.aprovacoes[responsavel.nome]) {
+    if (!M.atual.aprovacoes || !M.atual.aprovacoes[responsavel.bloqueadoPor]) {
         $peoplePickerResponsavel.attr('disabled', false);
         $peoplePickerParent.removeClass('sp-peoplepicker-disabled');
         return;
@@ -3879,7 +3878,7 @@ function ModificarCamposPorFormState(formState) {
     var $envaseResponsavelPPGer = $('#peoplePickerAbaRespGerEngEnvase_TopSpan_EditorInput');
     var $engFabResponsavelAcompanhamento = $('[name=EngenhariaFabricacaoAcompanhamen]');
     var $engFabResponsavelPPResp = $('#peoplePickerAbaRespRespEngFabricacao_TopSpan_EditorInput');
-    var $engFabResponsavelGer =    $('#peoplePickerAbaRespGerEngFabricacao_TopSpan_EditorInput');
+    var $engFabResponsavelGer = $('#peoplePickerAbaRespGerEngFabricacao_TopSpan_EditorInput');
     var $inovDfResponsavelAcompanhamento = $('[name=InovacaoDfAcompanhamento]');
     var $inovDfResponsavelPPResp = $('#peoplePickerAbaRespRespInovDF_TopSpan_EditorInput');
     var $inovDfResponsavelPPGer = $('#peoplePickerAbaRespGerInovDF_TopSpan_EditorInput');
