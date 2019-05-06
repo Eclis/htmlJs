@@ -111,6 +111,16 @@ var R = {
     AnalisesQualidadeGerenteAnexo: $('#txtAtt-tab-analise-qualidade-ger'),
 };
 
+var UltimoBloqueio = {
+    bloqueado: false,
+    meuBloqueio: false,
+    sessao: null,
+    usuario_id: null,
+    usuario_nome: null,
+    datahora: null,
+    datahora_limite: null
+};
+
 var JustificandoInicioProgramado = false;
 var UsuarioLogado = null;
 
@@ -2280,6 +2290,108 @@ function CarregarAgendamento(id) {
     });
 
     return $promise;
+}
+
+function CarregarBloqueio(ID) {
+    return CarregarRegistro(
+        ID,
+        'Agendamentos',
+        ['bloqueio_sessao', 'bloqueio_usuario_id', 'bloqueio_datahora']).then(function (result) {
+            return Bloqueio(result.record);
+        });
+}
+
+function BloquearAgendamento(ID) {
+    var $promise = $.Deferred();
+
+    CarregarBloqueio(ID).then(function (bloqueio) {
+        if (!bloqueio.bloqueado || bloqueio.meuBloqueio) {
+            return CriarBloqueio(ID).then(function (novo_bloqueio) {
+                if (novo_bloqueio.meuBloqueio) {
+                    $promise.resolve(novo_bloqueio);
+                } else {
+                    $promise.reject({
+                        errorCode: '0x99999998',
+                        errorText: 'Não foi possível bloquear o Agendamento. O Agendamento já está em uso por ' + novo_bloqueio.usuario_nome
+                    });
+                }
+            });
+        } else {
+            $promise.reject({
+                errorCode: '0x99999998',
+                errorText: 'Não foi possível bloquear o Agendamento. O Agendamento já está em uso por ' + bloqueio.usuario_nome
+            });
+        }
+    }).fail(function (erro) {
+        $promise.reject(erro);
+    });
+
+    return $promise;
+}
+
+function CriarBloqueio(ID) {
+    return AtualizarRegistro(ID, 'Agendamentos', [
+        ['bloqueio_usuario_id', UsuarioLogado.id],
+        ['bloqueio_datahora', moment(new Date(), 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DDTHH:mm:ss[-00:00]')]
+    ]).then(function (result) {
+        return Bloqueio(result.record);
+    });
+}
+
+function RemoverBloqueio(ID) {
+    return AtualizarRegistro(ID, 'Agendamentos', [
+        ['bloqueio_usuario_id', ''],
+        ['bloqueio_datahora', '']
+    ]).then(function (result) {
+        return Bloqueio(result.record);
+    });
+}
+
+function Bloqueio(record) {
+    record = record.first();
+
+    if (!record.attr('ows_bloqueio_datahora')) {
+        UltimoBloqueio = {
+            bloqueado: false,
+            meuBloqueio: false,
+            sessao: null,
+            usuario_id: null,
+            usuario_nome: null,
+            datahora: null,
+            datahora_limite: null
+        };
+
+        return UltimoBloqueio;
+    }
+
+    var bloqueio_datahora = moment(record.attr('ows_bloqueio_datahora'), 'YYYY-MM-DD HH:mm:ss');
+    var bloqueio_limite = bloqueio_datahora.clone().add(5, 'minutes');
+    var bloqueio_usuario_id = record.attr('ows_bloqueio_usuario_id');
+    var bloqueado = true;
+
+    if (!record || moment().diff(bloqueio_limite) >= 0) {
+        bloqueado = false;
+    }
+
+    UltimoBloqueio = {
+        bloqueado: bloqueado,
+        meuBloqueio: bloqueado && UsuarioLogado.id == FiltrarIdPorPessoaId(bloqueio_usuario_id),
+        sessao: null,
+        usuario_id: FiltrarIdPorPessoaId(record.attr('ows_bloqueio_usuario_id')),
+        usuario_nome: FiltrarNomeUsuarioPorPessoaId(record.attr('ows_bloqueio_usuario_id')),
+        datahora: bloqueio_datahora.format('DD/MM/YYYY HH:mm'),
+        datahora_limite: bloqueio_limite.format('DD/MM/YYYY HH:mm')
+    };
+
+    return UltimoBloqueio;
+}
+
+function DesbloquearAgendamento(ID) {
+    return CarregarBloqueio(ID).then(function (bloqueio) {
+        if (bloqueio.meuBloqueio) {
+            return RemoverBloqueio(ID);
+        }
+    });
 }
 
 function RecarregarAgendamento() {
@@ -4882,17 +4994,22 @@ function RegistrarBotoes() {
                 botoesStatus['salvar'] = true;
             }
 
-            SalvarAgendamento().then(function () {
-                window.history.pushState('Object', '', _spPageContextInfo.siteAbsoluteUrl + '/Lists/Agendamentos/DispForm.aspx?ID=' + memoriaAgendamentoAtual.ID);
-                bloquearBotoesAbaAnexo();
+            DesbloquearAgendamento(M.atual.agendamento.ID).then(function () {
+                SalvarAgendamento().then(function () {
+                    window.history.pushState('Object', '', _spPageContextInfo.siteAbsoluteUrl + '/Lists/Agendamentos/DispForm.aspx?ID=' + memoriaAgendamentoAtual.ID);
+                    bloquearBotoesAbaAnexo();
 
-                if (memoriaAgendamentoAntigo.ID) {
-                    alert('Alterações salvas');
-                } else {
-                    alert('Agendamento salvo');
-                }
+                    if (memoriaAgendamentoAntigo.ID) {
+                        alert('Alterações salvas');
+                    } else {
+                        alert('Agendamento salvo');
+                    }
 
-                botoesStatus['salvar'] = false;
+                    botoesStatus['salvar'] = false;
+                }).fail(function (response) {
+                    alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
+                    botoesStatus['salvar'] = false;
+                });
             }).fail(function (response) {
                 alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
                 botoesStatus['salvar'] = false;
@@ -5013,21 +5130,26 @@ function RegistrarBotoes() {
 
         let status = R.Status.val();
 
-        RecarregarAgendamento().then(function() {
-            if (status == RASCUNHO) {
-                ModificarFormState(RASCUNHO_EM_EDICAO);
-            } else if (status == AGENDADO) {
-                ModificarFormState(AGENDAMENTO_EM_EDICAO);
-            } else if(status == REGISTRO_DE_ANALISE) {
-                ModificarFormState(EM_REGISTRO_DE_ANALISE);
-            }
+        BloquearAgendamento(M.atual.agendamento.ID).then(function () {
+            return RecarregarAgendamento().then(function() {
+                if (status == RASCUNHO) {
+                    ModificarFormState(RASCUNHO_EM_EDICAO);
+                } else if (status == AGENDADO) {
+                    ModificarFormState(AGENDAMENTO_EM_EDICAO);
+                } else if(status == REGISTRO_DE_ANALISE) {
+                    ModificarFormState(EM_REGISTRO_DE_ANALISE);
+                }
 
-            return CarregarPaineisDeAnexos().then(function () {
-                botoesStatus['editar'] = false;
+                return CarregarPaineisDeAnexos().then(function () {
+                    botoesStatus['editar'] = false;
+                }).fail(function () {
+                    botoesStatus['editar'] = false;
+                });
             }).fail(function () {
                 botoesStatus['editar'] = false;
             });
-        }).fail(function () {
+        }).fail(function (response) {
+            alert('Ops., algo deu errado. Mensagem: ' + response.errorText);
             botoesStatus['editar'] = false;
         });
     });
@@ -5050,11 +5172,15 @@ function RegistrarBotoes() {
             botoesStatus['abandonar'] = true;
         }
 
-        anexosPendentes = [];
-        CarregarPaineisDeAnexos();
-        ModificarFormState(R.Status.val());
-        abandonarJustificativaInicioProgramado();
-        botoesStatus['abandonar'] = false;
+        DesbloquearAgendamento(M.atual.agendamento.ID).then(function () {
+            anexosPendentes = [];
+            CarregarPaineisDeAnexos();
+            ModificarFormState(R.Status.val());
+            abandonarJustificativaInicioProgramado();
+            botoesStatus['abandonar'] = false;
+        }).fail(function () {
+            botoesStatus['abandonar'] = false;
+        });
     });
 
     $('.btn-reagendar').click(function () {
@@ -5363,6 +5489,46 @@ function CarregarPaineisDeAnexos() {
     return $.when.apply($, promises);
 }
 
+function getListItemAttachments(listTitle, itemId, tableAnexo) {
+    var $promise = $.Deferred();
+    var ctx = SP.ClientContext.get_current();
+    var list = ctx.get_web().get_lists().getByTitle(listTitle);
+    var item = list.getItemById(itemId);
+    ctx.load(item);
+
+    ctx.executeQueryAsync(function () {
+        var hasAttachments = item.get_fieldValues()['Attachments'];
+        tableAnexo.show();
+        tableAnexo.empty();
+        tableAnexo.append('<thead class="thead-dark"><tr><th scope="col" width="10%">#</th><th scope="col" colspan="2">Anexos</th></tr></thead>');
+        tableAnexo.append('<tbody>');
+
+        if (hasAttachments) {
+            getAttachmentFiles(item).then(function (attachments) {
+                var contador = 1;
+                var table = '';
+
+                attachments.forEach(function (attachment) {
+                    table = table +
+                        '<tr>' +
+                        '   <th scope="row" width="10%">' + contador + '</th>' +
+                        '   <td><a href="' + _spPageContextInfo.siteAbsoluteUrl + '/Lists/AgendamentosResponsaveis/Attachments/' + itemId + '/' + attachment['name'] + '?web=1" target="_blank">' + attachment['name'] + '</a></td>' +
+                        '   <td><a name="ExcluirAnexo" href="#" onclick="DeleteAttachmentFile(this, \'Agendamentos - Responsáveis\', \'' + itemId + '\', \'' + attachment['name'] + '\'); return false;" style="display: none;">Excluir</a></td>' +
+                        '</tr>';
+                    contador = contador + 1;
+                });
+
+                tableAnexo.find('tbody').append(table);
+                $promise.resolve(attachments);
+            }).fail($promise.reject);
+        } else {
+            $promise.resolve([]);
+        }
+    }, $promise.reject);
+
+    return $promise;
+}
+
 function getAttachmentFiles(listItem) {
     var $promise = $.Deferred();
     var ctx = listItem.get_context();
@@ -5468,6 +5634,25 @@ function UpdateMultipleListItems(parametros) {
     }, parametros));
 
     return $promise;
+}
+
+function CarregarRegistro(id, lista, campos) {
+    var view = '';
+
+    $.each(campos, function (i, campo) {
+        view += '<FieldRef Name="' + campo + '" />';
+    });
+
+    return GetListItems({
+        listName: lista,
+        CAMLViewFields: '<ViewFields>' + view + '</ViewFields>',
+        CAMLQuery: '<Query><Where><Eq><FieldRef Name="ID" /><Value Type="Number">' + id + '</Value></Eq></Where></Query>',
+        CAMLRowLimit: 1
+    }).then(function (result) {
+        return {
+            record: result.records
+        };
+    });
 }
 
 function ListarRegistros(lista, campos, query) {
@@ -5634,6 +5819,31 @@ function ListarAnexos(tipo, id, status) {
     });
 }
 
+function ListarAnexosMigrados(responsavel_id, status) {
+    var $promise = $.Deferred();
+    var ctx = listItem.get_context();
+    var attachmentFolderUrl = String.format('{0}/Attachments/{1}', listItem.get_fieldValues()['FileDirRef'], listItem.get_fieldValues()['ID']);
+    var folder = ctx.get_web().getFolderByServerRelativeUrl(attachmentFolderUrl);
+    var files = folder.get_files();
+    ctx.load(files);
+
+    ctx.executeQueryAsync(function () {
+        var attachments = [];
+        var file;
+
+        for (var i = 0; file = files.get_item(i) ; i++) {
+            attachments.push({
+                url: file.get_serverRelativeUrl(),
+                name: file.get_name()
+            });
+        }
+
+        $promise.resolve(attachments);
+    }, $promise.reject);
+
+    return $promise;
+}
+
 function DeletarAnexo(id) {
     return DeletarRegistro(id, 'AgendamentosAnexos');
 }
@@ -5657,30 +5867,41 @@ function RemoverAnexoDaLista(id, element) {
     });
 }
 
-function ExibirAnexosNaLista(itemId, $tabelaAnexos, editavel) {
-    return ListarAnexos('responsavel', itemId, 'Ativo').then(function ($registros) {
-        var contador = 1;
-        var table = '';
+function ExibirAnexosNaLista(responsavelId, $tabelaAnexos, editavel) {
+    return CarregarAgendamentoIdOffset().then(function (offset) {
+        var $promise;
 
-        $tabelaAnexos.show();
-        $tabelaAnexos.empty();
-        $tabelaAnexos.append('<thead class="thead-dark"><tr><th scope="col" width="10%">#</th><th scope="col" colspan="2">Anexos</th></tr></thead>');
-        $tabelaAnexos.append('<tbody></tbody>');
+        // if (M.atual.agendamento.ID >= offset) {
+            $promise = ListarAnexos('responsavel', responsavelId, 'Ativo');
+        // }
+        // else {
+        //     $promise = ListarAnexosMigrados(responsavelId, 'Ativo');
+        // }
 
-        $registros.each(function () {
-            var id = this.attributes.ows_ID.value;
-            var nome = this.attributes.ows_nome.value;
+        return $promise.then(function ($registros) {
+            var contador = 1;
+            var table = '';
 
-            table = table +
-                '<tr>' +
-                '   <th scope="row" width="10%">' + contador + '</th>' +
-                '   <td><a href="' + _spPageContextInfo.siteAbsoluteUrl + '/Lists/AgendamentosAnexos/Attachments/' + id + '/' + nome + '?web=1" target="_blank">' + nome + '</a></td>' +
-                '   <td><a name="ExcluirAnexo" href="#" onclick="RemoverAnexoDaLista(\'' + id + '\', this); return false;"' + (!editavel ? ' style="display: none;"' : '') + '>Excluir</a></td>' +
-                '</tr>';
-            contador = contador + 1;
+            $tabelaAnexos.show();
+            $tabelaAnexos.empty();
+            $tabelaAnexos.append('<thead class="thead-dark"><tr><th scope="col" width="10%">#</th><th scope="col" colspan="2">Anexos</th></tr></thead>');
+            $tabelaAnexos.append('<tbody></tbody>');
+
+            $registros.each(function () {
+                var id = this.attributes.ows_ID.value;
+                var nome = this.attributes.ows_nome.value;
+
+                table = table +
+                    '<tr>' +
+                    '   <th scope="row" width="10%">' + contador + '</th>' +
+                    '   <td><a href="' + _spPageContextInfo.siteAbsoluteUrl + '/Lists/AgendamentosAnexos/Attachments/' + id + '/' + nome + '?web=1" target="_blank">' + nome + '</a></td>' +
+                    '   <td><a name="ExcluirAnexo" href="#" onclick="RemoverAnexoDaLista(\'' + id + '\', this); return false;"' + (!editavel ? ' style="display: none;"' : '') + '>Excluir</a></td>' +
+                    '</tr>';
+                contador = contador + 1;
+            });
+
+            $tabelaAnexos.find('tbody').append(table);
         });
-
-        $tabelaAnexos.find('tbody').append(table);
     });
 }
 
