@@ -1,13 +1,12 @@
-{  
-    "files": [
-      "src/app.ts"
-    ],
-    "compilerOptions": {  
-        "noImplicitAny": true,  
-        "target": "es5",
-        "lib": [
-          "es2017",
-          "dom"
-        ]    
-    }  
-} 
+{
+  "include": [
+    "./src/typescript"
+  ],
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "sourceMap": true,
+    "target": "es2017",
+    "experimentalDecorators": true
+  }
+}
