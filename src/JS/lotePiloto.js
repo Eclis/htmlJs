@@ -368,7 +368,7 @@ jQuery.extend({
 function ValidarAgendamentosGeral() {
     var errorAgendamentosGeral = 0;
     LimparValidacoes();
-    if ($('select#tipoDeLote').children('option:selected').val() === 'Selecione uma opção') {
+    if (R.TipoLote.children('option:selected').val() === 'Selecione uma opção') {
         errorAgendamentosGeral++;
         NotificarErroValidacao('select', 'select#tipoDeLote', '', '');
     }
@@ -520,7 +520,7 @@ function ValidarAgendamentosAgendamento() {
         errorAgendamentosAgendamento++;
         $('input#agendamentoDataInicioProgramado').attr("title", "Data não pode ser inválida.");
         NotificarErroValidacao('text', 'input#agendamentoDataInicioProgramado', '', '');
-    } else if ([EM_CRIACAO, RASCUNHO_EM_EDICAO, AGENDAMENTO_EM_EDICAO, RESP_ACOMP_AGENDADO_EM_EDICAO].indexOf(state) >= 0) {
+    } else if ((state == AGENDAMENTO_EM_EDICAO && M.antigo.agendamento.InicioProgramado != $('input#agendamentoDataInicioProgramado').val()) || [EM_CRIACAO, RASCUNHO_EM_EDICAO, RESP_ACOMP_AGENDADO_EM_EDICAO].indexOf(state) >= 0) {
         var SelectedDate = new Date($('input#agendamentoDataInicioProgramado').val().substring(6, 10), $('input#agendamentoDataInicioProgramado').val().substring(3, 5) - 1, $('input#agendamentoDataInicioProgramado').val().substring(0, 2));
         var CurrentDateTime = new Date();
         var CurrentDate = new Date(CurrentDateTime.getFullYear(), CurrentDateTime.getMonth(), CurrentDateTime.getDate());
@@ -1496,8 +1496,8 @@ function ValidarAgendamento() {
     var errorAbaAgendamento = ValidarAgendamentosAgendamento();
     var errosAbaJustificativa = ValidarAbaJustificativa();
 
-    var errorAgendamentosResponsaveis = ValidarAgendamentosResponsaveis($("select#tipoDeLote").val());
-    var errorAgendamentosAcompanhamentos = ValidarAgendamentosAcompanhamentos($("select#tipoDeLote").val());
+    var errorAgendamentosResponsaveis = ValidarAgendamentosResponsaveis(R.TipoLote.val());
+    var errorAgendamentosAcompanhamentos = ValidarAgendamentosAcompanhamentos(R.TipoLote.val());
 
     erroTotal = errosPnlGeral + errosAbaProduto + errorAbaAgendamento + errosAbaJustificativa + errorAgendamentosResponsaveis; //+ errorAgendamentosAcompanhamentos;
 
@@ -1808,7 +1808,7 @@ function AtualizarAgendamento(id) {
         if (memoriaStatusAnterior == REGISTRO_DE_ANALISE && memoriaGrupos.indexOf(listDemaisGrupos[0]) < 0) {
             responsaveis = GetMeusResponsaveisPorTipoDeLote(R.TipoLote.val());
         } else {
-            responsaveis = GetResponsaveisPorTipoDeLote(R.TipoLote.val());
+            responsaveis = GetResponsaveisPorTipoDeLoteECarregados(R.TipoLote.val());
         }
 
         memoriaAprovacoesAntigo = $.extend(true, {}, memoriaAprovacoesAtual);
@@ -1816,14 +1816,16 @@ function AtualizarAgendamento(id) {
         $.each(responsaveis, function (i, responsavel) {
             var usuarioDoPeoplePicker = PegarUsuarioDoPeoplePicker(responsavel.peoplePickerId);
 
-            if (usuarioDoPeoplePicker) {
+            if (memoriaAprovacoesAtual[responsavel.nome] == null && usuarioDoPeoplePicker) {
                 promises.push(CarregarUsuarioPorLoginName(usuarioDoPeoplePicker.loginName).then(function (usuario) {
-                    return AtualizarResponsavelAgendamento(
-                            memoriaAgendamentoAtual.ID,
-                            memoriaAgendamentoAtual.CodigoAgendamento,
-                            responsavel,
-                            usuario);
+                    return InserirResponsavelAgendamento(
+                        memoriaAgendamentoAtual.ID,
+                        memoriaAgendamentoAtual.CodigoAgendamento,
+                        responsavel,
+                        usuario);
                 }));
+            } else if (memoriaAprovacoesAtual[responsavel.nome] != null) {
+                promises.push(AtualizarResponsavelAgendamento(responsavel));
             }
         });
 
@@ -2079,22 +2081,14 @@ function ReprovarAgendamentoPorCodigoAgendamento(id) {
     return $promise;
 }
 
-function AtualizarResponsavelAgendamento(agendamentoId, codigoAgendamento, responsavel, usuario) {
-    if (memoriaAprovacoesAtual[responsavel.nome] == null) {
-        return InserirResponsavelAgendamento(
-                agendamentoId,
-                codigoAgendamento,
-                responsavel,
-                usuario);
-    }
-
+function AtualizarResponsavelAgendamento(responsavel) {
     return AtualizarAprovacaoEmMemoria(responsavel).then(function (aprovacao) {
         var $promise = $.Deferred();
         var campos = [];
 
         Object.keys(aprovacao).forEach(function (index) {
-            if (aprovacao[index] != null && !index.startsWith('_')) {
-                campos.push([index, aprovacao[index]]);
+            if ((aprovacao[index] != null || index == 'Pessoa') && !index.startsWith('_')) {
+                campos.push([index, aprovacao[index] != null ? aprovacao[index] : '']);
             }
         });
 
@@ -2435,11 +2429,11 @@ function CarregarAgendamentoResponsaveis(agendamento) {
             var promessas = [];
 
             $.each(registros, function () {
-                var responsavel = GetResponsavelPorNomeETipoDeLote(this.attributes.ows_TipoResponsavel.value, $('#tipoDeLote').val());
+                var responsavel = GetResponsavelPorNomeETipoDeLote(this.attributes.ows_TipoResponsavel.value, R.TipoLote.val());
 
                 memoriaAprovacoesAtual[this.attributes.ows_TipoResponsavel.value] = {
                     ID: this.attributes.ows_ID.value,
-                    Pessoa: this.attributes.ows_Pessoa.value,
+                    Pessoa: this.attributes.ows_Pessoa != undefined ? this.attributes.ows_Pessoa.value : null,
                     TipoResponsavel: this.attributes.ows_TipoResponsavel.value,
                     Resultado: this.attributes.ows_Resultado.value,
                     ExecucaoLoteAcompanhada: this.attributes.ows_ExecucaoLoteAcompanhada.value,
@@ -2481,11 +2475,13 @@ function CarregarAgendamentoResponsaveis(agendamento) {
                         }
                     }
 
-                    var usuarioNome = FiltrarNomeUsuarioPorPessoaId(this.attributes.ows_Pessoa.value);
+                    if (this.attributes.ows_Pessoa) {
+                        var usuarioNome = FiltrarNomeUsuarioPorPessoaId(this.attributes.ows_Pessoa.value);
 
-                    promessas.push(CarregarUsuarioPorLoginName(usuarioNome).then(function (usuario) {
-                        PreencherPeoplePicker(responsavel.peoplePickerId, usuario);
-                    }));
+                        promessas.push(CarregarUsuarioPorLoginName(usuarioNome).then(function (usuario) {
+                            PreencherPeoplePicker(responsavel.peoplePickerId, usuario);
+                        }));
+                    }
 
                     if (responsavel.abaAnaliseId) {
                         promessas.push(PreencherAbaAnalises(responsavel));
@@ -2545,6 +2541,9 @@ function AtualizarAprovacaoEmMemoria(responsavel) {
                     break;
             }
         }
+    } else if (responsavel.abaAcompanhanteId) {
+        var $abaAcompanhante = $('#' + responsavel.abaAcompanhanteId);
+        memoriaAprovacoesAtual[responsavel.nome].ExecucaoLoteAcompanhada = $abaAcompanhante.find('[name=ExecucaoLoteAcompanhada]').prop('checked') ? '1' : '0';
     }
 
     var usuarioDoPeoplePicker = PegarUsuarioDoPeoplePicker(responsavel.peoplePickerId);
@@ -2854,7 +2853,7 @@ function CarregarLinhasEquipamentosById(linhaEquipamentoId) {
             }
 
             $(Data.responseXML).SPFilterNode("z:row").each(function () {
-                if ($("select#tipoDeLote").val() == 'Fabricação') {
+                if (R.TipoLote.val() == 'Fabricação') {
                     $labelQuantidadePecas.text("Quantidade (kg) de " + AtributoNumber($(this).attr("ows_CapacidadeMin")) + " até " + AtributoNumber($(this).attr("ows_CapacidadeMax")));
                 } else {
                     $labelQuantidadePecas.text("Quantidade (peças) de " + AtributoNumber($(this).attr("ows_CapacidadeMin")) + " até " + AtributoNumber($(this).attr("ows_CapacidadeMax")));
@@ -3150,7 +3149,7 @@ function CarregarListaTiposLotes() {
 
             $(Data.responseXML).find('Field[DisplayName="Tipo de Lote"] CHOICE').each(function () {
                 if (this.innerHTML != "Picking") {
-                    $('select#tipoDeLote').append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
+                    R.TipoLote.append('<option value="' + this.innerHTML + '">' + this.innerHTML + '</option>');
                 }
             });
 
@@ -3194,7 +3193,7 @@ function CarregarAgendamentoIdOffset() {
 
 function DispararCarregarLinhasEquipamentos() {
     var fabricaVal = $("select#fabrica :selected").text();
-    var tipoLoteVal = $("select#tipoDeLote").val();
+    var tipoLoteVal = R.TipoLote.val();
 
     if (tipoLoteVal && fabricaVal) {
         CarregarLinhasEquipamentos(fabricaVal, tipoLoteVal);
@@ -3442,7 +3441,7 @@ function ResponsaveisAtual() {
     M.atual.aprovacoes = {};
     var promises = [];
 
-    $.each(GetResponsaveisPorTipoDeLote(M.atual.agendamento.TipoLote), function (i, responsavel) {
+    $.each(GetResponsaveisPorTipoDeLoteECarregados(M.atual.agendamento.TipoLote), function (i, responsavel) {
         promises.push(ResponsavelAtual(responsavel));
     });
 
@@ -3598,6 +3597,30 @@ function GetResponsaveisPorTipoDeLote(tipoDeLote) {
     });
 }
 
+function GetResponsaveisPorTipoDeLoteECarregados(tipoDeLote) {
+    var responsaveis = $.grep(SetoresResponsaveis, function (responsavel) {
+        return responsavel.tipoDeLote == tipoDeLote || (responsavel.tipoDeLote == tipoDeLote && memoriaAprovacoesAtual[responsavel.nome]);
+    });
+
+    Object.keys(memoriaAprovacoesAtual).forEach(function (index) {
+        if (ResponsaveisPossuiNome(responsaveis, index)) {
+            responsaveis.push(GetResponsavelPorNome(index));
+        }
+    });
+
+    return responsaveis;
+}
+
+function ResponsaveisPossuiNome(responsaveis, nome) {
+    for (var i = 0; i < responsaveis.length; i ++) {
+        if (responsaveis[i].nome == nome) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 function GetResponsavelPorNomeETipoDeLote(nome, tipoDeLote) {
     for (var i = 0; i < SetoresResponsaveis.length; i ++) {
         if (SetoresResponsaveis[i].nome == nome && SetoresResponsaveis[i].tipoDeLote == tipoDeLote) {
@@ -3626,6 +3649,12 @@ function GetResponsavelPorPeoplePickerId(peoplePickerId) {
     }
 
     return null;
+}
+
+function GetAcompanhantesPorTipoDeLote(tipoDeLote) {
+    return $.grep(SetoresResponsaveis, function (responsavel) {
+        return responsavel.tipoDeLote == tipoDeLote && responsavel.abaAcompanhanteId != null;
+    });
 }
 
 function PegarPeoplePickerPorId(peoplePickerId) {
@@ -3843,7 +3872,7 @@ function ModificarBotoesPorFormState(formState) {
                     var inovDe = listDemaisGrupos[4];
                     var inovDf = listDemaisGrupos[5];
                     var qualidade = listDemaisGrupos[7];
-                    var tipoLote = $("select#tipoDeLote").val();
+                    var tipoLote = R.TipoLote.val();
 
                     if (tipoLote == 'Brinde' && usuarioPertenceAoGrupo($xml, qualidade)) {
                         $btnExecutado.show();
@@ -4432,7 +4461,7 @@ function ModificarAbasPorFormState(formState) {
 function ListarPeoplePicker() {
     var res = [];
 
-    $.each(GetResponsaveisPorTipoDeLote($('#tipoDeLote').val()), function (i, it) {
+    $.each(GetResponsaveisPorTipoDeLoteECarregados(R.TipoLote.val()), function (i, it) {
         try {
             var usuario = $.extend({}, PegarUsuarioDoPeoplePicker(it.peoplePickerId, true));
             usuario.setor = it.nome;
@@ -4648,6 +4677,11 @@ function PreencherPeoplePicker(peoplePickerId, usuario) {
     return $promise;
 }
 
+function ResetarPeoplePickerPorPeoplePickerId(peoplePickerId) {
+    var peoplePicker = PegarPeoplePickerPorId(peoplePickerId);
+    peoplePicker.DeleteProcessedUser();
+}
+
 function PreencherResponsavelDlPcl() {
     return PreencherPeoplePicker('peoplePickerAbaRespRespDLPCL', UsuarioLogado);
 }
@@ -4673,6 +4707,8 @@ function RegistrarBindings() {
                 $('#maoObra').prop('disabled', true);
                 $('#maoObra').val('');
             }
+
+            ResetarAbaAcompanhamento();
         }
 
         DispararCarregarLinhasEquipamentos();
@@ -4799,6 +4835,15 @@ function RegistrarBindings() {
     });
 
     document.addEventListener('click', registrarBloqueadorPeoplePicker, true);
+}
+
+function ResetarAbaAcompanhamento() {
+    var acompanhantes = GetAcompanhantesPorTipoDeLote(R.TipoLote.val());
+
+    $.each(acompanhantes, function (i, acompanhante) {
+        $('#' + acompanhante.abaAcompanhanteId).find('[name=ExecucaoLoteAcompanhada]').prop('checked', 0);
+        ResetarPeoplePickerPorPeoplePickerId(acompanhante.peoplePickerId);
+    });
 }
 
 function habilitarJustificativaInicioProgramado() {
@@ -4994,7 +5039,15 @@ function RegistrarBotoes() {
                 botoesStatus['salvar'] = true;
             }
 
-            DesbloquearAgendamento(M.atual.agendamento.ID).then(function () {
+            var $promise;
+
+            if (!M.atual.agendamento) {
+                $promise = $.when(true);
+            } else {
+                $promise = DesbloquearAgendamento(M.atual.agendamento.ID);
+            }
+
+            $promise.then(function () {
                 SalvarAgendamento().then(function () {
                     window.history.pushState('Object', '', _spPageContextInfo.siteAbsoluteUrl + '/Lists/Agendamentos/DispForm.aspx?ID=' + memoriaAgendamentoAtual.ID);
                     bloquearBotoesAbaAnexo();

@@ -14,7 +14,7 @@ var notifier = require("node-notifier");
 const settings = require("./config/settings.js");
 
 let env: string = yargs.argv.env || 'development';
-let branch: string = yargs.argv.usuario || 'main';
+let branch: string = yargs.argv.branch || 'main';
 
 console.log('=== Efetuando deploy para o ambiente [' + env.toUpperCase() + '] na branch [' + branch.toUpperCase() + '] ===');
 
