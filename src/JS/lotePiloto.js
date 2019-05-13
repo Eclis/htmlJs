@@ -61,7 +61,7 @@ var historicos = {
     'DESCRICAO_PRODUTO_ALTERADO':   'Descrição do Produto alterado de "%s" para "%s"',
     'PROJETO_ALTERADO':             'Projeto alterado de "%s" para "%s"',
     'FORMULA_ALTERADO':             'Fórmula alterado de "%s" para "%s"',
-    'QUANTIDADE_PECAS_ALTERADO':          'Quantidade alterado de "%s" para "%s"',
+    'QUANTIDADE_PECAS_ALTERADO':    'Quantidade alterado de "%s" para "%s"',
     'RESPONSAVEL_AMOSTRA_ALTERADO': 'Responsável pela Amostra alterado de "%s" para "%s"',
     'QUANTIDADE_AMOSTRAS_ALTERADO': 'Quantidade de Amostras alterado de "%s" para "%s"',
     'CENTRO_CUSTO_ALTERADO':        'Centro de custo - PEP - NT alterado de "%s" para "%s"',
@@ -2549,6 +2549,15 @@ function AtualizarAprovacaoEmMemoria(responsavel) {
     var usuarioDoPeoplePicker = PegarUsuarioDoPeoplePicker(responsavel.peoplePickerId);
 
     if (!usuarioDoPeoplePicker) {
+        if (memoriaAprovacoesAntigo[responsavel.nome].Pessoa != null) {
+            RegistrarHistoricoPendente(
+                historicos.RESPONSAVEL_ALTERADO,
+                true,
+                responsavel.nome,
+                FiltrarNomeUsuarioPorPessoaId(memoriaAprovacoesAntigo[responsavel.nome].Pessoa),
+                "");
+        }
+
         return $.when(memoriaAprovacoesAtual[responsavel.nome]);
     }
 
@@ -3599,11 +3608,11 @@ function GetResponsaveisPorTipoDeLote(tipoDeLote) {
 
 function GetResponsaveisPorTipoDeLoteECarregados(tipoDeLote) {
     var responsaveis = $.grep(SetoresResponsaveis, function (responsavel) {
-        return responsavel.tipoDeLote == tipoDeLote || (responsavel.tipoDeLote == tipoDeLote && memoriaAprovacoesAtual[responsavel.nome]);
+        return responsavel.tipoDeLote == tipoDeLote;
     });
 
     Object.keys(memoriaAprovacoesAtual).forEach(function (index) {
-        if (ResponsaveisPossuiNome(responsaveis, index)) {
+        if (!ResponsaveisPossuiNome(responsaveis, index)) {
             responsaveis.push(GetResponsavelPorNome(index));
         }
     });
