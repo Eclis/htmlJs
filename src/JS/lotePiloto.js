@@ -106,6 +106,8 @@ var R = {
     InicioProgramadoComentarios: $('textarea[name="InicioProgramadoComentarios"]'),
     Status: $('select#status'),
     TipoLote: $('[name=TipoLote]'),
+    LinhaEquipamento: $('[name=LinhaEquipamento]'),
+    Fabrica: $('[name=Fabrica]'),
     AnalisesQualidadeResponsavelPainel: $('#tab-qualidade-resp'),
     AnalisesQualidadeResponsavelAnexo: $('#txtAtt-tab-analise-qualidade'),
     AnalisesQualidadeGerenteAnexo: $('#txtAtt-tab-analise-qualidade-ger'),
@@ -4850,7 +4852,7 @@ function ResetarAbaAcompanhamento() {
     var acompanhantes = GetAcompanhantesPorTipoDeLote(R.TipoLote.val());
 
     $.each(acompanhantes, function (i, acompanhante) {
-        $('#' + acompanhante.abaAcompanhanteId).find('[name=ExecucaoLoteAcompanhada]').prop('checked', 0);
+        $('#' + acompanhante.abaAcompanhanteId).find('[name=ExecucaoLoteAcompanhada]').prop('checked', 0).change();
         ResetarPeoplePickerPorPeoplePickerId(acompanhante.peoplePickerId);
     });
 }

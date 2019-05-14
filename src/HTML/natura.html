@@ -24,7 +24,19 @@
 <script type="text/javascript" src="/_layouts/15/1033/sts_strings.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.SPServices/2014.02/jquery.SPServices.js"></script>
 <script type="text/javascript" src="/sites/DEV_LotePiloto/SiteAssets/libs/summernote/summernote-bs4.min.js"></script>
-<script type="text/javascript" src="/sites/DEV_LotePiloto/SiteAssets/deploy/main/JS/lotePiloto.js?250220191022"></script>
+<script type="text/javascript">
+    var $ENV = 'DEVELOPMENT';
+
+    if ($ENV == 'PRODUCTION') {
+        var script = document.createElement("script");
+        script.src = "/sites/DEV_LotePiloto/SiteAssets/deploy/main/JS/lotePiloto.js";
+        document.getElementsByTagName("head")[0].appendChild(script);
+    } else {
+        $(document).ready(function () {
+            $.getScript("/sites/DEV_LotePiloto/SiteAssets/deploy/main/JS/lotePiloto.js");
+        });
+    }
+</script>
 <style>
     .note-editor.note-frame.card button {
         min-width: unset !important;

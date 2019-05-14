@@ -16,8 +16,6 @@ const settings = require("./config/settings.js");
 let env: string = yargs.argv.env || 'development';
 let branch: string = yargs.argv.branch || 'main';
 
-console.log('=== Efetuando deploy para o ambiente [' + env.toUpperCase() + '] na branch [' + branch.toUpperCase() + '] ===');
-
 interface Settings {
     siteUrl: string,
     clientId: string,
@@ -112,11 +110,14 @@ export class Gulpfile {
             .pipe(replace('/sites/DEV_LotePiloto/SiteAssets/deploy/main/JS/agendamentos.js', settings.envs[env].siteUrl + '/SiteAssets/deploy/' + branch + '/JS/agendamentos.js'))
             .pipe(replace('/sites/DEV_LotePiloto/SiteAssets/main.aspx', settings.envs[env].siteUrl + '/SiteAssets/' + branch + '.aspx'))
             .pipe(replace('/sites/DEV_LotePiloto/SiteAssets/main-agendamentos.aspx', settings.envs[env].siteUrl + '/SiteAssets/' + branch + '-agendamentos.aspx'))
+            .pipe(replace('/sites/DEV_LotePiloto/SiteAssets/', settings.envs[env].siteUrl + '/SiteAssets/'))
+            .pipe(replace('ENV = \'DEVELOPMENT\'', 'ENV = \'' + env.toUpperCase() + '\''))
             .pipe(gulp.dest('dist'));
     }
 
     @Task()
     deploy() {
+        console.log('=== Efetuando deploy para o ambiente [' + env.toUpperCase() + '] na branch [' + branch.toUpperCase() + '] ===');
         return new Deployer(settings.envs[env]).deploy(branch);
     }
 
@@ -130,6 +131,12 @@ export class Gulpfile {
         cb();
     }
 
+    @SequenceTask()
+    build() {
+        console.log('=== Efetuando build para o ambiente [' + env.toUpperCase() + '] na branch [' + branch.toUpperCase() + '] ===');
+        return ['build-js', 'build-html'];
+    }
+
     @Task()
     watch() {
         return watch(['src/HTML/*.html', 'src/JS/*.js'], gulp.series(['build-js', 'build-html'], 'deploy', 'notify'));
@@ -137,6 +144,6 @@ export class Gulpfile {
 
     @SequenceTask()
     default() {
-        return [['build-js', 'build-html'], 'deploy', 'notify'];
+        return ['build', 'deploy', 'notify'];
     }
 }
