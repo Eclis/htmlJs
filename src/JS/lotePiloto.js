@@ -2308,14 +2308,14 @@ function BloquearAgendamento(ID) {
                 } else {
                     $promise.reject({
                         errorCode: '0x99999998',
-                        errorText: 'Não foi possível bloquear o Agendamento. O Agendamento já está em uso por ' + novo_bloqueio.usuario_nome
+                        errorText: 'Este lote está sendo editado por ' + bloqueio.usuario_nome + '. Aguarde e tente novamente mais tarde ou entre em contato com ' + novo_bloqueio.usuario_nome + '.'
                     });
                 }
             });
         } else {
             $promise.reject({
                 errorCode: '0x99999998',
-                errorText: 'Não foi possível bloquear o Agendamento. O Agendamento já está em uso por ' + bloqueio.usuario_nome
+                errorText: 'Este lote está sendo editado por ' + bloqueio.usuario_nome + '. Aguarde e tente novamente mais tarde ou entre em contato com ' + bloqueio.usuario_nome + '.'
             });
         }
     }).fail(function (erro) {

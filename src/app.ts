@@ -115,6 +115,12 @@ export class Gulpfile {
             .pipe(gulp.dest('dist'));
     }
 
+    @SequenceTask()
+    build() {
+        console.log('=== Efetuando build para o ambiente [' + env.toUpperCase() + '] na branch [' + branch.toUpperCase() + '] ===');
+        return ['build-js', 'build-html'];
+    }
+
     @Task()
     deploy() {
         console.log('=== Efetuando deploy para o ambiente [' + env.toUpperCase() + '] na branch [' + branch.toUpperCase() + '] ===');
@@ -129,12 +135,6 @@ export class Gulpfile {
         });
 
         cb();
-    }
-
-    @SequenceTask()
-    build() {
-        console.log('=== Efetuando build para o ambiente [' + env.toUpperCase() + '] na branch [' + branch.toUpperCase() + '] ===');
-        return ['build-js', 'build-html'];
     }
 
     @Task()
